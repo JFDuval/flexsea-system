@@ -261,7 +261,32 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
         #ifdef BOARD_TYPE_FLEXSEA_MANAGE
-        //...
+
+		//uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)12345, &tmp0, &tmp1);	//Fake data
+		buf[P_DATA1] = tmp0;
+		buf[P_DATA1 + 1] = tmp1;
+		//uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
+		buf[P_DATA1 + 2] = tmp0;
+		buf[P_DATA1 + 3] = tmp1;
+		//uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
+		buf[P_DATA1 + 4] = tmp0;
+		buf[P_DATA1 + 5] = tmp1;
+
+		//uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
+		buf[P_DATA1 + 6] = tmp0;
+		buf[P_DATA1 + 7] = tmp1;
+		//uint16_to_bytes((uint16_t)imu.accel.y, &tmp0, &tmp1);
+		buf[P_DATA1 + 8] = tmp0;
+		buf[P_DATA1 + 9] = tmp1;
+		//uint16_to_bytes((uint16_t)imu.accel.z, &tmp0, &tmp1);
+		buf[P_DATA1 + 10] = tmp0;
+		buf[P_DATA1 + 11] = tmp1;
+
+		//...
+
+		bytes = P_DATA1 + 12;     //Bytes is always last+1
+
         #endif  //BOARD_TYPE_FLEXSEA_MANAGE
 
         #ifdef BOARD_TYPE_FLEXSEA_GOSSIP
@@ -359,6 +384,10 @@ void rx_cmd_data_read_all(uint8_t *buf)
 		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
+		#endif
+
+		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
 		//Delayed response:
 		#ifdef USE_RS485
 		rs485_reply_ready(comm_str_485_1, (numb));
@@ -368,11 +397,12 @@ void rx_cmd_data_read_all(uint8_t *buf)
 		usb_puts(comm_str_485_1, (numb));
 		#endif
 
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+		#endif 	//BOARD_TYPE_FLEXSEA_EXECUTE
 
 		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-		//ToDo
+		//ToDo is that right?
+		flexsea_send_serial_master(PORT_USB, comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -416,18 +446,19 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 exec_s_ptr->temp = buf[P_DATA1+26];
                 exec_s_ptr->status1 = buf[P_DATA1+27];
                 exec_s_ptr->status2 = buf[P_DATA1+28];
-
-                /*
-                //Plan uses the Super Structure to save decoded values:
-                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
-                execD_s_ptr->exRaw = *exec_s_ptr;
-                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
-                */
             }
             else if(buf[P_XID] == FLEXSEA_MANAGE_1)
             {
 
-                //Decode values
+                //Store values:
+				mn_s_ptr->gyro.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+0], buf[P_DATA1+1]));
+				mn_s_ptr->gyro.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]));
+				mn_s_ptr->gyro.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]));
+
+				mn_s_ptr->accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]));
+				mn_s_ptr->accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
+				mn_s_ptr->accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
+
                 //...
 
             }
