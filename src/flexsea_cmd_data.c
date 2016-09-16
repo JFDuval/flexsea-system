@@ -56,6 +56,11 @@ extern "C" {
 #include "main.h"
 #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
+//Gossip boards only:
+#ifdef BOARD_TYPE_FLEXSEA_GOSSIP
+#include "main.h"
+#endif	//BOARD_TYPE_FLEXSEA_GOSSIP
+
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
@@ -176,7 +181,7 @@ void rx_cmd_data_acqui(uint8_t *buf)
 	}
 }
 
-//Transmission of a READ_ALL command
+//Transmission of a READ_ALL command - used by all boards
 uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len)
 {
 	uint8_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
@@ -254,6 +259,39 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		bytes = P_DATA1 + 29;     //Bytes is always last+1
 		
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+
+        #ifdef BOARD_TYPE_FLEXSEA_MANAGE
+        //...
+        #endif  //BOARD_TYPE_FLEXSEA_MANAGE
+
+        #ifdef BOARD_TYPE_FLEXSEA_GOSSIP
+        
+		//Arguments:
+		uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
+		buf[P_DATA1] = tmp0;
+		buf[P_DATA1 + 1] = tmp1;
+		uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
+		buf[P_DATA1 + 2] = tmp0;
+		buf[P_DATA1 + 3] = tmp1;
+		uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
+		buf[P_DATA1 + 4] = tmp0;
+		buf[P_DATA1 + 5] = tmp1;
+		
+		uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
+		buf[P_DATA1 + 6] = tmp0;
+		buf[P_DATA1 + 7] = tmp1;
+		uint16_to_bytes((uint16_t)imu.accel.y, &tmp0, &tmp1);
+		buf[P_DATA1 + 8] = tmp0;
+		buf[P_DATA1 + 9] = tmp1;
+		uint16_to_bytes((uint16_t)imu.accel.z, &tmp0, &tmp1);
+		buf[P_DATA1 + 10] = tmp0;
+		buf[P_DATA1 + 11] = tmp1;
+		
+		bytes = P_DATA1 + 12;     //Bytes is always last+1
+		
+        #endif  //BOARD_TYPE_FLEXSEA_GOSSIP
+
+        //ToDo other boards
 	}
 	else
 	{
@@ -265,15 +303,17 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 	return bytes;
 }
 
-//Reception of a READ_ALL command
+//Reception of a READ_ALL command - used by all boards
 void rx_cmd_data_read_all(uint8_t *buf)
 {
 	uint8_t numb = 0, sampling = 0;
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//Structure pointer. Points to exec1 by default.
+	//Structure pointers ***ToDo this isn't clean
     struct execute_s *exec_s_ptr = &exec1;
+    struct manage_s *mn_s_ptr = &manag1;
+    struct gossip_s *go_s_ptr = &gossip1;
 
 	//Point to the appropriate structure:
 	if(buf[P_XID] == FLEXSEA_EXECUTE_1)
@@ -299,7 +339,8 @@ void rx_cmd_data_read_all(uint8_t *buf)
 	{
 		//Received a Read command from our master, prepare a reply:
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+        #if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE) \
+            || (defined BOARD_TYPE_FLEXSEA_GOSSIP))
 
 		//Generate the reply:
 		numb = tx_cmd_data_read_all(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
@@ -307,7 +348,9 @@ void rx_cmd_data_read_all(uint8_t *buf)
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
 		//Delayed response:
+		#ifdef USE_RS485
 		rs485_reply_ready(comm_str_485, (numb));
+		#endif	//USE_RS485
 		
 		#ifdef USE_USB
 		usb_puts(comm_str_485, (numb));
@@ -334,36 +377,54 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-			//Store values:
-				
-			exec_s_ptr->gyro.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+0], buf[P_DATA1+1]));
-			exec_s_ptr->gyro.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]));
-			exec_s_ptr->gyro.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]));
-			
-			exec_s_ptr->accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]));
-			exec_s_ptr->accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
-			exec_s_ptr->accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
-			
-			exec_s_ptr->strain = (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
-			exec_s_ptr->analog[0] = (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
-			exec_s_ptr->analog[1] = (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
-	
-			exec_s_ptr->enc_display = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+18], buf[P_DATA1+19], \
-										buf[P_DATA1+20], buf[P_DATA1+21]));
-			
-			exec_s_ptr->current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+22], buf[P_DATA1+23]));
+            //***ToDo*** replace that by a boadr type call!
+            if(buf[P_XID] == FLEXSEA_EXECUTE_1 || buf[P_XID] == FLEXSEA_EXECUTE_2)
+            {
+                //Store values:
 
-			exec_s_ptr->volt_batt = buf[P_DATA1+24];
-			exec_s_ptr->volt_int = buf[P_DATA1+25];
-			exec_s_ptr->temp = buf[P_DATA1+26];
-			exec_s_ptr->status1 = buf[P_DATA1+27];
-			exec_s_ptr->status2 = buf[P_DATA1+28];
+                exec_s_ptr->gyro.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+0], buf[P_DATA1+1]));
+                exec_s_ptr->gyro.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]));
+                exec_s_ptr->gyro.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]));
 
-			#ifdef MULTIPLE_COMMANDS
-			//To interface with Python:
-			printf("[%i,%i,%i,%i,%i,%i,%i]\n", exec1.encoder, exec1.current, exec1.imu.x, exec1.imu.y, exec1.imu.z, \
-					exec1.strain, exec1.analog[0]);
-			#endif
+                exec_s_ptr->accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]));
+                exec_s_ptr->accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
+                exec_s_ptr->accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
+
+                exec_s_ptr->strain = (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
+                exec_s_ptr->analog[0] = (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
+                exec_s_ptr->analog[1] = (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
+
+                exec_s_ptr->enc_display = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+18], buf[P_DATA1+19], \
+                                            buf[P_DATA1+20], buf[P_DATA1+21]));
+
+                exec_s_ptr->current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+22], buf[P_DATA1+23]));
+
+                exec_s_ptr->volt_batt = buf[P_DATA1+24];
+                exec_s_ptr->volt_int = buf[P_DATA1+25];
+                exec_s_ptr->temp = buf[P_DATA1+26];
+                exec_s_ptr->status1 = buf[P_DATA1+27];
+                exec_s_ptr->status2 = buf[P_DATA1+28];
+
+                #ifdef MULTIPLE_COMMANDS
+                //To interface with Python:
+                printf("[%i,%i,%i,%i,%i,%i,%i]\n", exec1.encoder, exec1.current, exec1.imu.x, exec1.imu.y, exec1.imu.z, \
+                        exec1.strain, exec1.analog[0]);
+                #endif
+            }
+            else if(buf[P_XID] == FLEXSEA_MANAGE_1)
+            {
+
+            }
+            else if(buf[P_XID] == FLEXSEA_GOSSIP_1)
+            {
+                go_s_ptr->gyro.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+0], buf[P_DATA1+1]));
+                go_s_ptr->gyro.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]));
+                go_s_ptr->gyro.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]));
+
+                go_s_ptr->accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]));
+                go_s_ptr->accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
+                go_s_ptr->accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
+            }
 			
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 		}
@@ -433,7 +494,7 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;		
 		
-		uint16_to_bytes((uint16_t)as5047.angle_raw, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)as5047.angle_raws[0], &tmp0, &tmp1);
 		buf[P_DATA1 + 12] = tmp0;
 		buf[P_DATA1 + 13] = tmp1;
 		

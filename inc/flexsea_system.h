@@ -198,6 +198,7 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 #define FLEXSEA_STRAIN_1				(FLEXSEA_STRAIN_BASE + 0)
 #define FLEXSEA_GOSSIP_BASE          	80						//Gossip: from 80 to 89
 #define FLEXSEA_GOSSIP_1				(FLEXSEA_GOSSIP_BASE + 0)
+#define FLEXSEA_GOSSIP_2				(FLEXSEA_GOSSIP_BASE + 1)
 
 //Software error (SE) codes. Values will be ORed
 #define SE_DEFAULT						0
@@ -294,6 +295,14 @@ struct execute_s
 
 struct manage_s
 {
+    struct xyz_s gyro;
+    struct xyz_s accel;
+
+    uint16_t analog[8];
+    uint16_t digitalIn;
+
+    uint8_t status1;
+
 	uint8_t sw1;
 	uint8_t sampling;
 };
@@ -352,6 +361,26 @@ struct user_data_s
 	int32_t w[4];
 };
 
+//ToDo fill
+struct gossip_s
+{
+    struct xyz_s gyro;
+    struct xyz_s accel;
+    struct xyz_s magneto;
+
+    uint16_t capsense[4];
+
+    uint16_t io[2];
+    uint8_t status;
+};
+
+//ToDo fill
+struct battery_s
+{
+};
+
+
+
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
@@ -360,9 +389,11 @@ struct user_data_s
 
 extern struct execute_s exec1, exec2, exec3, exec4;
 extern struct ricnu_s ricnu_1;
-extern struct manage_s manag1;
+extern struct manage_s manag1, manag2;
 extern struct strain_s strain[6];
 extern struct in_control_s in_control_1;
+extern struct gossip_s gossip1, gossip2;
+extern struct battery_s batt1;
 
 #endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
