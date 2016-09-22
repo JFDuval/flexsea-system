@@ -56,6 +56,18 @@ struct battery_s batt1;
 
 #endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
+//Super Structures for the Plan-GUI (they include decoded values):
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct executeD_s execD1, execD2, execD3, execD4;
+struct ricnuD_s ricnuD_1;
+struct manageD_s managD1, managD2;
+struct strainD_s strainD[6];
+struct gossipD_s gossipD1, gossipD2;
+struct batteryD_s battD1;
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
+
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)
 struct user_data_s user_data_1;
 #endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)

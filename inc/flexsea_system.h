@@ -263,6 +263,12 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 // Structure(s):
 //****************************************************************************
 
+//Note: most structures will have two versions. The original, aka 'raw'
+//version has multiple data types, and is used by the different boards.
+//The version with 'D' in the name is Decoded => it includes extra variables
+//(often with the same name) holding decoded values (ex.: mV and not ADC counts)
+//The 'D' values are always int32
+
 //Inner structure for the gyro and the accelero
 struct xyz_s
 {
@@ -270,6 +276,17 @@ struct xyz_s
      int16_t y;
      int16_t z;
 };
+
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct xyzD_s
+{
+     int32_t x;
+     int32_t y;
+     int32_t z;
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 struct execute_s
 {
@@ -279,7 +296,6 @@ struct execute_s
 	uint16_t strain;
 	uint16_t analog[8];
 	int16_t current;
-	//int32_t encoder;
 	int32_t enc_display;
 	int32_t enc_control;
 	int32_t enc_commut;
@@ -290,8 +306,30 @@ struct execute_s
 	uint8_t status1;
 	uint8_t status2;
 
-	struct ctrl_s ctrl;	//ToDo update previous fields (ex: PWM should be under ctrl)
+    struct ctrl_s ctrl;
 };
+
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct executeD_s
+{
+    //Raw values:
+    struct execute_s exRaw;
+
+    //Decoded fields:
+
+    struct xyzD_s gyro;     //deg/s
+    struct xyzD_s accel;    //mg
+
+    int32_t strain;         //%
+    int32_t current;        //mA
+    int32_t volt_batt;      //mV
+    int32_t volt_int;       //mV
+    int32_t temp;           //Celsius x10
+    int32_t analog[8];      //mV
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 struct manage_s
 {
@@ -306,6 +344,23 @@ struct manage_s
 	uint8_t sw1;
 	uint8_t sampling;
 };
+
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct manageD_s
+{
+    //Raw values:
+    struct manage_s mnRaw;
+
+    //Decoded values:
+
+    struct xyzD_s gyro;     //deg/s
+    struct xyzD_s accel;    //mg
+
+    int32_t analog[8];      //mV
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 //In Control Tool:
 struct in_control_s
@@ -343,6 +398,21 @@ struct strain_s
 	uint16_t filtered_strain;
 };
 
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct strainD_s
+{
+    //Raw values:
+    struct strain_s stRaw;
+
+    //Decoded values:
+
+    //ToDo
+    //...
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
+
 //Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
 struct ricnu_s
 {
@@ -350,10 +420,21 @@ struct ricnu_s
 	struct execute_s ex;
 	
 	//Extra sensors:
-	//uint16_t enc_mot;
-	//uint16_t enc_joint;
-	uint16_t ext_strain[6];	
+    uint16_t ext_strain[6];
 };
+
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct ricnuD_s
+{
+    //Execute:
+    struct executeD_s ex;
+
+    //Extra sensors:
+    uint16_t ext_strain[6];
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 struct user_data_s
 {
@@ -361,7 +442,10 @@ struct user_data_s
 	int32_t w[4];
 };
 
-//ToDo fill
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
+
 struct gossip_s
 {
     struct xyz_s gyro;
@@ -374,12 +458,48 @@ struct gossip_s
     uint8_t status;
 };
 
-//ToDo fill
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct gossipD_s
+{
+    //Raw values:
+    struct gossip_s goRaw;
+
+    //Decoded values:
+
+    struct xyzD_s gyro;     //deg/s
+    struct xyzD_s accel;    //mg
+    struct xyzD_s magneto;  //?
+};
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
+
 struct battery_s
 {
+    uint16_t voltage;
+    int16_t current;
+    uint8_t temp;
+    uint8_t pushbutton;
+    uint8_t status;
+};
+
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+struct batteryD_s
+{
+    //Raw values:
+    struct battery_s baRaw;
+
+    //Decoded values:
+
+    int32_t voltage;    //mV
+    int32_t current;    //mA
+    int32_t power;      //mW
+    int32_t temp;       //C*10
 };
 
 
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 //****************************************************************************
 // Shared variable(s)
@@ -396,6 +516,18 @@ extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
 
 #endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+//Super Structures for the Plan-GUI (they include decoded values):
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+extern struct executeD_s execD1, execD2, execD3, execD4;
+extern struct ricnuD_s ricnuD_1;
+extern struct manageD_s managD1, managD2;
+extern struct strainD_s strainD[6];
+extern struct gossipD_s gossipD1, gossipD2;
+extern struct batteryD_s battD1;
+
+#endif //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)
 extern struct user_data_s user_data_1;

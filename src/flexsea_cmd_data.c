@@ -287,7 +287,17 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;
 		
-		bytes = P_DATA1 + 12;     //Bytes is always last+1
+		uint16_to_bytes((uint16_t)imu.magneto.x, &tmp0, &tmp1);
+		buf[P_DATA1 + 12] = tmp0;
+		buf[P_DATA1 + 13] = tmp1;
+		uint16_to_bytes((uint16_t)imu.magneto.y, &tmp0, &tmp1);
+		buf[P_DATA1 + 14] = tmp0;
+		buf[P_DATA1 + 15] = tmp1;
+		uint16_to_bytes((uint16_t)imu.magneto.z, &tmp0, &tmp1);
+		buf[P_DATA1 + 16] = tmp0;
+		buf[P_DATA1 + 17] = tmp1;
+		
+		bytes = P_DATA1 + 18;     //Bytes is always last+1
 		
         #endif  //BOARD_TYPE_FLEXSEA_GOSSIP
 
@@ -303,6 +313,7 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 	return bytes;
 }
 
+//***ToDo*** this is aweful code, requires significant work!
 //Reception of a READ_ALL command - used by all boards
 void rx_cmd_data_read_all(uint8_t *buf)
 {
@@ -312,8 +323,11 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 	//Structure pointers ***ToDo this isn't clean
     struct execute_s *exec_s_ptr = &exec1;
+    struct executeD_s *execD_s_ptr = &execD1;
     struct manage_s *mn_s_ptr = &manag1;
+    struct manageD_s *mnD_s_ptr = &managD1;
     struct gossip_s *go_s_ptr = &gossip1;
+    struct gossipD_s *goD_s_ptr = &gossipD1;
 
 	//Point to the appropriate structure:
 	if(buf[P_XID] == FLEXSEA_EXECUTE_1)
@@ -377,7 +391,7 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-            //***ToDo*** replace that by a boadr type call!
+            //***ToDo*** replace that by a board type call!
             if(buf[P_XID] == FLEXSEA_EXECUTE_1 || buf[P_XID] == FLEXSEA_EXECUTE_2)
             {
                 //Store values:
@@ -405,15 +419,21 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 exec_s_ptr->status1 = buf[P_DATA1+27];
                 exec_s_ptr->status2 = buf[P_DATA1+28];
 
-                #ifdef MULTIPLE_COMMANDS
-                //To interface with Python:
-                printf("[%i,%i,%i,%i,%i,%i,%i]\n", exec1.encoder, exec1.current, exec1.imu.x, exec1.imu.y, exec1.imu.z, \
-                        exec1.strain, exec1.analog[0]);
-                #endif
+                //Plan uses the Super Structure to save decoded values:
+                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
+                execD_s_ptr->exRaw = *exec_s_ptr;
+                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
             }
             else if(buf[P_XID] == FLEXSEA_MANAGE_1)
             {
 
+                //Decode values
+                //...
+
+                //Plan uses the Super Structure to save decoded values:
+                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
+                mnD_s_ptr->mnRaw = *mn_s_ptr;
+                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
             }
             else if(buf[P_XID] == FLEXSEA_GOSSIP_1)
             {
@@ -424,6 +444,15 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 go_s_ptr->accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]));
                 go_s_ptr->accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
                 go_s_ptr->accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
+
+                go_s_ptr->magneto.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
+                go_s_ptr->magneto.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
+                go_s_ptr->magneto.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
+
+                //Plan uses the Super Structure to save decoded values:
+                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
+                goD_s_ptr->goRaw = *go_s_ptr;
+                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
             }
 			
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
@@ -494,11 +523,9 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;		
 		
-		uint16_to_bytes((uint16_t)as5047.angle_raws[0], &tmp0, &tmp1);
+        uint32_to_bytes((uint32_t)refresh_enc_display(), &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 12] = tmp0;
 		buf[P_DATA1 + 13] = tmp1;
-		
-		uint16_to_bytes((uint16_t)encoder.count, &tmp0, &tmp1);
 		buf[P_DATA1 + 14] = tmp0;
 		buf[P_DATA1 + 15] = tmp1;
 
@@ -553,7 +580,7 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 	//Structure pointer. Points to ricnu_1 by default.
 	//struct execute_s *exec_s_ptr;
 	struct ricnu_s *ricnu_s_ptr = &ricnu_1;
-
+    struct executeD_s *execD_s_ptr = &execD1;
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 	
@@ -620,6 +647,11 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 			ricnu_s_ptr->ext_strain[5] = (BYTES_TO_UINT16(buf[P_DATA1+29], buf[P_DATA1+30]));
 		
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+            //Plan uses the Super Structure to save decoded values:
+            #if(defined BOARD_TYPE_FLEXSEA_PLAN)
+            execD_s_ptr->exRaw = ricnu_s_ptr->ex;
+            #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
 		}
 		else
 		{
