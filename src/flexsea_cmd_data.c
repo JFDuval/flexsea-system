@@ -121,13 +121,13 @@ void rx_cmd_data_acqui(uint8_t *buf)
 
 		//Generate the reply:
 		numb = tx_cmd_data_acqui(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, 0);	//Returns 0 for now
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
@@ -358,16 +358,16 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 		//Generate the reply:
 		numb = tx_cmd_data_read_all(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
 		//Delayed response:
 		#ifdef USE_RS485
-		rs485_reply_ready(comm_str_485, (numb));
+		rs485_reply_ready(comm_str_485_1, (numb));
 		#endif	//USE_RS485
 		
 		#ifdef USE_USB
-		usb_puts(comm_str_485, (numb));
+		usb_puts(comm_str_485_1, (numb));
 		#endif
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
@@ -592,14 +592,14 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 
 		//Generate the reply:
 		numb = tx_cmd_data_read_all_ricnu(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
 		//Delayed response:
-		rs485_reply_ready(comm_str_485, (numb));
+		rs485_reply_ready(comm_str_485_1, (numb));
 		
 		#ifdef USE_USB
-		usb_puts(comm_str_485, (numb));
+		usb_puts(comm_str_485_1, (numb));
 		#endif
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE

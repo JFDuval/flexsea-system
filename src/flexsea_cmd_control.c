@@ -116,13 +116,13 @@ void rx_cmd_ctrl_mode(uint8_t *buf)
 
 		//Generate the reply:
 		numb = tx_cmd_ctrl_mode(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, ctrl.active_ctrl);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 		
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -215,13 +215,13 @@ void rx_cmd_ctrl_i(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_i(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.current.actual_val, ctrl.current.setpoint_val);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 		
 		//(for now, send it)
-		rs485_puts(comm_str_485, (numb));
+		rs485_puts(comm_str_485_1, (numb));
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -344,13 +344,13 @@ void rx_cmd_ctrl_o(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_o(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.pwm);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 		
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -475,13 +475,13 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_p(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.position.pos, ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -624,13 +624,13 @@ void rx_cmd_ctrl_i_g(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_i_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.current.gain.I_KP, ctrl.current.gain.I_KI, ctrl.current.gain.I_KD);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -742,13 +742,13 @@ void rx_cmd_ctrl_p_g(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_p_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.position.gain.P_KP, ctrl.position.gain.P_KI, ctrl.position.gain.P_KD);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -860,13 +860,13 @@ void rx_cmd_ctrl_z_g(uint8_t *buf)
 		//Generate the reply:
 		numb = tx_cmd_ctrl_z_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
 			ctrl.impedance.gain.Z_K, ctrl.impedance.gain.Z_B, ctrl.impedance.gain.Z_I);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -1037,17 +1037,17 @@ void rx_cmd_in_control(uint8_t *buf)
 
 		//Generate the reply:
 		numb = tx_cmd_in_control(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, 0);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 		
 		//(for now, send it)
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 		
 		#ifdef USE_USB
-		usb_puts(comm_str_485, (numb));
+		usb_puts(comm_str_485_1, (numb));
 		#endif
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE

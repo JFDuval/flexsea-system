@@ -113,9 +113,9 @@ void rx_cmd_digital_in(uint8_t *buf)
         #ifdef BOARD_TYPE_FLEXSEA_APPLICATION
 		
 		numb = tx_cmd_digital_in(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		//numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		flexsea_send_serial_master(0, comm_str_485, numb+1);
+		flexsea_send_serial_master(0, comm_str_485_1, numb+1);
 		
 		//ToDo: the reply should be managed elsewhere!
 		
@@ -226,9 +226,9 @@ void rx_cmd_analog_in(uint8_t *buf)
         #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		
 		numb = tx_cmd_analog_in(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		//numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		flexsea_send_serial_master(0, comm_str_485, numb+1);
+		flexsea_send_serial_master(0, comm_str_485_1, numb+1);
 		
 		//ToDo: the reply should be managed elsewhere!
 		
@@ -349,14 +349,14 @@ void rx_cmd_exp_pwro(uint8_t *buf)
 
 		numb = tx_cmd_exp_pwro(buf[P_XID], CMD_WRITE, tmp_payload_xmit, \
 									PAYLOAD_BUF_LEN, read_pwro());
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
 		
 		//(for now, send it)
-		rs485_puts(comm_str_485, (numb));
+		rs485_puts(comm_str_485_1, (numb));
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 

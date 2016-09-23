@@ -230,9 +230,9 @@ void rx_cmd_encoder(uint8_t *buf)
 		//===================
 
 		numb = tx_cmd_encoder(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, qei_read());
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		rs485_puts(comm_str_485, numb);
+		rs485_puts(comm_str_485_1, numb);
 
 		#endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
@@ -355,12 +355,12 @@ void rx_cmd_strain(uint8_t *buf)
 		//===================
 
 		numb = tx_cmd_strain(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485, numb);
+		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		//rs485_puts(comm_str_485, numb);	
+		//rs485_puts(comm_str_485_1, numb);	
 		
 		#ifdef USE_USB
-		usb_puts(comm_str_485, (numb));	
+		usb_puts(comm_str_485_1, (numb));	
 		#endif
 			
 		#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
