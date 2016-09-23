@@ -263,13 +263,20 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 // Structure(s):
 //****************************************************************************
 
-//Note: most structures will have two versions. The original, aka 'raw'
-//version has multiple data types, and is used by the different boards.
-//The version with 'D' in the name is Decoded => it includes extra variables
-//(often with the same name) holding decoded values (ex.: mV and not ADC counts)
-//The 'D' values are always int32
+/*Note: most structures will have two versions. The original, aka 'raw'
+version has multiple data types, and is used by the different boards.
+It includes a sub-structure named decoded_X that contains decoded values
+(physical units, not ticks). The decoded values are always int32*/
 
-//Inner structure for the gyro and the accelero
+//Inner structure for the IMU:
+
+struct decoded_xyz_s
+{
+     int32_t x;
+     int32_t y;
+     int32_t z;
+};
+
 struct xyz_s
 {
      int16_t x;
@@ -277,11 +284,19 @@ struct xyz_s
      int16_t z;
 };
 
-struct xyzD_s
+//FlexSEA-Execute:
+
+struct decoded_execute_s
 {
-     int32_t x;
-     int32_t y;
-     int32_t z;
+    struct decoded_xyz_s gyro;  //deg/s
+    struct decoded_xyz_s accel; //mg
+
+    int32_t strain;             //%
+    int32_t current;            //mA
+    int32_t volt_batt;          //mV
+    int32_t volt_int;           //mV
+    int32_t temp;               //Celsius x10
+    int32_t analog[8];          //mV
 };
 
 struct execute_s
@@ -303,24 +318,19 @@ struct execute_s
 	uint8_t status2;
 
     struct ctrl_s ctrl;
+
+    //Decoded values:
+    struct decoded_execute_s decoded;
 };
 
-struct executeD_s
+//FlexSEA-Manage:
+
+struct decoded_manage_s
 {
-    //Raw values:
-    struct execute_s exRaw;
+    struct decoded_xyz_s gyro;  //deg/s
+    struct decoded_xyz_s accel; //mg
 
-    //Decoded fields:
-
-    struct xyzD_s gyro;     //deg/s
-    struct xyzD_s accel;    //mg
-
-    int32_t strain;         //%
-    int32_t current;        //mA
-    int32_t volt_batt;      //mV
-    int32_t volt_int;       //mV
-    int32_t temp;           //Celsius x10
-    int32_t analog[8];      //mV
+    int32_t analog[8];          //mV
 };
 
 struct manage_s
@@ -335,36 +345,16 @@ struct manage_s
 
 	uint8_t sw1;
 	uint8_t sampling;
-};
-
-struct manageD_s
-{
-    //Raw values:
-    struct manage_s mnRaw;
 
     //Decoded values:
-
-    struct xyzD_s gyro;     //deg/s
-    struct xyzD_s accel;    //mg
-
-    int32_t analog[8];      //mV
+    struct decoded_manage_s decoded;
 };
 
-//In Control Tool:
-struct in_control_s
+//***ToDo*** strain needs to be reworked
+
+struct decoded_strain_s
 {
-	uint8_t controller;
-	int32_t setp;
-	int32_t actual_val;
-	int32_t error;
-	int32_t output;
-	int16_t pwm;
-	uint8_t mot_dir;
-	int16_t current;
-	uint16_t combined;	//[CTRL2:0][MOT_DIR][PWM]
-	
-	int32_t r[4];
-	int32_t w[4];
+    int32_t strain_filtered;
 };
 
 //Strain gauge amplifier:
@@ -384,17 +374,9 @@ struct strain_s
 	//Filtered value:
 	uint16_t strain_filtered;
 	uint16_t filtered_strain;
-};
-
-struct strainD_s
-{
-    //Raw values:
-    struct strain_s stRaw;
 
     //Decoded values:
-
-    //ToDo
-    //...
+    struct decoded_strain_s decoded;
 };
 
 //Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
@@ -407,21 +389,14 @@ struct ricnu_s
     uint16_t ext_strain[6];
 };
 
-struct ricnuD_s
+//FlexSEA-Gossip:
+
+struct decoded_gossip_s
 {
-    //Execute:
-    struct executeD_s ex;
-
-    //Extra sensors:
-    uint16_t ext_strain[6];
+    struct decoded_xyz_s gyro;     //deg/s
+    struct decoded_xyz_s accel;    //mg
+    struct decoded_xyz_s magneto;  //uT
 };
-
-struct user_data_s
-{
-	int32_t r[4];
-	int32_t w[4];
-};
-
 
 struct gossip_s
 {
@@ -433,18 +408,19 @@ struct gossip_s
 
     uint16_t io[2];
     uint8_t status;
-};
-
-struct gossipD_s
-{
-    //Raw values:
-    struct gossip_s goRaw;
 
     //Decoded values:
+    struct decoded_gossip_s decoded;
+};
 
-    struct xyzD_s gyro;     //deg/s
-    struct xyzD_s accel;    //mg
-    struct xyzD_s magneto;  //?
+//FlexSEA-Battery:
+
+struct decoded_battery_s
+{
+    int32_t voltage;    //mV
+    int32_t current;    //mA
+    int32_t power;      //mW
+    int32_t temp;       //C*10
 };
 
 struct battery_s
@@ -454,19 +430,34 @@ struct battery_s
     uint8_t temp;
     uint8_t pushbutton;
     uint8_t status;
-};
-
-struct batteryD_s
-{
-    //Raw values:
-    struct battery_s baRaw;
 
     //Decoded values:
+    struct decoded_battery_s decoded;
+};
 
-    int32_t voltage;    //mV
-    int32_t current;    //mA
-    int32_t power;      //mW
-    int32_t temp;       //C*10
+//Commands, tools, specialty, etc.:
+
+//In Control Tool:
+struct in_control_s
+{
+    uint8_t controller;
+    int32_t setp;
+    int32_t actual_val;
+    int32_t error;
+    int32_t output;
+    int16_t pwm;
+    uint8_t mot_dir;
+    int16_t current;
+    uint16_t combined;	//[CTRL2:0][MOT_DIR][PWM]
+
+    int32_t r[4];
+    int32_t w[4];
+};
+
+struct user_data_s
+{
+    int32_t r[4];
+    int32_t w[4];
 };
 
 //****************************************************************************
@@ -482,13 +473,6 @@ extern struct strain_s strain[6];
 extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
-
-extern struct executeD_s execD1, execD2, execD3, execD4;
-extern struct ricnuD_s ricnuD_1;
-extern struct manageD_s managD1, managD2;
-extern struct strainD_s strainD[6];
-extern struct gossipD_s gossipD1, gossipD2;
-extern struct batteryD_s battD1;
 
 #endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 

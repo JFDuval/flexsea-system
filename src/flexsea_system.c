@@ -54,17 +54,6 @@ struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
 struct battery_s batt1;
 
-//Super Structures
-struct executeD_s execD1, execD2, execD3, execD4;
-struct ricnuD_s ricnuD_1;
-struct manageD_s managD1, managD2;
-struct strainD_s strainD[6];
-struct gossipD_s gossipD1, gossipD2;
-struct batteryD_s battD1;
-
-//ToDo: should the original structure be expanded with a 'decoded' member, rather
-//than having duplicate structures? This seems cleaner...
-
 #endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)

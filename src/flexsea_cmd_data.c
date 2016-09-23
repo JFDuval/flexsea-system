@@ -323,11 +323,9 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 	//Structure pointers ***ToDo this isn't clean
     struct execute_s *exec_s_ptr = &exec1;
-    struct executeD_s *execD_s_ptr = &execD1;
+    //struct executeD_s *execD_s_ptr = &execD1;
     struct manage_s *mn_s_ptr = &manag1;
-    struct manageD_s *mnD_s_ptr = &managD1;
     struct gossip_s *go_s_ptr = &gossip1;
-    struct gossipD_s *goD_s_ptr = &gossipD1;
 
 	//Point to the appropriate structure:
 	if(buf[P_XID] == FLEXSEA_EXECUTE_1)
@@ -419,10 +417,12 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 exec_s_ptr->status1 = buf[P_DATA1+27];
                 exec_s_ptr->status2 = buf[P_DATA1+28];
 
+                /*
                 //Plan uses the Super Structure to save decoded values:
                 #if(defined BOARD_TYPE_FLEXSEA_PLAN)
                 execD_s_ptr->exRaw = *exec_s_ptr;
                 #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
+                */
             }
             else if(buf[P_XID] == FLEXSEA_MANAGE_1)
             {
@@ -430,10 +430,6 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 //Decode values
                 //...
 
-                //Plan uses the Super Structure to save decoded values:
-                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
-                mnD_s_ptr->mnRaw = *mn_s_ptr;
-                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
             }
             else if(buf[P_XID] == FLEXSEA_GOSSIP_1)
             {
@@ -448,11 +444,6 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 go_s_ptr->magneto.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
                 go_s_ptr->magneto.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
                 go_s_ptr->magneto.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
-
-                //Plan uses the Super Structure to save decoded values:
-                #if(defined BOARD_TYPE_FLEXSEA_PLAN)
-                goD_s_ptr->goRaw = *go_s_ptr;
-                #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
             }
 			
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
@@ -578,9 +569,9 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 	//Structure pointer. Points to ricnu_1 by default.
-	//struct execute_s *exec_s_ptr;
+    struct execute_s *exec_s_ptr = &exec1;
 	struct ricnu_s *ricnu_s_ptr = &ricnu_1;
-    struct executeD_s *execD_s_ptr = &execD1;
+    //struct executeD_s *execD_s_ptr = &execD1;
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 	
@@ -650,7 +641,7 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 
             //Plan uses the Super Structure to save decoded values:
             #if(defined BOARD_TYPE_FLEXSEA_PLAN)
-            execD_s_ptr->exRaw = ricnu_s_ptr->ex;
+            *exec_s_ptr = ricnu_s_ptr->ex;
             #endif //#(defined BOARD_TYPE_FLEXSEA_PLAN)
 		}
 		else
