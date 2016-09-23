@@ -460,6 +460,15 @@ struct user_data_s
     int32_t w[4];
 };
 
+//IMU data & config
+struct imu_s
+{
+     struct xyz_s accel;
+     struct xyz_s gyro;
+	 struct xyz_s magneto;
+     uint32_t config;
+};
+
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************

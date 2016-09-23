@@ -262,24 +262,24 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 
         #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-		//uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
-		uint16_to_bytes((uint16_t)12345, &tmp0, &tmp1);	//Fake data
+		uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
+		//uint16_to_bytes((uint16_t)12345, &tmp0, &tmp1);	//Fake data
 		buf[P_DATA1] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
-		//uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
 		buf[P_DATA1 + 2] = tmp0;
 		buf[P_DATA1 + 3] = tmp1;
-		//uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
 		buf[P_DATA1 + 4] = tmp0;
 		buf[P_DATA1 + 5] = tmp1;
 
-		//uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
 		buf[P_DATA1 + 6] = tmp0;
 		buf[P_DATA1 + 7] = tmp1;
-		//uint16_to_bytes((uint16_t)imu.accel.y, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.accel.y, &tmp0, &tmp1);
 		buf[P_DATA1 + 8] = tmp0;
 		buf[P_DATA1 + 9] = tmp1;
-		//uint16_to_bytes((uint16_t)imu.accel.z, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.accel.z, &tmp0, &tmp1);
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;
 
