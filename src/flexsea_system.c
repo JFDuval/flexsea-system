@@ -44,7 +44,7 @@
 unsigned char execute_1_data[SLAVE_READ_BUFFER_LEN];
 unsigned char manage_1_data[SLAVE_READ_BUFFER_LEN];
 
-#if defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
+//#if defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 struct execute_s exec1, exec2, exec3, exec4;
 struct ricnu_s ricnu_1;
@@ -54,7 +54,7 @@ struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
 struct battery_s batt1;
 
-#endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
+//#endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)
 struct user_data_s user_data_1;

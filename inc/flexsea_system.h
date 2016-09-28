@@ -478,7 +478,7 @@ struct imu_s
 // Shared variable(s)
 //****************************************************************************
 
-#if defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
+//#if defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 extern struct execute_s exec1, exec2, exec3, exec4;
 extern struct ricnu_s ricnu_1;
@@ -488,7 +488,7 @@ extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
 
-#endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
+//#endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)
 extern struct user_data_s user_data_1;

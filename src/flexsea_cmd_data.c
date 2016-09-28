@@ -442,6 +442,14 @@ void rx_cmd_data_read_all(uint8_t *buf)
         #endif
 
         #endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
+		
+		#ifdef BOARD_TYPE_FLEXSEA_GOSSIP
+
+        #ifdef USE_USB
+        usb_puts(comm_str_485_1, (numb));
+        #endif
+
+        #endif 	//BOARD_TYPE_FLEXSEA_GOSSIP
 
 	}
 	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
