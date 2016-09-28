@@ -350,16 +350,15 @@ struct manage_s
     struct decoded_manage_s decoded;
 };
 
-//***ToDo*** strain needs to be reworked
+//FlexSEA-Strain:
 
 struct decoded_strain_s
 {
-    int32_t strain_filtered;
+    int32_t strain[6];
 };
 
-//Strain gauge amplifier:
-//(structure supports both single and 6-ch amp)
-struct strain_s
+//Strain - single channel
+struct strain_1ch_s
 {
 	//Config:     
     uint8_t offset;
@@ -373,7 +372,13 @@ struct strain_s
 	 
 	//Filtered value:
 	uint16_t strain_filtered;
-	uint16_t filtered_strain;
+};
+
+//Strain - 6 channels
+struct strain_s
+{
+	//One structure per channel:
+	struct strain_1ch_s ch[6];
 
     //Decoded values:
     struct decoded_strain_s decoded;
@@ -478,7 +483,7 @@ struct imu_s
 extern struct execute_s exec1, exec2, exec3, exec4;
 extern struct ricnu_s ricnu_1;
 extern struct manage_s manag1, manag2;
-extern struct strain_s strain[6];
+extern struct strain_s strain1;
 extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;

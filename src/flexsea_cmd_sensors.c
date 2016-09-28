@@ -267,7 +267,8 @@ void rx_cmd_encoder(uint8_t *buf)
 }
 
 //Transmission of a STRAIN command.
-//ToDo: add support for gains & offsets
+//TODO: add support for gains & offsets
+//Note: the Reading part can be (and should be) done via Read All
 uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len)
 {
 	uint32_t bytes = 0;
@@ -297,22 +298,22 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 		#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
 			
 		//Arguments:	
-		uint16_to_bytes((uint16_t)strain[0].strain_filtered, &tmp0, &tmp1);		
+		uint16_to_bytes((uint16_t)strain1.ch[0].strain_filtered, &tmp0, &tmp1);		
 		buf[P_DATA1 + 0] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)strain[1].strain_filtered, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)strain1.ch[1].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 2] = tmp0;
 		buf[P_DATA1 + 3] = tmp1;
-		uint16_to_bytes((uint16_t)strain[2].strain_filtered, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)strain1.ch[2].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 4] = tmp0;
 		buf[P_DATA1 + 5] = tmp1;
-		uint16_to_bytes((uint16_t)strain[3].strain_filtered, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)strain1.ch[3].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 6] = tmp0;
 		buf[P_DATA1 + 7] = tmp1;
-		uint16_to_bytes((uint16_t)strain[4].strain_filtered, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)strain1.ch[4].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 8] = tmp0;
 		buf[P_DATA1 + 9] = tmp1;
-		uint16_to_bytes((uint16_t)strain[5].strain_filtered, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)strain1.ch[5].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;
 		
@@ -335,6 +336,7 @@ void rx_cmd_strain(uint8_t *buf)
 {
 	uint32_t numb = 0;
 	int32_t tmp = 0;
+    struct strain_s *strainPtr = &strain1;
 
 	if(IS_CMD_RW(buf[P_CMD1]) == READ)
 	{
@@ -375,12 +377,12 @@ void rx_cmd_strain(uint8_t *buf)
 
 			#ifdef BOARD_TYPE_FLEXSEA_PLAN
 				
-			strain[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
-			strain[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
-			strain[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
-			strain[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
-			strain[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
-			strain[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);	
+            strainPtr->ch[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
+            strainPtr->ch[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
+            strainPtr->ch[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
+            strainPtr->ch[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
+            strainPtr->ch[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
+            strainPtr->ch[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);
 
 			_USE_PRINTF("Strain[0] = %i.\n", strain[0].strain_filtered);
 

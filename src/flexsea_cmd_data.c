@@ -61,6 +61,11 @@ extern "C" {
 #include "main.h"
 #endif	//BOARD_TYPE_FLEXSEA_GOSSIP
 
+//Strain boards only:
+#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
+#include "main.h"
+#endif	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
+
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
@@ -326,7 +331,31 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		
         #endif  //BOARD_TYPE_FLEXSEA_GOSSIP
 
-        //ToDo other boards
+        #ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
+
+        //Arguments:
+        uint16_to_bytes((uint16_t)strain1.ch[0].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 0] = tmp0;
+        buf[P_DATA1 + 1] = tmp1;
+        uint16_to_bytes((uint16_t)strain1.ch[1].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 2] = tmp0;
+        buf[P_DATA1 + 3] = tmp1;
+        uint16_to_bytes((uint16_t)strain1.ch[2].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 4] = tmp0;
+        buf[P_DATA1 + 5] = tmp1;
+        uint16_to_bytes((uint16_t)strain1.ch[3].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 6] = tmp0;
+        buf[P_DATA1 + 7] = tmp1;
+        uint16_to_bytes((uint16_t)strain1.ch[4].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 8] = tmp0;
+        buf[P_DATA1 + 9] = tmp1;
+        uint16_to_bytes((uint16_t)strain1.ch[5].strain_filtered, &tmp0, &tmp1);
+        buf[P_DATA1 + 10] = tmp0;
+        buf[P_DATA1 + 11] = tmp1;
+
+        bytes = P_DATA1 + 12;     //Bytes is always last+1
+
+        #endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 	}
 	else
 	{
@@ -338,7 +367,7 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 	return bytes;
 }
 
-//***ToDo*** this is aweful code, requires significant work!
+//TODO this is awful code, requires significant work!
 //Reception of a READ_ALL command - used by all boards
 void rx_cmd_data_read_all(uint8_t *buf)
 {
@@ -346,11 +375,11 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//Structure pointers ***ToDo this isn't clean
+    //Structure pointers ***TODO this isn't clean
     struct execute_s *exec_s_ptr = &exec1;
-    //struct executeD_s *execD_s_ptr = &execD1;
     struct manage_s *mn_s_ptr = &manag1;
     struct gossip_s *go_s_ptr = &gossip1;
+    struct strain_s *stPtr = &strain1;
 
 	//Point to the appropriate structure:
 	if(buf[P_XID] == FLEXSEA_EXECUTE_1)
@@ -377,7 +406,7 @@ void rx_cmd_data_read_all(uint8_t *buf)
 		//Received a Read command from our master, prepare a reply:
 
         #if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE) \
-            || (defined BOARD_TYPE_FLEXSEA_GOSSIP))
+            || (defined BOARD_TYPE_FLEXSEA_GOSSIP) || (defined BOARD_TYPE_FLEXSEA_STRAIN_AMP))
 
 		//Generate the reply:
 		numb = tx_cmd_data_read_all(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
@@ -404,7 +433,16 @@ void rx_cmd_data_read_all(uint8_t *buf)
 		//ToDo is that right?
 		flexsea_send_serial_master(PORT_USB, comm_str_485_1, numb);
 
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+        #endif	//BOARD_TYPE_FLEXSEA_MANAGE
+
+        #ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
+
+        #ifdef USE_USB
+        usb_puts(comm_str_485_1, (numb));
+        #endif
+
+        #endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
+
 	}
 	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
 	{
@@ -419,7 +457,7 @@ void rx_cmd_data_read_all(uint8_t *buf)
 
 			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-            //***ToDo*** replace that by a board type call!
+            //***TODO*** replace that by a board type call!
             if(buf[P_XID] == FLEXSEA_EXECUTE_1 || buf[P_XID] == FLEXSEA_EXECUTE_2)
             {
                 //Store values:
@@ -475,6 +513,15 @@ void rx_cmd_data_read_all(uint8_t *buf)
                 go_s_ptr->magneto.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
                 go_s_ptr->magneto.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
                 go_s_ptr->magneto.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
+            }
+            else if(buf[P_XID] == FLEXSEA_STRAIN_1)
+            {
+                stPtr->ch[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
+                stPtr->ch[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
+                stPtr->ch[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
+                stPtr->ch[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
+                stPtr->ch[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
+                stPtr->ch[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);
             }
 			
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
