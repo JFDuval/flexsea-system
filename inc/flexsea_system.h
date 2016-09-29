@@ -474,6 +474,27 @@ struct imu_s
      uint32_t config;
 };
 
+//AS504x Magnetic encoders:
+struct as504x_s
+{
+	int32_t angle_raws[10]; //last 10 raw readings
+    int32_t angle_conts[10]; // last 10 continuous angle readings
+
+    int32_t angle_vel_denoms[8]; //the number of 1 MHz counts between the last two angle readings 
+    int32_t num_rot;        //number of rotations
+    int32_t angle_vel[2];		//sensor reading - last sensor reading
+    int32_t angle_vel_filt[2];		//sensor reading - last sensor reading
+    int32_t angle_vel_RPMS_raw[2];		//sensor reading - last sensor reading
+    int32_t angle_vel_RPMS_filt[2];
+    int32_t angle_vel_RPM;
+	uint16_t angle_comp;	//Sensor reading, 2/ Compensation enabled
+	uint16_t angle_ctrl;	//Modified version (gain, zero). Used by controllers.
+    
+    int32_t last_angtimer_read;
+    int32_t counts_since_last_ang_read;
+    int32_t last_ang_read_period;
+};
+
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
