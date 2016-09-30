@@ -600,40 +600,44 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;		
 		
-        uint32_to_bytes((uint32_t)refresh_enc_display(), &tmp0, &tmp1, &tmp2, &tmp3);
+		//Motor encoder, multi-turns
+        uint32_to_bytes((uint32_t)as5047.angle_comp, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 12] = tmp0;
 		buf[P_DATA1 + 13] = tmp1;
 		buf[P_DATA1 + 14] = tmp0;
 		buf[P_DATA1 + 15] = tmp1;
-
-		uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
+		
+		//Joint encoder, limited to 1 rotation
+		uint16_to_bytes((uint16_t)as5048b.angle_ctrl, &tmp0, &tmp1);
 		buf[P_DATA1 + 16] = tmp0;
 		buf[P_DATA1 + 17] = tmp1;
-
-		buf[P_DATA1 + 18] = safety_cop.v_vb;
 		
+		uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
+		buf[P_DATA1 + 18] = tmp0;
+		buf[P_DATA1 + 19] = tmp1;
+
 		uint16_to_bytes((uint16_t)ext_strain[0], &tmp0, &tmp1);
-		buf[P_DATA1 + 19] = tmp0;
-		buf[P_DATA1 + 20] = tmp1;
+		buf[P_DATA1 + 20] = tmp0;
+		buf[P_DATA1 + 21] = tmp1;
 		uint16_to_bytes((uint16_t)ext_strain[1], &tmp0, &tmp1);
-		buf[P_DATA1 + 21] = tmp0;
-		buf[P_DATA1 + 22] = tmp1;
+		buf[P_DATA1 + 22] = tmp0;
+		buf[P_DATA1 + 23] = tmp1;
 		uint16_to_bytes((uint16_t)ext_strain[2], &tmp0, &tmp1);
-		buf[P_DATA1 + 23] = tmp0;
-		buf[P_DATA1 + 24] = tmp1;
+		buf[P_DATA1 + 24] = tmp0;
+		buf[P_DATA1 + 25] = tmp1;
 		uint16_to_bytes((uint16_t)ext_strain[3], &tmp0, &tmp1);
-		buf[P_DATA1 + 25] = tmp0;
-		buf[P_DATA1 + 26] = tmp1;
+		buf[P_DATA1 + 26] = tmp0;
+		buf[P_DATA1 + 27] = tmp1;
 		uint16_to_bytes((uint16_t)ext_strain[4], &tmp0, &tmp1);
-		buf[P_DATA1 + 27] = tmp0;
-		buf[P_DATA1 + 28] = tmp1;
+		buf[P_DATA1 + 28] = tmp0;
+		buf[P_DATA1 + 29] = tmp1;
 		uint16_to_bytes((uint16_t)ext_strain[5], &tmp0, &tmp1);
-		buf[P_DATA1 + 29] = tmp0;
-		buf[P_DATA1 + 30] = tmp1;
+		buf[P_DATA1 + 30] = tmp0;
+		buf[P_DATA1 + 31] = tmp1;
 		
 		//ToDo add user variables
 		
-		bytes = P_DATA1 + 31;     //Bytes is always last+1
+		bytes = P_DATA1 + 32;     //Bytes is always last+1
 		
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -710,18 +714,20 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 			ricnu_s_ptr->ex.accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]));
 			ricnu_s_ptr->ex.accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]));
 			
-			ricnu_s_ptr->ex.enc_commut = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
-			ricnu_s_ptr->ex.enc_control = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+14], buf[P_DATA1+15]));
+			//ricnu_s_ptr->ex.enc_commut = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+12], buf[P_DATA1+13]));
+			ricnu_s_ptr->ex.enc_motor = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+12], buf[P_DATA1+13], \
+																		buf[P_DATA1+14], buf[P_DATA1+15]));
+			ricnu_s_ptr->ex.enc_control = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
 			
-			ricnu_s_ptr->ex.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+16], buf[P_DATA1+17]));
-			ricnu_s_ptr->ex.volt_batt = buf[P_DATA1+18];
+			ricnu_s_ptr->ex.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+18], buf[P_DATA1+19]));
+			//ricnu_s_ptr->ex.volt_batt = buf[P_DATA1+18];
 			
-			ricnu_s_ptr->ext_strain[0] = (BYTES_TO_UINT16(buf[P_DATA1+19], buf[P_DATA1+20]));
-			ricnu_s_ptr->ext_strain[1] = (BYTES_TO_UINT16(buf[P_DATA1+21], buf[P_DATA1+22]));
-			ricnu_s_ptr->ext_strain[2] = (BYTES_TO_UINT16(buf[P_DATA1+23], buf[P_DATA1+24]));
-			ricnu_s_ptr->ext_strain[3] = (BYTES_TO_UINT16(buf[P_DATA1+25], buf[P_DATA1+26]));
-			ricnu_s_ptr->ext_strain[4] = (BYTES_TO_UINT16(buf[P_DATA1+27], buf[P_DATA1+28]));
-			ricnu_s_ptr->ext_strain[5] = (BYTES_TO_UINT16(buf[P_DATA1+29], buf[P_DATA1+30]));
+			ricnu_s_ptr->ext_strain[0] = (BYTES_TO_UINT16(buf[P_DATA1+20], buf[P_DATA1+21]));
+			ricnu_s_ptr->ext_strain[1] = (BYTES_TO_UINT16(buf[P_DATA1+22], buf[P_DATA1+23]));
+			ricnu_s_ptr->ext_strain[2] = (BYTES_TO_UINT16(buf[P_DATA1+24], buf[P_DATA1+25]));
+			ricnu_s_ptr->ext_strain[3] = (BYTES_TO_UINT16(buf[P_DATA1+26], buf[P_DATA1+27]));
+			ricnu_s_ptr->ext_strain[4] = (BYTES_TO_UINT16(buf[P_DATA1+28], buf[P_DATA1+29]));
+			ricnu_s_ptr->ext_strain[5] = (BYTES_TO_UINT16(buf[P_DATA1+30], buf[P_DATA1+31]));
 		
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 

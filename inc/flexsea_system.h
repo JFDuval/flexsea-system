@@ -310,6 +310,7 @@ struct execute_s
 	int32_t enc_display;
 	int32_t enc_control;
 	int32_t enc_commut;
+	int32_t enc_motor;
 	uint8_t volt_batt;	//+VB
 	uint8_t volt_int;	//+VG
 	uint8_t temp;
