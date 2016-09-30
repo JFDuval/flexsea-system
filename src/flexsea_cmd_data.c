@@ -601,14 +601,14 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		buf[P_DATA1 + 11] = tmp1;		
 		
 		//Motor encoder, multi-turns
-        uint32_to_bytes((uint32_t)as5047.angle_comp, &tmp0, &tmp1, &tmp2, &tmp3);
+        uint32_to_bytes((uint32_t)as5047.angle_conts[0], &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 12] = tmp0;
 		buf[P_DATA1 + 13] = tmp1;
-		buf[P_DATA1 + 14] = tmp0;
-		buf[P_DATA1 + 15] = tmp1;
+		buf[P_DATA1 + 14] = tmp2;
+		buf[P_DATA1 + 15] = tmp3;
 		
 		//Joint encoder, limited to 1 rotation
-		uint16_to_bytes((uint16_t)as5048b.angle_ctrl, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)as5048b.angle_conts[0], &tmp0, &tmp1);
 		buf[P_DATA1 + 16] = tmp0;
 		buf[P_DATA1 + 17] = tmp1;
 		

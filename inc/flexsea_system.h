@@ -199,6 +199,9 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 #define FLEXSEA_GOSSIP_BASE          	80						//Gossip: from 80 to 89
 #define FLEXSEA_GOSSIP_1				(FLEXSEA_GOSSIP_BASE + 0)
 #define FLEXSEA_GOSSIP_2				(FLEXSEA_GOSSIP_BASE + 1)
+#define FLEXSEA_VIRTUAL_BASE          	100						//Virtual boards from 100 to N
+#define FLEXSEA_VIRTUAL_1				(FLEXSEA_VIRTUAL_BASE + 0)
+#define FLEXSEA_VIRTUAL_2				(FLEXSEA_VIRTUAL_BASE + 1)
 
 //Software error (SE) codes. Values will be ORed
 #define SE_DEFAULT						0
@@ -386,6 +389,12 @@ struct strain_s
 };
 
 //Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
+
+struct decoded_ricnu_s
+{
+	int32_t ext_strain[6];
+};
+
 struct ricnu_s
 {
 	//Execute:
@@ -393,6 +402,9 @@ struct ricnu_s
 	
 	//Extra sensors:
     uint16_t ext_strain[6];
+	
+	//Decoded values (ext_strain only)
+	struct decoded_ricnu_s decoded;
 };
 
 //FlexSEA-Gossip:
