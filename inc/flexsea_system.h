@@ -383,6 +383,7 @@ struct strain_s
 {
 	//One structure per channel:
 	struct strain_1ch_s ch[6];
+    uint8_t compressedBytes[9];
 
     //Decoded values:
     struct decoded_strain_s decoded;
@@ -400,8 +401,9 @@ struct ricnu_s
 	//Execute:
 	struct execute_s ex;
 	
-	//Extra sensors:
-    uint16_t ext_strain[6];
+    //Extra sensors (Strain):
+    //uint16_t ext_strain[6];
+    struct strain_s st;
 	
 	//Decoded values (ext_strain only)
 	struct decoded_ricnu_s decoded;

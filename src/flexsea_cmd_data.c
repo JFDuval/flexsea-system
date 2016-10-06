@@ -334,27 +334,20 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
         #ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
         //Arguments:
-        uint16_to_bytes((uint16_t)strain1.ch[0].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 0] = tmp0;
-        buf[P_DATA1 + 1] = tmp1;
-        uint16_to_bytes((uint16_t)strain1.ch[1].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 2] = tmp0;
-        buf[P_DATA1 + 3] = tmp1;
-        uint16_to_bytes((uint16_t)strain1.ch[2].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 4] = tmp0;
-        buf[P_DATA1 + 5] = tmp1;
-        uint16_to_bytes((uint16_t)strain1.ch[3].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 6] = tmp0;
-        buf[P_DATA1 + 7] = tmp1;
-        uint16_to_bytes((uint16_t)strain1.ch[4].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 8] = tmp0;
-        buf[P_DATA1 + 9] = tmp1;
-        uint16_to_bytes((uint16_t)strain1.ch[5].strain_filtered, &tmp0, &tmp1);
-        buf[P_DATA1 + 10] = tmp0;
-        buf[P_DATA1 + 11] = tmp1;
-
-        bytes = P_DATA1 + 12;     //Bytes is always last+1
-
+		
+		//Compressed Strain:
+		buf[P_DATA1 + 0] = strain1.compressedBytes[0];
+		buf[P_DATA1 + 1] = strain1.compressedBytes[1];
+		buf[P_DATA1 + 2] = strain1.compressedBytes[2];		
+		buf[P_DATA1 + 3] = strain1.compressedBytes[3];
+		buf[P_DATA1 + 4] = strain1.compressedBytes[4];
+		buf[P_DATA1 + 5] = strain1.compressedBytes[5];
+		buf[P_DATA1 + 6] = strain1.compressedBytes[6];
+		buf[P_DATA1 + 7] = strain1.compressedBytes[7];
+		buf[P_DATA1 + 8] = strain1.compressedBytes[8];
+			
+		bytes = P_DATA1 + 9;     //Bytes is always last+1
+		
         #endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 	}
 	else
@@ -524,12 +517,15 @@ void rx_cmd_data_read_all(uint8_t *buf)
             }
             else if(buf[P_XID] == FLEXSEA_STRAIN_1)
             {
-                stPtr->ch[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
-                stPtr->ch[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
-                stPtr->ch[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
-                stPtr->ch[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
-                stPtr->ch[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
-                stPtr->ch[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);
+				strain1.compressedBytes[0] = buf[P_DATA1 + 0];
+				strain1.compressedBytes[1] = buf[P_DATA1 + 1];
+				strain1.compressedBytes[2] = buf[P_DATA1 + 2];		
+				strain1.compressedBytes[3] = buf[P_DATA1 + 3];
+				strain1.compressedBytes[4] = buf[P_DATA1 + 4];
+				strain1.compressedBytes[5] = buf[P_DATA1 + 5];
+				strain1.compressedBytes[6] = buf[P_DATA1 + 6];
+				strain1.compressedBytes[7] = buf[P_DATA1 + 7];
+				strain1.compressedBytes[8] = buf[P_DATA1 + 8];
             }
 			
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
@@ -617,29 +613,19 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
 		buf[P_DATA1 + 20] = tmp0;
 		buf[P_DATA1 + 21] = tmp1;
-
-		uint16_to_bytes((uint16_t)ext_strain[0], &tmp0, &tmp1);
-		buf[P_DATA1 + 22] = tmp0;
-		buf[P_DATA1 + 23] = tmp1;
-		uint16_to_bytes((uint16_t)ext_strain[1], &tmp0, &tmp1);
-		buf[P_DATA1 + 24] = tmp0;
-		buf[P_DATA1 + 25] = tmp1;
-		uint16_to_bytes((uint16_t)ext_strain[2], &tmp0, &tmp1);
-		buf[P_DATA1 + 26] = tmp0;
-		buf[P_DATA1 + 27] = tmp1;
-		uint16_to_bytes((uint16_t)ext_strain[3], &tmp0, &tmp1);
-		buf[P_DATA1 + 28] = tmp0;
-		buf[P_DATA1 + 29] = tmp1;
-		uint16_to_bytes((uint16_t)ext_strain[4], &tmp0, &tmp1);
-		buf[P_DATA1 + 30] = tmp0;
-		buf[P_DATA1 + 31] = tmp1;
-		uint16_to_bytes((uint16_t)ext_strain[5], &tmp0, &tmp1);
-		buf[P_DATA1 + 32] = tmp0;
-		buf[P_DATA1 + 33] = tmp1;
 		
-		//ToDo add user variables
+		//Compressed Strain:		
+		buf[P_DATA1 + 22] = strain1.compressedBytes[0];
+		buf[P_DATA1 + 23] = strain1.compressedBytes[1];
+		buf[P_DATA1 + 24] = strain1.compressedBytes[2];		
+		buf[P_DATA1 + 25] = strain1.compressedBytes[3];
+		buf[P_DATA1 + 26] = strain1.compressedBytes[4];
+		buf[P_DATA1 + 27] = strain1.compressedBytes[5];
+		buf[P_DATA1 + 28] = strain1.compressedBytes[6];
+		buf[P_DATA1 + 29] = strain1.compressedBytes[7];
+		buf[P_DATA1 + 30] = strain1.compressedBytes[8];
 		
-		bytes = P_DATA1 + 34;     //Bytes is always last+1
+		bytes = P_DATA1 + 31;     //Bytes is always last+1
 		
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 	}
@@ -723,13 +709,16 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 			
 			ricnu_s_ptr->ex.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+20], buf[P_DATA1+21]));
 			
-			ricnu_s_ptr->ext_strain[0] = (BYTES_TO_UINT16(buf[P_DATA1+22], buf[P_DATA1+23]));
-			ricnu_s_ptr->ext_strain[1] = (BYTES_TO_UINT16(buf[P_DATA1+24], buf[P_DATA1+25]));
-			ricnu_s_ptr->ext_strain[2] = (BYTES_TO_UINT16(buf[P_DATA1+26], buf[P_DATA1+27]));
-			ricnu_s_ptr->ext_strain[3] = (BYTES_TO_UINT16(buf[P_DATA1+28], buf[P_DATA1+29]));
-			ricnu_s_ptr->ext_strain[4] = (BYTES_TO_UINT16(buf[P_DATA1+30], buf[P_DATA1+31]));
-			ricnu_s_ptr->ext_strain[5] = (BYTES_TO_UINT16(buf[P_DATA1+32], buf[P_DATA1+33]));
-		
+            ricnu_s_ptr->st.compressedBytes[0] = buf[P_DATA1 + 22];
+            ricnu_s_ptr->st.compressedBytes[1] = buf[P_DATA1 + 23];
+            ricnu_s_ptr->st.compressedBytes[2] = buf[P_DATA1 + 24];
+            ricnu_s_ptr->st.compressedBytes[3] = buf[P_DATA1 + 25];
+            ricnu_s_ptr->st.compressedBytes[4] = buf[P_DATA1 + 26];
+            ricnu_s_ptr->st.compressedBytes[5] = buf[P_DATA1 + 27];
+            ricnu_s_ptr->st.compressedBytes[6] = buf[P_DATA1 + 28];
+            ricnu_s_ptr->st.compressedBytes[7] = buf[P_DATA1 + 29];
+            ricnu_s_ptr->st.compressedBytes[8] = buf[P_DATA1 + 30];
+
 			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
             //Plan uses the Super Structure to save decoded values:
