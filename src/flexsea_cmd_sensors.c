@@ -49,7 +49,7 @@ extern "C" {
 
 //Manage boards only:
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
-//...
+#include "main.h"
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 //Execute boards only:
