@@ -105,6 +105,9 @@ struct gen_ctrl_s
 	int32_t error_prev;					//Past error
     int32_t error_sum;					//Integral
     int32_t error_dif;					//Differential
+    
+    //trapezoidal time
+    int64_t trap_t;
 };
 
 //Position controller
@@ -126,6 +129,9 @@ struct pos_ctrl_s
 	int32_t error_prev;					//Past error
     int32_t error_sum;					//Integral
     int32_t error_dif;					//Differential
+    
+    //trapezoidal time
+    int64_t trap_t;
 };
 
 //Main data structure for all the controllers:
