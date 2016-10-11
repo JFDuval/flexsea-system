@@ -526,14 +526,16 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 
 			//Store value:
 			//ctrl.position.pos = tmp_pos;
-			ctrl.position.posi = tmp_posi;
+			//ctrl.position.posi = tmp_posi;
+            
 			ctrl.position.posf = tmp_posf;
 			ctrl.position.spdm = tmp_spdm;
 			ctrl.position.acc = tmp_acc;
 
 			if(ctrl.active_ctrl == CTRL_POSITION)
 			{
-				steps = trapez_gen_motion_1(tmp_posi, tmp_posf, tmp_spdm, tmp_acc);
+				ctrl.position.posi = ctrl.position.setp;
+                steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
 			}
 			else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
 			{
@@ -548,7 +550,9 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 				ctrl.impedance.gain.Z_I = 0;
 
 				//New trajectory
-				steps = trapez_gen_motion_1(tmp_posi, tmp_posf, tmp_spdm, tmp_acc);
+                ctrl.position.posi = ctrl.impedance.setpoint_val;
+				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
+			
 
 				//Restore gains
 				ctrl.impedance.gain.Z_K = tmp_z_k;
