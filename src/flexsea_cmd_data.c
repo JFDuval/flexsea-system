@@ -576,10 +576,10 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Arguments:
-		uint16_to_bytes((uint16_t)(ctrl.impedance.actual_vel), &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
 		buf[P_DATA1 + 0] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)(ctrl.impedance.actual_val), &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
 		buf[P_DATA1 + 2] = tmp0;
 		buf[P_DATA1 + 3] = tmp1;
 		uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
