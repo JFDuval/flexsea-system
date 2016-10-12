@@ -704,7 +704,7 @@ void rx_cmd_data_read_all_ricnu(uint8_t *buf)
 			
 			ricnu_s_ptr->ex.enc_motor = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+12], buf[P_DATA1+13], \
 																		buf[P_DATA1+14], buf[P_DATA1+15]));
-			ricnu_s_ptr->ex.enc_control = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+16], buf[P_DATA1+17], \
+            ricnu_s_ptr->ex.enc_joint = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+16], buf[P_DATA1+17], \
 																		buf[P_DATA1+18], buf[P_DATA1+19]));
 			
 			ricnu_s_ptr->ex.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+20], buf[P_DATA1+21]));
