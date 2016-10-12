@@ -49,6 +49,7 @@ void rx_cmd_special_2(uint8_t *buf);
 void rx_cmd_special_3(uint8_t *buf);
 void rx_cmd_special_4(uint8_t *buf);
 void rx_cmd_special_5(uint8_t *buf);
+void rx_cmd_ricnu(uint8_t *buf);
 
 //****************************************************************************
 // Definition(s):

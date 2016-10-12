@@ -112,6 +112,7 @@ void init_flexsea_payload_ptr(void)
     flexsea_payload_ptr[CMD_SPC3] = &rx_cmd_special_3;
     flexsea_payload_ptr[CMD_SPC4] = &rx_cmd_special_4;
     flexsea_payload_ptr[CMD_SPC5] = &rx_cmd_special_5;
+    flexsea_payload_ptr[CMD_RICNU] = &rx_cmd_ricnu;
 
     //Sensors:
     flexsea_payload_ptr[CMD_ENCODER] = &rx_cmd_encoder;

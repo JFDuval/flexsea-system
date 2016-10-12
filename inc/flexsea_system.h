@@ -169,6 +169,7 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 #define CMD_READ_ALL_RICNU				105		//RIC/NU Knee, Read All function
 #define CMD_SPC4						120		//Dual ShuoBot
 #define CMD_SPC5						121		//Ankle 2-Dof Plan <> Manage
+#define CMD_RICNU						122		//RIC/NU R/W
 
 //===================
 

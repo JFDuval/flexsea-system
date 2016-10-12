@@ -1278,6 +1278,203 @@ uint32_t tx_cmd_ctrl_special_5(uint8_t receiver, uint8_t cmd_type, uint8_t *buf,
 	return bytes;
 }
 
+//Transmission of a CMD_RICNU command: RIC/NU Knee R/W. We use this command
+//to communicate from Manage to Execute
+//setGains: KEEP/CHANGE
+uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+                        uint8_t offset, uint8_t controller, int32_t setpoint,
+                        uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
+                        int16_t g3)
+{
+    uint8_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
+    uint32_t bytes = 0;
+
+    #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
+
+    //Structure pointer. Points to exec1 by default.
+    //struct execute_s *exec_s_ptr = &exec1;
+
+    #endif	//(defined BOARD_TYPE_FLEXSEA_MANAGE)
+
+    //Fresh payload string:
+    prepare_empty_payload(board_id, receiver, buf, len);
+
+    //Command:
+    buf[P_CMDS] = 1;                     //1 command in string
+
+    if(cmd_type == CMD_READ)
+    {
+        buf[P_CMD1] = CMD_R(CMD_RICNU);
+
+        //Arguments:
+        buf[P_DATA1 + 0] = offset;
+        buf[P_DATA1 + 1] = controller;
+
+        uint32_to_bytes((uint32_t)setpoint, &tmp0, &tmp1, &tmp2, &tmp3);
+        buf[P_DATA1 + 2] = tmp0;
+        buf[P_DATA1 + 3] = tmp1;
+        buf[P_DATA1 + 4] = tmp2;
+        buf[P_DATA1 + 5] = tmp3;
+
+        buf[P_DATA1 + 6] = setGains;
+
+        uint16_to_bytes((uint16_t)g0, &tmp0, &tmp1);
+        buf[P_DATA1 + 7] = tmp0;
+        buf[P_DATA1 + 8] = tmp1;
+        uint16_to_bytes((uint16_t)g1, &tmp0, &tmp1);
+        buf[P_DATA1 + 9] = tmp0;
+        buf[P_DATA1 + 10] = tmp1;
+        uint16_to_bytes((uint16_t)g2, &tmp0, &tmp1);
+        buf[P_DATA1 + 11] = tmp0;
+        buf[P_DATA1 + 12] = tmp1;
+        uint16_to_bytes((uint16_t)g3, &tmp0, &tmp1);
+        buf[P_DATA1 + 13] = tmp0;
+        buf[P_DATA1 + 14] = tmp1;
+
+        bytes = P_DATA1 + 15;     //Bytes is always last+1
+    }
+    else if(cmd_type == CMD_WRITE)
+    {
+        //In that case Write is only used for the Reply
+
+        buf[P_CMD1] = CMD_W(CMD_RICNU);
+        buf[P_DATA1] = offset;
+
+        #ifdef BOARD_TYPE_FLEXSEA_MANAGE
+
+        bytes = P_DATA1 + 1;     //Bytes is always last+1
+
+        #endif	//BOARD_TYPE_FLEXSEA_MANAGE
+
+        #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+        //Send sensor readings here...
+
+        bytes = P_DATA1 + 1;     //Bytes is always last+1
+
+        #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+    }
+    else
+    {
+        //Invalid
+        flexsea_error(SE_INVALID_READ_TYPE);
+        bytes = 0;
+    }
+
+    return bytes;
+}
+
+//Reception of a CMD_RICNU command
+void rx_cmd_ricnu(uint8_t *buf)
+{
+    uint32_t numb = 0;
+    uint8_t offset = 0;
+    int32_t tmpSetpoint = 0;
+    int32_t tmpGain[4] = {0,0,0,0};
+
+    #if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+    //Structure pointer.
+    //struct execute_s *exec_s_ptr = &exec1;
+
+    #endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+    if(IS_CMD_RW(buf[P_CMD1]) == READ)
+    {
+        //Received a Read command from our master.
+
+        #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+        offset = buf[P_DATA1];
+
+        tmpSetpoint = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+2], buf[P_DATA1+3], \
+                buf[P_DATA1+4], buf[P_DATA1+5]));
+
+        tmpGain[0] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+7], buf[P_DATA1+8]));
+        tmpGain[1] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+9], buf[P_DATA1+10]));
+        tmpGain[2] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+11], buf[P_DATA1+12]));
+        tmpGain[3] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+13], buf[P_DATA1+14]));
+
+        //Update controller (if needed):
+        control_strategy(buf[P_DATA1 + 1]);
+
+        /*
+        //Only change the setpoint if we are in current control mode:
+        if(ctrl.active_ctrl == CTRL_CURRENT)
+        {
+            tmp_wanted_current = BYTES_TO_UINT16(buf[P_DATA1 + 2], buf[P_DATA1 + 3]);
+            ctrl.current.setpoint_val = tmp_wanted_current;
+        }
+        else if(ctrl.active_ctrl == CTRL_OPEN)
+        {
+            tmp_open_spd = (int16_t) BYTES_TO_UINT16(buf[P_DATA1 + 4], buf[P_DATA1 + 5]);
+            motor_open_speed_1(tmp_open_spd);
+        }
+        */
+
+        //Generate the reply:
+        numb = tx_cmd_ricnu(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN,
+                            offset, 0, 0, 0, 0, 0, 0, 0);
+        numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
+        numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
+
+        //Delayed response:
+        rs485_reply_ready(comm_str_485_1, (numb));
+
+        #ifdef USE_USB
+        usb_puts(comm_str_485_1, (numb));
+        #endif
+
+        #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+
+        #ifdef BOARD_TYPE_FLEXSEA_PLAN
+        //No code (yet), you shouldn't be here...
+        flexsea_error(SE_CMD_NOT_PROGRAMMED);
+        #endif	//BOARD_TYPE_FLEXSEA_PLAN
+    }
+    else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
+    {
+        //Two options: from Master of from slave (a read reply)
+
+        if(sent_from_a_slave(buf))
+        {
+            //We received a reply to our read request
+
+            #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+            //No code (yet), you shouldn't be here...
+            flexsea_error(SE_CMD_NOT_PROGRAMMED);
+            #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+
+            #if((defined BOARD_TYPE_FLEXSEA_MANAGE))
+
+            buf[P_DATA1];
+
+
+            #endif	//BOARD_TYPE_FLEXSEA_MANAGE
+        }
+        else
+        {
+            //Master is writing a value to this board
+
+            #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+            //ToDo call relevant functions ****
+
+            #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+
+            #ifdef BOARD_TYPE_FLEXSEA_MANAGE
+            //No code (yet), you shouldn't be here...
+            flexsea_error(SE_CMD_NOT_PROGRAMMED);
+            #endif	//BOARD_TYPE_FLEXSEA_MANAGE
+
+            #ifdef BOARD_TYPE_FLEXSEA_PLAN
+            //No code (yet), you shouldn't be here...
+            flexsea_error(SE_CMD_NOT_PROGRAMMED);
+            #endif	//BOARD_TYPE_FLEXSEA_PLAN
+        }
+    }
+}
+
 //Reception of a CMD_SPECIAL_5 command
 void rx_cmd_special_5(uint8_t *buf)
 {
