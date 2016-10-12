@@ -1397,20 +1397,47 @@ void rx_cmd_ricnu(uint8_t *buf)
 
         //Update controller (if needed):
         control_strategy(buf[P_DATA1 + 1]);
+        
+        if (buf[P_DATA1 + 6] == CHANGE)
+        {
+        }
 
-        /*
+        
         //Only change the setpoint if we are in current control mode:
         if(ctrl.active_ctrl == CTRL_CURRENT)
         {
-            tmp_wanted_current = BYTES_TO_UINT16(buf[P_DATA1 + 2], buf[P_DATA1 + 3]);
-            ctrl.current.setpoint_val = tmp_wanted_current;
+            ctrl.current.setpoint_val = tmpSetpoint;
+            if (buf[P_DATA1 + 6] == CHANGE)
+            {
+                ctrl.current.gain.g0 = tmpGain[0];
+                ctrl.current.gain.g1 = tmpGain[1];
+            }
         }
         else if(ctrl.active_ctrl == CTRL_OPEN)
         {
-            tmp_open_spd = (int16_t) BYTES_TO_UINT16(buf[P_DATA1 + 4], buf[P_DATA1 + 5]);
-            motor_open_speed_1(tmp_open_spd);
+            motor_open_speed_1(tmpSetpoint);
         }
-        */
+        else if(ctrl.active_ctrl == CTRL_POSITION)
+        {
+            ctrl.position.setp = tmpSetpoint;
+            if (buf[P_DATA1 + 6] == CHANGE)
+            {
+                ctrl.position.gain.g0 = tmpGain[0];
+                ctrl.position.gain.g1 = tmpGain[1];
+            }
+        }
+        else if (ctrl.active_ctrl == CTRL_IMPEDANCE)
+        {
+            ctrl.impedance.setpoint_val = tmpSetpoint;
+            if (buf[P_DATA1 + 6] == CHANGE)
+            {
+                ctrl.impedance.gain.g0 = tmpGain[0];
+                ctrl.impedance.gain.g1 = tmpGain[1];
+                ctrl.current.gain.g0 = tmpGain[2];
+                ctrl.current.gain.g1 = tmpGain[3];
+            }
+        }
+        
 
         //Generate the reply:
         numb = tx_cmd_ricnu(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN,
