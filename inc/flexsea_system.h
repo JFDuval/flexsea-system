@@ -310,10 +310,13 @@ struct execute_s
 	uint16_t strain;
 	uint16_t analog[8];
 	int16_t current;
-	int32_t enc_display;
-	int32_t enc_control;
-	int32_t enc_commut;
+	int32_t enc_display; //useful?
+	int32_t enc_control; //useful?
+	int32_t enc_commut; //useful?
+    int32_t enc_control_ang;
+    int32_t enc_control_vel; 
 	int32_t enc_motor;
+    int32_t enc_joint;
 	uint8_t volt_batt;	//+VB
 	uint8_t volt_int;	//+VG
 	uint8_t temp;
@@ -508,6 +511,7 @@ struct as504x_s
     int32_t last_angtimer_read;
     int32_t counts_since_last_ang_read;
     int32_t last_ang_read_period;
+    int32_t samplefreq; //sampling frequency of the sensor
 };
 
 //****************************************************************************

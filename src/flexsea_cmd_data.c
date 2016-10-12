@@ -576,10 +576,10 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Arguments:
-		uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)(ctrl.impedance.actual_vel), &tmp0, &tmp1);
 		buf[P_DATA1 + 0] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
+		uint16_to_bytes((uint16_t)(ctrl.impedance.actual_val), &tmp0, &tmp1);
 		buf[P_DATA1 + 2] = tmp0;
 		buf[P_DATA1 + 3] = tmp1;
 		uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
@@ -597,14 +597,14 @@ uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t 
 		buf[P_DATA1 + 11] = tmp1;		
 		
 		//Motor encoder, multi-turns
-        uint32_to_bytes((uint32_t)as5047.angle_conts[0], &tmp0, &tmp1, &tmp2, &tmp3);
+        uint32_to_bytes((uint32_t)exec1.enc_motor, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 12] = tmp0;
 		buf[P_DATA1 + 13] = tmp1;
 		buf[P_DATA1 + 14] = tmp2;
 		buf[P_DATA1 + 15] = tmp3;
 		
 		//Joint encoder, limited to 1 rotation
-		uint32_to_bytes((uint32_t)as5048b.angle_conts[0], &tmp0, &tmp1, &tmp2, &tmp3);
+		uint32_to_bytes((uint32_t)exec1.enc_joint, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 16] = tmp0;
 		buf[P_DATA1 + 17] = tmp1;
 		buf[P_DATA1 + 18] = tmp2;

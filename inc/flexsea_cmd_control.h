@@ -99,6 +99,7 @@ struct gen_ctrl_s
 	//Value wanted and setpoint value:
 	int32_t actual_val;
     int32_t setpoint_val;
+    int32_t actual_vel;
 
 	//Errors:
     int32_t error;						//Current error
@@ -152,6 +153,7 @@ struct enc_s
 	int32_t count_last;
 	int32_t count_dif;
 	uint32_t config;
+    int32_t vel;
 };
 
 //****************************************************************************
