@@ -1457,8 +1457,8 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
                         uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
                         int16_t g3)
 {
-    uint8_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
     uint32_t bytes = 0;
+    uint16_t index = 0;
 
     #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
@@ -1478,42 +1478,29 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
         buf[P_CMD1] = CMD_R(CMD_RICNU);
 
         //Arguments:
-        buf[P_DATA1 + 0] = offset;
-        buf[P_DATA1 + 1] = controller;
-
-        uint32_to_bytes((uint32_t)setpoint, &tmp0, &tmp1, &tmp2, &tmp3);
-        buf[P_DATA1 + 2] = tmp0;
-        buf[P_DATA1 + 3] = tmp1;
-        buf[P_DATA1 + 4] = tmp2;
-        buf[P_DATA1 + 5] = tmp3;
-
-        buf[P_DATA1 + 6] = setGains;
-
-        uint16_to_bytes((uint16_t)g0, &tmp0, &tmp1);
-        buf[P_DATA1 + 7] = tmp0;
-        buf[P_DATA1 + 8] = tmp1;
-        uint16_to_bytes((uint16_t)g1, &tmp0, &tmp1);
-        buf[P_DATA1 + 9] = tmp0;
-        buf[P_DATA1 + 10] = tmp1;
-        uint16_to_bytes((uint16_t)g2, &tmp0, &tmp1);
-        buf[P_DATA1 + 11] = tmp0;
-        buf[P_DATA1 + 12] = tmp1;
-        uint16_to_bytes((uint16_t)g3, &tmp0, &tmp1);
-        buf[P_DATA1 + 13] = tmp0;
-        buf[P_DATA1 + 14] = tmp1;
-
-        bytes = P_DATA1 + 15;     //Bytes is always last+1
+        index = P_DATA1;
+        buf[index++] = offset;
+        buf[index++] = controller;
+        SPLIT_32(setpoint, buf, &index);
+        buf[index++] = setGains;
+        SPLIT_16(g0, buf, &index);
+        SPLIT_16(g1, buf, &index);
+        SPLIT_16(g2, buf, &index);
+        SPLIT_16(g3, buf, &index);
+        bytes = index;
     }
     else if(cmd_type == CMD_WRITE)
     {
         //In that case Write is only used for the Reply
 
         buf[P_CMD1] = CMD_W(CMD_RICNU);
-        buf[P_DATA1] = offset;
+
+        index = P_DATA1;
+        buf[index++] = offset;
 
         #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-        bytes = P_DATA1 + 1;     //Bytes is always last+1
+        bytes = index + 1;     //Bytes is always last+1
 
         #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
@@ -1522,62 +1509,32 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
         //Arguments:
         if(offset == 0)
         {
-            uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
-            buf[P_DATA1 + 1] = tmp0;
-            buf[P_DATA1 + 2] = tmp1;
-            uint16_to_bytes((uint16_t)imu.gyro.y, &tmp0, &tmp1);
-            buf[P_DATA1 + 3] = tmp0;
-            buf[P_DATA1 + 4] = tmp1;
-            uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
-            buf[P_DATA1 + 5] = tmp0;
-            buf[P_DATA1 + 6] = tmp1;
-
-            uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
-            buf[P_DATA1 + 7] = tmp0;
-            buf[P_DATA1 + 8] = tmp1;
-            uint16_to_bytes((uint16_t)imu.accel.y, &tmp0, &tmp1);
-            buf[P_DATA1 + 9] = tmp0;
-            buf[P_DATA1 + 10] = tmp1;
-            uint16_to_bytes((uint16_t)imu.accel.z, &tmp0, &tmp1);
-            buf[P_DATA1 + 11] = tmp0;
-            buf[P_DATA1 + 12] = tmp1;
-
-            //Motor encoder, multi-turns
-            uint32_to_bytes((uint32_t)exec1.enc_motor, &tmp0, &tmp1, &tmp2, &tmp3);
-            buf[P_DATA1 + 13] = tmp0;
-            buf[P_DATA1 + 14] = tmp1;
-            buf[P_DATA1 + 15] = tmp2;
-            buf[P_DATA1 + 16] = tmp3;
-
-            //Joint encoder, limited to 1 rotation
-            uint32_to_bytes((uint32_t)exec1.enc_joint, &tmp0, &tmp1, &tmp2, &tmp3);
-            buf[P_DATA1 + 17] = tmp0;
-            buf[P_DATA1 + 18] = tmp1;
-            buf[P_DATA1 + 19] = tmp2;
-            buf[P_DATA1 + 20] = tmp3;
-
-            uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
-            buf[P_DATA1 + 21] = tmp0;
-            buf[P_DATA1 + 22] = tmp1;
-
-            bytes = P_DATA1 + 23;     //Bytes is always last+1
+            SPLIT_16((uint16_t)imu.gyro.x, buf, &index);
+            SPLIT_16((uint16_t)imu.gyro.y, buf, &index);
+            SPLIT_16((uint16_t)imu.gyro.z, buf, &index);
+            SPLIT_16((uint16_t)imu.accel.x, buf, &index);
+            SPLIT_16((uint16_t)imu.accel.y, buf, &index);
+            SPLIT_16((uint16_t)imu.accel.z, buf, &index);
+            SPLIT_32((uint32_t)exec1.enc_motor, buf, &index);
+            SPLIT_32((uint32_t)exec1.enc_joint, buf, &index);
+            SPLIT_16((uint16_t)ctrl.current.actual_val, buf, &index);
+            bytes = index;     //Bytes is always last+1
         }
         else if(offset == 1)
         {
             //Compressed Strain:
-            buf[P_DATA1 + 1] = strain1.compressedBytes[0];
-            buf[P_DATA1 + 2] = strain1.compressedBytes[1];
-            buf[P_DATA1 + 3] = strain1.compressedBytes[2];
-            buf[P_DATA1 + 4] = strain1.compressedBytes[3];
-            buf[P_DATA1 + 5] = strain1.compressedBytes[4];
-            buf[P_DATA1 + 6] = strain1.compressedBytes[5];
-            buf[P_DATA1 + 7] = strain1.compressedBytes[6];
-            buf[P_DATA1 + 8] = strain1.compressedBytes[7];
-            buf[P_DATA1 + 9] = strain1.compressedBytes[8];
 
+            buf[index++] = strain1.compressedBytes[0];
+            buf[index++] = strain1.compressedBytes[1];
+            buf[index++] = strain1.compressedBytes[2];
+            buf[index++] = strain1.compressedBytes[3];
+            buf[index++] = strain1.compressedBytes[4];
+            buf[index++] = strain1.compressedBytes[5];
+            buf[index++] = strain1.compressedBytes[6];
+            buf[index++] = strain1.compressedBytes[7];
+            buf[index++] = strain1.compressedBytes[8];
             //Include other variables here (ToDo)
-
-            bytes = P_DATA1 + 10;     //Bytes is always last+1
+            bytes = index;     //Bytes is always last+1
         }
         else
         {
@@ -1600,8 +1557,9 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
 //Reception of a CMD_RICNU command
 void rx_cmd_ricnu(uint8_t *buf)
 {
+    uint16_t index = 0;
     uint32_t numb = 0;
-    uint8_t offset = 0;
+    uint8_t offset = 0, tmpController = 0, setGains = 0;
     int32_t tmpSetpoint = 0;
     int32_t tmpGain[4] = {0,0,0,0};
 
@@ -1619,18 +1577,18 @@ void rx_cmd_ricnu(uint8_t *buf)
 
         #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-        offset = buf[P_DATA1];
-
-        tmpSetpoint = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+2], buf[P_DATA1+3], \
-                buf[P_DATA1+4], buf[P_DATA1+5]));
-
-        tmpGain[0] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+7], buf[P_DATA1+8]));
-        tmpGain[1] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+9], buf[P_DATA1+10]));
-        tmpGain[2] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+11], buf[P_DATA1+12]));
-        tmpGain[3] = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+13], buf[P_DATA1+14]));
+        index = P_DATA1;
+        offset = buf[index++];
+        tmpController = buf[index++];
+        tmpSetpoint = (int32_t)REBUILD_UINT32(buf, &index);
+        tmpSetGains = buf[index++];
+        tmpGain[0] = (int16_t)REBUILD_UINT16(buf, &index);
+        tmpGain[1] = (int16_t)REBUILD_UINT16(buf, &index);
+        tmpGain[2] = (int16_t)REBUILD_UINT16(buf, &index);
+        tmpGain[3] = (int16_t)REBUILD_UINT16(buf, &index);
 
         //Update controller (if needed):
-        control_strategy(buf[P_DATA1 + 1]);
+        control_strategy(tmpController);
         
         //Only change the setpoint if we are in current control mode:
         if(ctrl.active_ctrl == CTRL_CURRENT)
@@ -1649,7 +1607,7 @@ void rx_cmd_ricnu(uint8_t *buf)
         else if(ctrl.active_ctrl == CTRL_POSITION)
         {
             ctrl.position.setp = tmpSetpoint;
-            if (buf[P_DATA1 + 6] == CHANGE)
+            if (tmpSetGains == CHANGE)
             {
                 ctrl.position.gain.g0 = tmpGain[0];
                 ctrl.position.gain.g1 = tmpGain[1];
@@ -1658,7 +1616,7 @@ void rx_cmd_ricnu(uint8_t *buf)
         else if (ctrl.active_ctrl == CTRL_IMPEDANCE)
         {
             ctrl.impedance.setpoint_val = tmpSetpoint;
-            if (buf[P_DATA1 + 6] == CHANGE)
+            if (tmpSetGains == CHANGE)
             {
                 ctrl.impedance.gain.g0 = tmpGain[0];
                 ctrl.impedance.gain.g1 = tmpGain[1];
@@ -1702,36 +1660,32 @@ void rx_cmd_ricnu(uint8_t *buf)
 
             #if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-            offset = buf[P_DATA1];
+            index = P_DATA1;
+            offset = buf[index++];
 
             if(offset == 0)
             {
-                ricnu_s_ptr->ex.gyro.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+1], buf[P_DATA1+2]));
-                ricnu_s_ptr->ex.gyro.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+3], buf[P_DATA1+4]));
-                ricnu_s_ptr->ex.gyro.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+5], buf[P_DATA1+6]));
-
-                ricnu_s_ptr->ex.accel.x = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+7], buf[P_DATA1+8]));
-                ricnu_s_ptr->ex.accel.y = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+9], buf[P_DATA1+10]));
-                ricnu_s_ptr->ex.accel.z = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+11], buf[P_DATA1+12]));
-
-                ricnu_s_ptr->ex.enc_motor = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+13], buf[P_DATA1+14], \
-                                                                            buf[P_DATA1+15], buf[P_DATA1+16]));
-                ricnu_s_ptr->ex.enc_joint = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1+17], buf[P_DATA1+18], \
-                                                                            buf[P_DATA1+19], buf[P_DATA1+20]));
-
-                ricnu_s_ptr->ex.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+21], buf[P_DATA1+22]));
+                ricnu_s_ptr->ex.gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.accel.x = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.accel.y = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+                ricnu_s_ptr->ex.enc_motor = (int32_t) REBUILD_UINT32(buf, &index);
+                ricnu_s_ptr->ex.enc_joint = (int32_t) REBUILD_UINT32(buf, &index);
+                ricnu_s_ptr->ex.current = (int16_t) REBUILD_UINT16(buf, &index);
             }
             else if(offset == 1)
             {
-                ricnu_s_ptr->st.compressedBytes[0] = buf[P_DATA1 + 1];
-                ricnu_s_ptr->st.compressedBytes[1] = buf[P_DATA1 + 2];
-                ricnu_s_ptr->st.compressedBytes[2] = buf[P_DATA1 + 3];
-                ricnu_s_ptr->st.compressedBytes[3] = buf[P_DATA1 + 4];
-                ricnu_s_ptr->st.compressedBytes[4] = buf[P_DATA1 + 5];
-                ricnu_s_ptr->st.compressedBytes[5] = buf[P_DATA1 + 6];
-                ricnu_s_ptr->st.compressedBytes[6] = buf[P_DATA1 + 7];
-                ricnu_s_ptr->st.compressedBytes[7] = buf[P_DATA1 + 8];
-                ricnu_s_ptr->st.compressedBytes[8] = buf[P_DATA1 + 9];
+                ricnu_s_ptr->st.compressedBytes[0] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[1] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[2] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[3] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[4] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[5] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[6] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[7] = buf[index++];
+                ricnu_s_ptr->st.compressedBytes[8] = buf[index++];
 
                 //Include other variables here (ToDo)
             }

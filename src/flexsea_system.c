@@ -74,7 +74,7 @@ void init_flexsea_payload_ptr(void)
     int i = 0;
 
     //By default, they all point to 'flexsea_payload_catchall()'
-    for(i = 0; i < 128; i++)
+    for(i = 0; i < MAX_CMD_CODE; i++)
     {
         flexsea_payload_ptr[i] = &flexsea_payload_catchall;
     }
