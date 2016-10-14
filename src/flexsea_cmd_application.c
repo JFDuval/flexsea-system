@@ -1457,23 +1457,11 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
 						uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
 						int16_t g3)
 {
-	//uint32_t bytes = 0;
-	uint16_t index = 0;
-
-	//ToDo: does this need to be board specific?
-	#if(defined BOARD_TYPE_FLEXSEA_MANAGE)
-
-	//Structure pointer. Points to exec1 by default.
-	//struct execute_s *exec_s_ptr = &exec1;
-
-	#endif	//(defined BOARD_TYPE_FLEXSEA_MANAGE)
-
-	TX_INIT(1)	//Fresh payload string, 1 command per string
+	TX_INIT(1)
 
 	TX_STARTOF_READ	//> > > > > > > > > > > > > > > > > >  Start of Read Section
 
 		//Arguments:
-		index = P_DATA1;
 		buf[index++] = offset;
 		buf[index++] = controller;
 		SPLIT_32(setpoint, buf, &index);
@@ -1486,10 +1474,9 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
 	TX_ENDOF_READ		//< < < < < < < < < < < < < < < < <  End of Read Section
 	TX_STARTOF_WRITE	//> > > > > > > > > > > > > > > > Start of Write Section
 
-		index = P_DATA1;
-		buf[index++] = offset;
-
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+		buf[index++] = offset;
 
 		//Arguments:
 		if(offset == 0)
@@ -1537,7 +1524,7 @@ void rx_cmd_ricnu(uint8_t *buf)
 	uint16_t index = 0;
 	uint8_t offset = 0;
 
-	//Structure pointer.
+	//Structure pointer. ToDo replace by generic function
 	struct execute_s *exec_s_ptr = &exec1;
 	struct ricnu_s *ricnu_s_ptr = &ricnu_1;
 
@@ -1562,7 +1549,7 @@ void rx_cmd_ricnu(uint8_t *buf)
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Act on the decoded data:
-		rx_cmd_ricnu_READ(tmpController, tmpSetpoint, tmpSetGains, tmpGain[0],
+		rx_cmd_ricnu_Action1(tmpController, tmpSetpoint, tmpSetGains, tmpGain[0],
 							tmpGain[1], tmpGain[2], tmpGain[3]);
 
 		//Generate the reply:
@@ -1663,7 +1650,7 @@ void rx_cmd_ricnu(uint8_t *buf)
 }
 
 //Command = rx_cmd_ricnu, section = READ
-void rx_cmd_ricnu_READ(uint8_t controller, int32_t setpoint, uint8_t setGains,
+void rx_cmd_ricnu_Action1(uint8_t controller, int32_t setpoint, uint8_t setGains,
 						int16_t g0,	int16_t g1,	int16_t g2, int16_t g3)
 {
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE

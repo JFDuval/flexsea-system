@@ -17,9 +17,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
 	[This file] flexsea_cmd_application: Application/User specific commands
 *****************************************************************************
@@ -41,8 +41,6 @@
 // Prototype(s):
 //****************************************************************************
 
-//TX functions are prototyped in flexsea_system // ToDo is that necessary?
-
 void rx_cmd_special_1(uint8_t *buf);
 void rx_cmd_special_2(uint8_t *buf);
 void rx_cmd_special_3(uint8_t *buf);
@@ -50,8 +48,24 @@ void rx_cmd_special_4(uint8_t *buf);
 void rx_cmd_special_5(uint8_t *buf);
 void rx_cmd_ricnu(uint8_t *buf);
 
+uint32_t tx_cmd_ctrl_special_1(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+	uint8_t controller_w, uint8_t controller, uint8_t encoder_w, int32_t encoder, \
+								int16_t current, int16_t open_spd);
+uint32_t tx_cmd_ctrl_special_2(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+	int16_t z_k, int16_t z_b, int16_t z_i, uint8_t rgb, uint8_t clutch, \
+								uint8_t trapeze, int32_t posi, int32_t posf, int32_t spdm, int32_t acc);
+uint32_t tx_cmd_ctrl_special_3(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+	int16_t i_kp, int16_t i_ki, int16_t i_kd, int16_t w_curr);
+uint32_t tx_cmd_ctrl_special_4(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+	uint8_t controller_w1, uint8_t controller1, uint8_t encoder_w1, int32_t encoder1, \
+	int16_t current1, int16_t open_spd1, \
+	uint8_t controller_w2, uint8_t controller2, uint8_t encoder_w2, int32_t encoder2, \
+	int16_t current2, int16_t open_spd2);
+uint32_t tx_cmd_ctrl_special_5(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+	uint8_t slave, uint8_t controller, int16_t ctrl_i, int16_t ctrl_o);
+
 //Decoding:
-void rx_cmd_ricnu_READ(uint8_t controller, int32_t setpoint, uint8_t setGains, 
+void rx_cmd_ricnu_Action1(uint8_t controller, int32_t setpoint, uint8_t setGains,
 						int16_t g0,	int16_t g1,	int16_t g2, int16_t g3);
 
 //****************************************************************************

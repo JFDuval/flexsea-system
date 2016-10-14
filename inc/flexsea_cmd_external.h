@@ -17,9 +17,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
 	[This file] flexsea_cmd_external: External/Expansion connector
 *****************************************************************************
@@ -41,12 +41,14 @@
 // Prototype(s):
 //****************************************************************************
 
-//TX functions are prototyped in flexsea_system
-
-//Redefine weak functions from flexsea_payload:
 //void rx_cmd_digital_in(uint8_t *buf);
 //void rx_cmd_analog_in(uint8_t *buf);
 void rx_cmd_exp_pwro(uint8_t *buf);
+
+uint32_t tx_cmd_digital_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
+uint32_t tx_cmd_analog_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
+uint32_t tx_cmd_exp_pwro(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+								uint8_t pwro_pwm);
 
 //****************************************************************************
 // Definition(s):

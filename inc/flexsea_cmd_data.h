@@ -17,9 +17,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
 	[This file] flexsea_cmd_data: Data Commands
 *****************************************************************************
@@ -41,14 +41,16 @@
 // Prototype(s):
 //****************************************************************************
 
-//TX functions are prototyped in flexsea_system
-
-//Redefine weak functions from flexsea_payload:
 void rx_cmd_data_acqui(uint8_t *buf);
 void rx_cmd_data_read_all(uint8_t *buf);
 void rx_cmd_data_read_all_ricnu(uint8_t *buf);
 void rx_cmd_data_user(uint8_t *buf);
 void rx_cmd_data_read_all_ricnu(uint8_t *buf);
+
+uint32_t tx_cmd_data_acqui(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t acqui);
+uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
+uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
+uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
 
 //****************************************************************************
 // Definition(s):

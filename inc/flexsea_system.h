@@ -17,11 +17,11 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] flexsea_system: configuration and functions for this 
+	[This file] flexsea_system: configuration and functions for this
 	particular system
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
@@ -43,7 +43,7 @@
 #include "flexsea_cmd_sensors.h"
 #include "flexsea_cmd_external.h"
 #include "flexsea_cmd_application.h"
-#include "flexsea_cmd_data.h"	
+#include "flexsea_cmd_data.h"
 //...
 
 //****************************************************************************
@@ -51,57 +51,6 @@
 //****************************************************************************
 
 void init_flexsea_payload_ptr(void);
-
-//TX functions:
-//=============
-
-//External:
-uint32_t tx_cmd_digital_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_analog_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_exp_pwro(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t pwro_pwm);
-								
-//Control:
-uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t ctrl);
-uint32_t tx_cmd_ctrl_i(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t wanted, int16_t measured);
-uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd);
-uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int32_t pos, int32_t posi, int32_t posf, int32_t spdm, int32_t acc);
-uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd);
-uint32_t tx_cmd_ctrl_p_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd);
-uint32_t tx_cmd_ctrl_z_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t zk, int16_t zb, int16_t zi);
-uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
-						
-//Data:
-uint32_t tx_cmd_data_acqui(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t acqui);
-uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
-uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-
-//Application:
-uint32_t tx_cmd_ctrl_special_1(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t controller_w, uint8_t controller, uint8_t encoder_w, int32_t encoder, \
-								int16_t current, int16_t open_spd);						
-uint32_t tx_cmd_ctrl_special_2(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								int16_t z_k, int16_t z_b, int16_t z_i, uint8_t rgb, uint8_t clutch, \
-								uint8_t trapeze, int32_t posi, int32_t posf, int32_t spdm, int32_t acc);
-uint32_t tx_cmd_ctrl_special_3(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								int16_t i_kp, int16_t i_ki, int16_t i_kd, int16_t w_curr);
-uint32_t tx_cmd_ctrl_special_4(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t controller_w1, uint8_t controller1, uint8_t encoder_w1, int32_t encoder1, \
-								int16_t current1, int16_t open_spd1, \
-								uint8_t controller_w2, uint8_t controller2, uint8_t encoder_w2, int32_t encoder2, \
-								int16_t current2, int16_t open_spd2);
-uint32_t tx_cmd_ctrl_special_5(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t slave, uint8_t controller, int16_t ctrl_i, int16_t ctrl_o);
-
-//Sensors:
-uint32_t tx_cmd_switch(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_encoder(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int32_t enc);
-uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
 
 //****************************************************************************
 // Definition(s):
@@ -113,8 +62,8 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 
 //System commands:
 
-#define CMD_NULL              			0
-#define CMD_TEST                		1
+#define CMD_NULL						0
+#define CMD_TEST						1
 #define CMD_PING						10
 #define CMD_STATUS						11
 #define CMD_RESET						12
@@ -174,33 +123,33 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 //===================
 
 //Board types:
-#define FLEXSEA_PLAN                	1
-#define FLEXSEA_MANAGE              	2
-#define FLEXSEA_EXECUTE             	3
+#define FLEXSEA_PLAN					1
+#define FLEXSEA_MANAGE					2
+#define FLEXSEA_EXECUTE					3
 #define FLEXSEA_BATTERY					4
 #define FLEXSEA_STRAIN					5
 #define FLEXSEA_GOSSIP					6
 
 //Board addresses:
-#define FLEXSEA_DEFAULT             	0
-#define FLEXSEA_PLAN_BASE              	10						//Plan: from 10 to 19
+#define FLEXSEA_DEFAULT					0
+#define FLEXSEA_PLAN_BASE			 	10						//Plan: from 10 to 19
 #define FLEXSEA_PLAN_1					(FLEXSEA_PLAN_BASE + 0)
 #define FLEXSEA_MANAGE_BASE				20						//Manage: from 20 to 39
-#define FLEXSEA_MANAGE_1            	(FLEXSEA_MANAGE_BASE + 0)
-#define FLEXSEA_MANAGE_2            	(FLEXSEA_MANAGE_BASE + 1)
-#define FLEXSEA_EXECUTE_BASE          	40						//Execute: from 40 to 59
+#define FLEXSEA_MANAGE_1				(FLEXSEA_MANAGE_BASE + 0)
+#define FLEXSEA_MANAGE_2				(FLEXSEA_MANAGE_BASE + 1)
+#define FLEXSEA_EXECUTE_BASE			40						//Execute: from 40 to 59
 #define FLEXSEA_EXECUTE_1				(FLEXSEA_EXECUTE_BASE + 0)
-#define FLEXSEA_EXECUTE_2           	(FLEXSEA_EXECUTE_BASE + 1)
-#define FLEXSEA_EXECUTE_3           	(FLEXSEA_EXECUTE_BASE + 2)
-#define FLEXSEA_EXECUTE_4           	(FLEXSEA_EXECUTE_BASE + 3)
-#define FLEXSEA_BATTERY_BASE          	60						//Battery: from 60 to 69
+#define FLEXSEA_EXECUTE_2				(FLEXSEA_EXECUTE_BASE + 1)
+#define FLEXSEA_EXECUTE_3				(FLEXSEA_EXECUTE_BASE + 2)
+#define FLEXSEA_EXECUTE_4				(FLEXSEA_EXECUTE_BASE + 3)
+#define FLEXSEA_BATTERY_BASE			60						//Battery: from 60 to 69
 #define FLEXSEA_BATTERY_1				(FLEXSEA_BATTERY_BASE + 0)
-#define FLEXSEA_STRAIN_BASE          	70						//Strain: from 70 to 79
+#define FLEXSEA_STRAIN_BASE				70						//Strain: from 70 to 79
 #define FLEXSEA_STRAIN_1				(FLEXSEA_STRAIN_BASE + 0)
-#define FLEXSEA_GOSSIP_BASE          	80						//Gossip: from 80 to 89
+#define FLEXSEA_GOSSIP_BASE				80						//Gossip: from 80 to 89
 #define FLEXSEA_GOSSIP_1				(FLEXSEA_GOSSIP_BASE + 0)
 #define FLEXSEA_GOSSIP_2				(FLEXSEA_GOSSIP_BASE + 1)
-#define FLEXSEA_VIRTUAL_BASE          	100						//Virtual boards from 100 to N
+#define FLEXSEA_VIRTUAL_BASE			100						//Virtual boards from 100 to N
 #define FLEXSEA_VIRTUAL_1				(FLEXSEA_VIRTUAL_BASE + 0)
 #define FLEXSEA_VIRTUAL_2				(FLEXSEA_VIRTUAL_BASE + 1)
 
@@ -276,31 +225,31 @@ It includes a sub-structure named decoded_X that contains decoded values
 
 struct decoded_xyz_s
 {
-     int32_t x;
-     int32_t y;
-     int32_t z;
+	 int32_t x;
+	 int32_t y;
+	 int32_t z;
 };
 
 struct xyz_s
 {
-     int16_t x;
-     int16_t y;
-     int16_t z;
+	 int16_t x;
+	 int16_t y;
+	 int16_t z;
 };
 
 //FlexSEA-Execute:
 
 struct decoded_execute_s
 {
-    struct decoded_xyz_s gyro;  //deg/s
-    struct decoded_xyz_s accel; //mg
+	struct decoded_xyz_s gyro;  //deg/s
+	struct decoded_xyz_s accel; //mg
 
-    int32_t strain;             //%
-    int32_t current;            //mA
-    int32_t volt_batt;          //mV
-    int32_t volt_int;           //mV
-    int32_t temp;               //Celsius x10
-    int32_t analog[8];          //mV
+	int32_t strain;             //%
+	int32_t current;            //mA
+	int32_t volt_batt;          //mV
+	int32_t volt_int;           //mV
+	int32_t temp;               //Celsius x10
+	int32_t analog[8];          //mV
 };
 
 struct execute_s
@@ -314,10 +263,10 @@ struct execute_s
 	int32_t enc_display; //useful?
 	int32_t enc_control; //useful?
 	int32_t enc_commut; //useful?
-    int32_t enc_control_ang;
-    int32_t enc_control_vel; 
+	int32_t enc_control_ang;
+	int32_t enc_control_vel;
 	int32_t enc_motor;
-    int32_t enc_joint;
+	int32_t enc_joint;
 	uint8_t volt_batt;	//+VB
 	uint8_t volt_int;	//+VG
 	uint8_t temp;
@@ -325,59 +274,59 @@ struct execute_s
 	uint8_t status1;
 	uint8_t status2;
 
-    struct ctrl_s ctrl;
+	struct ctrl_s ctrl;
 
-    //Decoded values:
-    struct decoded_execute_s decoded;
+	//Decoded values:
+	struct decoded_execute_s decoded;
 };
 
 //FlexSEA-Manage:
 
 struct decoded_manage_s
 {
-    struct decoded_xyz_s gyro;  //deg/s
-    struct decoded_xyz_s accel; //mg
+	struct decoded_xyz_s gyro;  //deg/s
+	struct decoded_xyz_s accel; //mg
 
-    int32_t analog[8];          //mV
+	int32_t analog[8];          //mV
 };
 
 struct manage_s
 {
-    struct xyz_s gyro;
-    struct xyz_s accel;
+	struct xyz_s gyro;
+	struct xyz_s accel;
 
-    uint16_t analog[8];
-    uint16_t digitalIn;
+	uint16_t analog[8];
+	uint16_t digitalIn;
 
-    uint8_t status1;
+	uint8_t status1;
 
 	uint8_t sw1;
 	uint8_t sampling;
 
-    //Decoded values:
-    struct decoded_manage_s decoded;
+	//Decoded values:
+	struct decoded_manage_s decoded;
 };
 
 //FlexSEA-Strain:
 
 struct decoded_strain_s
 {
-    int32_t strain[6];
+	int32_t strain[6];
 };
 
 //Strain - single channel
 struct strain_1ch_s
 {
-	//Config:     
-    uint8_t offset;
+	//Config:
+	uint8_t offset;
 	uint8_t gain;
-    uint8_t oref;	
-	
-    //Raw ADC values:
-    uint16_t strain_raw[4];
+	uint8_t oref;
+
+	//Raw ADC values:
+	uint16_t strain_raw[4];
 	uint16_t vo1;
-    uint16_t vo2;
-	 
+	uint16_t vo2;
+
 	//Filtered value:
 	uint16_t strain_filtered;
 };
@@ -387,10 +336,10 @@ struct strain_s
 {
 	//One structure per channel:
 	struct strain_1ch_s ch[6];
-    uint8_t compressedBytes[9];
+	uint8_t compressedBytes[9];
 
-    //Decoded values:
-    struct decoded_strain_s decoded;
+	//Decoded values:
+	struct decoded_strain_s decoded;
 };
 
 //Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
@@ -404,11 +353,11 @@ struct ricnu_s
 {
 	//Execute:
 	struct execute_s ex;
-	
-    //Extra sensors (Strain):
-    //uint16_t ext_strain[6];
-    struct strain_s st;
-	
+
+	//Extra sensors (Strain):
+	//uint16_t ext_strain[6];
+	struct strain_s st;
+
 	//Decoded values (ext_strain only)
 	struct decoded_ricnu_s decoded;
 };
@@ -417,46 +366,46 @@ struct ricnu_s
 
 struct decoded_gossip_s
 {
-    struct decoded_xyz_s gyro;     //deg/s
-    struct decoded_xyz_s accel;    //mg
-    struct decoded_xyz_s magneto;  //uT
+	struct decoded_xyz_s gyro;     //deg/s
+	struct decoded_xyz_s accel;    //mg
+	struct decoded_xyz_s magneto;  //uT
 };
 
 struct gossip_s
 {
-    struct xyz_s gyro;
-    struct xyz_s accel;
-    struct xyz_s magneto;
+	struct xyz_s gyro;
+	struct xyz_s accel;
+	struct xyz_s magneto;
 
-    uint16_t capsense[4];
+	uint16_t capsense[4];
 
-    uint16_t io[2];
-    uint8_t status;
+	uint16_t io[2];
+	uint8_t status;
 
-    //Decoded values:
-    struct decoded_gossip_s decoded;
+	//Decoded values:
+	struct decoded_gossip_s decoded;
 };
 
 //FlexSEA-Battery:
 
 struct decoded_battery_s
 {
-    int32_t voltage;    //mV
-    int32_t current;    //mA
-    int32_t power;      //mW
-    int32_t temp;       //C*10
+	int32_t voltage;    //mV
+	int32_t current;    //mA
+	int32_t power;      //mW
+	int32_t temp;       //C*10
 };
 
 struct battery_s
 {
-    uint16_t voltage;
-    int16_t current;
-    uint8_t temp;
-    uint8_t pushbutton;
-    uint8_t status;
+	uint16_t voltage;
+	int16_t current;
+	uint8_t temp;
+	uint8_t pushbutton;
+	uint8_t status;
 
-    //Decoded values:
-    struct decoded_battery_s decoded;
+	//Decoded values:
+	struct decoded_battery_s decoded;
 };
 
 //Commands, tools, specialty, etc.:
@@ -464,62 +413,60 @@ struct battery_s
 //In Control Tool:
 struct in_control_s
 {
-    uint8_t controller;
-    int32_t setp;
-    int32_t actual_val;
-    int32_t error;
-    int32_t output;
-    int16_t pwm;
-    uint8_t mot_dir;
-    int16_t current;
-    uint16_t combined;	//[CTRL2:0][MOT_DIR][PWM]
+	uint8_t controller;
+	int32_t setp;
+	int32_t actual_val;
+	int32_t error;
+	int32_t output;
+	int16_t pwm;
+	uint8_t mot_dir;
+	int16_t current;
+	uint16_t combined;	//[CTRL2:0][MOT_DIR][PWM]
 
-    int32_t r[4];
-    int32_t w[4];
+	int32_t r[4];
+	int32_t w[4];
 };
 
 struct user_data_s
 {
-    int32_t r[4];
-    int32_t w[4];
+	int32_t r[4];
+	int32_t w[4];
 };
 
 //IMU data & config
 struct imu_s
 {
-     struct xyz_s accel;
-     struct xyz_s gyro;
+	 struct xyz_s accel;
+	 struct xyz_s gyro;
 	 struct xyz_s magneto;
-     uint32_t config;
+	 uint32_t config;
 };
 
 //AS504x Magnetic encoders:
 struct as504x_s
 {
 	int32_t angle_raws[10]; //last 10 raw readings
-    int32_t angle_conts[10]; // last 10 continuous angle readings
+	int32_t angle_conts[10]; // last 10 continuous angle readings
 
-    int32_t angle_vel_denoms[8]; //the number of 1 MHz counts between the last two angle readings 
-    int32_t num_rot;        //number of rotations
-    int32_t angle_vel[2];		//sensor reading - last sensor reading
-    int32_t angle_vel_filt[2];		//sensor reading - last sensor reading
-    int32_t angle_vel_RPMS_raw[2];		//sensor reading - last sensor reading
-    int32_t angle_vel_RPMS_filt[2];
-    int32_t angle_vel_RPM;
+	int32_t angle_vel_denoms[8]; //the number of 1 MHz counts between the last two angle readings
+	int32_t num_rot;        //number of rotations
+	int32_t angle_vel[2];		//sensor reading - last sensor reading
+	int32_t angle_vel_filt[2];		//sensor reading - last sensor reading
+	int32_t angle_vel_RPMS_raw[2];		//sensor reading - last sensor reading
+	int32_t angle_vel_RPMS_filt[2];
+	int32_t angle_vel_RPM;
 	uint16_t angle_comp;	//Sensor reading, 2/ Compensation enabled
 	uint16_t angle_ctrl;	//Modified version (gain, zero). Used by controllers.
-    
-    int32_t last_angtimer_read;
-    int32_t counts_since_last_ang_read;
-    int32_t last_ang_read_period;
-    int32_t samplefreq; //sampling frequency of the sensor
+
+	int32_t last_angtimer_read;
+	int32_t counts_since_last_ang_read;
+	int32_t last_ang_read_period;
+	int32_t samplefreq; //sampling frequency of the sensor
 };
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
-
-//#if defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 extern struct execute_s exec1, exec2, exec3, exec4;
 extern struct ricnu_s ricnu_1;
@@ -528,8 +475,6 @@ extern struct strain_s strain1;
 extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
-
-//#endif	//defined(BOARD_TYPE_FLEXSEA_MANAGE) || defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_PLAN)
 extern struct user_data_s user_data_1;
