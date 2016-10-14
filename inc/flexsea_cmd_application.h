@@ -41,15 +41,18 @@
 // Prototype(s):
 //****************************************************************************
 
-//TX functions are prototyped in flexsea_system
+//TX functions are prototyped in flexsea_system // ToDo is that necessary?
 
-//Redefine weak functions from flexsea_payload:
-void rx_cmd_special_1(uint8_t *buf);	//payload_30
+void rx_cmd_special_1(uint8_t *buf);
 void rx_cmd_special_2(uint8_t *buf);
 void rx_cmd_special_3(uint8_t *buf);
 void rx_cmd_special_4(uint8_t *buf);
 void rx_cmd_special_5(uint8_t *buf);
 void rx_cmd_ricnu(uint8_t *buf);
+
+//Decoding:
+void rx_cmd_ricnu_READ(uint8_t controller, int32_t setpoint, uint8_t setGains, 
+						int16_t g0,	int16_t g1,	int16_t g2, int16_t g3);
 
 //****************************************************************************
 // Definition(s):
