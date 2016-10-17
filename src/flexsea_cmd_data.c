@@ -213,6 +213,7 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Arguments:
+            
 		uint16_to_bytes((uint16_t)imu.gyro.x, &tmp0, &tmp1);
 		buf[P_DATA1] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
@@ -222,7 +223,19 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 		uint16_to_bytes((uint16_t)imu.gyro.z, &tmp0, &tmp1);
 		buf[P_DATA1 + 4] = tmp0;
 		buf[P_DATA1 + 5] = tmp1;
-		
+        
+        /*
+        uint16_to_bytes((uint16_t)global_variable_1, &tmp0, &tmp1);
+		buf[P_DATA1] = tmp0;
+		buf[P_DATA1 + 1] = tmp1;
+		uint16_to_bytes((uint16_t)global_variable_2, &tmp0, &tmp1);
+		buf[P_DATA1 + 2] = tmp0;
+		buf[P_DATA1 + 3] = tmp1;
+		uint16_to_bytes((uint16_t)global_variable_3, &tmp0, &tmp1);
+		buf[P_DATA1 + 4] = tmp0;
+		buf[P_DATA1 + 5] = tmp1;
+		*/
+        
 		uint16_to_bytes((uint16_t)imu.accel.x, &tmp0, &tmp1);
 		buf[P_DATA1 + 6] = tmp0;
 		buf[P_DATA1 + 7] = tmp1;

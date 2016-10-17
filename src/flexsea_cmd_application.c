@@ -1648,7 +1648,7 @@ void rx_cmd_ricnu(uint8_t *buf)
         }
         else if(ctrl.active_ctrl == CTRL_POSITION)
         {
-            ctrl.position.setp = tmpSetpoint;
+            trapez_gen_motion_1(tmpSetpoint,tmpSetpoint,1,1);
             if (buf[P_DATA1 + 6] == CHANGE)
             {
                 ctrl.position.gain.g0 = tmpGain[0];
