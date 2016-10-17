@@ -48,6 +48,10 @@ void rx_cmd_special_4(uint8_t *buf);
 void rx_cmd_special_5(uint8_t *buf);
 void rx_cmd_ricnu(uint8_t *buf);
 
+void rx_cmd_ricnu_rw(uint8_t *buf);
+void rx_cmd_ricnu_w(uint8_t *buf);
+void rx_cmd_ricnu_rr(uint8_t *buf);
+
 uint32_t tx_cmd_ctrl_special_1(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 	uint8_t controller_w, uint8_t controller, uint8_t encoder_w, int32_t encoder, \
 								int16_t current, int16_t open_spd);

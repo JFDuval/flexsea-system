@@ -66,6 +66,10 @@ struct user_data_s user_data;
 //****************************************************************************
 
 //Initialize function pointer array
+//BUG IMPORTANT: this is being reworked. Not all functions should be of type
+//RX_PTYPE_READ!
+//Note: soon this will only take care of the core functions. The user functions
+//will be done in different files
 void init_flexsea_payload_ptr(void)
 {
 	int i = 0;
@@ -73,7 +77,9 @@ void init_flexsea_payload_ptr(void)
 	//By default, they all point to 'flexsea_payload_catchall()'
 	for(i = 0; i < MAX_CMD_CODE; i++)
 	{
-		flexsea_payload_ptr[i] = &flexsea_payload_catchall;
+		flexsea_payload_ptr[i][RX_PTYPE_READ] = &flexsea_payload_catchall;
+		flexsea_payload_ptr[i][RX_PTYPE_WRITE] = &flexsea_payload_catchall;
+		flexsea_payload_ptr[i][RX_PTYPE_REPLY] = &flexsea_payload_catchall;
 	}
 
 	//Associate pointers to your project-specific functions:
@@ -83,37 +89,42 @@ void init_flexsea_payload_ptr(void)
 	//External:
 	//flexsea_payload_ptr[CMD_ANALOG] = &rx_cmd_analog_in;
 	//flexsea_payload_ptr[CMD_DIGITAL] = &rx_cmd_digital_in;
-	flexsea_payload_ptr[CMD_PWRO] = &rx_cmd_exp_pwro;
+	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_READ] = &rx_cmd_exp_pwro;
+	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_WRITE] = &rx_cmd_exp_pwro;
+	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_REPLY] = &rx_cmd_exp_pwro;
 
 	//Control:
-	flexsea_payload_ptr[CMD_CTRL_MODE] = &rx_cmd_ctrl_mode;
+	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_READ] = &rx_cmd_ctrl_mode;
 	//flexsea_payload_ptr[CMD_CTRL_X_G] = &rx_cmd_ctrl_x_g;
-	flexsea_payload_ptr[CMD_CTRL_I_G] = &rx_cmd_ctrl_i_g;
-	flexsea_payload_ptr[CMD_CTRL_P_G] = &rx_cmd_ctrl_p_g;
-	flexsea_payload_ptr[CMD_CTRL_Z_G] = &rx_cmd_ctrl_z_g;
-	flexsea_payload_ptr[CMD_CTRL_O] = &rx_cmd_ctrl_o;
-	flexsea_payload_ptr[CMD_CTRL_I] = &rx_cmd_ctrl_i;
-	flexsea_payload_ptr[CMD_CTRL_P] = &rx_cmd_ctrl_p;
+	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_READ] = &rx_cmd_ctrl_i_g;
+	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_READ] = &rx_cmd_ctrl_p_g;
+	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_READ] = &rx_cmd_ctrl_z_g;
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p;
 	//flexsea_payload_ptr[SHORTED_LEADS = &;
-	flexsea_payload_ptr[CMD_IN_CONTROL] = &rx_cmd_in_control;
+	flexsea_payload_ptr[CMD_IN_CONTROL][RX_PTYPE_READ] = &rx_cmd_in_control;
 
 	//Data:
-	flexsea_payload_ptr[CMD_ACQUI] = &rx_cmd_data_acqui;
-	flexsea_payload_ptr[CMD_READ_ALL] = &rx_cmd_data_read_all;
-	flexsea_payload_ptr[CMD_USER_DATA] = &rx_cmd_data_user;
-	flexsea_payload_ptr[CMD_READ_ALL_RICNU] = &rx_cmd_data_read_all_ricnu;
+	flexsea_payload_ptr[CMD_ACQUI][RX_PTYPE_READ] = &rx_cmd_data_acqui;
+	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_READ] = &rx_cmd_data_read_all;
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
+	flexsea_payload_ptr[CMD_READ_ALL_RICNU][RX_PTYPE_READ] = &rx_cmd_data_read_all_ricnu;
 
 	//Application:
-	flexsea_payload_ptr[CMD_SPC1] = &rx_cmd_special_1;
-	flexsea_payload_ptr[CMD_SPC2] = &rx_cmd_special_2;
-	flexsea_payload_ptr[CMD_SPC3] = &rx_cmd_special_3;
-	flexsea_payload_ptr[CMD_SPC4] = &rx_cmd_special_4;
-	flexsea_payload_ptr[CMD_SPC5] = &rx_cmd_special_5;
-	flexsea_payload_ptr[CMD_RICNU] = &rx_cmd_ricnu;
+	flexsea_payload_ptr[CMD_SPC1][RX_PTYPE_READ] = &rx_cmd_special_1;
+	flexsea_payload_ptr[CMD_SPC2][RX_PTYPE_READ] = &rx_cmd_special_2;
+	flexsea_payload_ptr[CMD_SPC3][RX_PTYPE_READ] = &rx_cmd_special_3;
+	flexsea_payload_ptr[CMD_SPC4][RX_PTYPE_READ] = &rx_cmd_special_4;
+	flexsea_payload_ptr[CMD_SPC5][RX_PTYPE_READ] = &rx_cmd_special_5;
+
+	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_READ] = &rx_cmd_ricnu_rw;
+	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_WRITE] = &rx_cmd_ricnu_w;
+	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_REPLY] = &rx_cmd_ricnu_rr;
 
 	//Sensors:
-	flexsea_payload_ptr[CMD_ENCODER] = &rx_cmd_encoder;
-	flexsea_payload_ptr[CMD_STRAIN] = &rx_cmd_strain;
+	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_encoder;
+	flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
 
 	//ToDo Add support for flexsea-user here
 }

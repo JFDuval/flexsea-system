@@ -1449,76 +1449,6 @@ void rx_cmd_special_5(uint8_t *buf)
 	}
 }
 
-//Transmission of a CMD_RICNU command: RIC/NU Knee R/W. We use this command
-//to communicate from Manage to Execute
-//setGains: KEEP/CHANGE
-//***TODO this function is being deprecated, see below for the new implementation ***
-uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						uint8_t offset, uint8_t controller, int32_t setpoint,
-						uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
-						int16_t g3)
-{
-	TX_INIT(1)
-
-	TX_STARTOF_READ	//> > > > > > > > > > > > > > > > > >  Start of Read Section
-
-		//Arguments:
-		buf[index++] = offset;
-		buf[index++] = controller;
-		SPLIT_32(setpoint, buf, &index);
-		buf[index++] = setGains;
-		SPLIT_16(g0, buf, &index);
-		SPLIT_16(g1, buf, &index);
-		SPLIT_16(g2, buf, &index);
-		SPLIT_16(g3, buf, &index);
-
-	TX_ENDOF_READ		//< < < < < < < < < < < < < < < < <  End of Read Section
-	TX_STARTOF_WRITE	//> > > > > > > > > > > > > > > > Start of Write Section
-
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		buf[index++] = offset;
-
-		//Arguments:
-		if(offset == 0)
-		{
-			SPLIT_16((uint16_t)imu.gyro.x, buf, &index);
-			SPLIT_16((uint16_t)imu.gyro.y, buf, &index);
-			SPLIT_16((uint16_t)imu.gyro.z, buf, &index);
-			SPLIT_16((uint16_t)imu.accel.x, buf, &index);
-			SPLIT_16((uint16_t)imu.accel.y, buf, &index);
-			SPLIT_16((uint16_t)imu.accel.z, buf, &index);
-			SPLIT_32((uint32_t)exec1.enc_motor, buf, &index);
-			SPLIT_32((uint32_t)exec1.enc_joint, buf, &index);
-			SPLIT_16((uint16_t)ctrl.current.actual_val, buf, &index);
-		}
-		else if(offset == 1)
-		{
-			//Compressed Strain:
-
-			buf[index++] = strain1.compressedBytes[0];
-			buf[index++] = strain1.compressedBytes[1];
-			buf[index++] = strain1.compressedBytes[2];
-			buf[index++] = strain1.compressedBytes[3];
-			buf[index++] = strain1.compressedBytes[4];
-			buf[index++] = strain1.compressedBytes[5];
-			buf[index++] = strain1.compressedBytes[6];
-			buf[index++] = strain1.compressedBytes[7];
-			buf[index++] = strain1.compressedBytes[8];
-			//Include other variables here (ToDo)
-		}
-		else
-		{
-			//Deal with other offsets here...
-		}
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-	TX_ENDOF_WRITE		//< < < < < < < < < < < < < < < < < End of Write Section
-
-	TX_CLOSING	//Handle errors, and return number of bytes
-}
-
 //Command: CMD_RICNU. Type: R/W.
 //setGains: KEEP/CHANGE
 void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -1527,11 +1457,11 @@ void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 					int16_t g2, int16_t g3)
 {
 	uint16_t index = 0;
-	
+
 	//Formatting:
 	(*cmd) = CMD_RICNU;
 	(*cmdType) = READ;
-	
+
 	//Data:
 	sharedBuf[index++] = offset;
 	sharedBuf[index++] = controller;
@@ -1541,7 +1471,7 @@ void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16(g1, sharedBuf, &index);
 	SPLIT_16(g2, sharedBuf, &index);
 	SPLIT_16(g3, sharedBuf, &index);
-	
+
 	//Payload length:
 	(*len) = index;
 }
@@ -1552,14 +1482,14 @@ void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset)
 {
 	uint16_t index = 0;
-	
+
 	//Formatting:
 	(*cmd) = CMD_RICNU;
 	(*cmdType) = READ;
-	
+
 	//Data:
 	sharedBuf[index++] = offset;
-	
+
 	//Payload length:
 	(*len) = index;
 }
@@ -1570,14 +1500,14 @@ void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset)
 {
 	uint16_t index = 0;
-	
+
 	//Formatting:
 	(*cmd) = CMD_RICNU;
 	(*cmdType) = WRITE;
-	
+
 	//Data:
 	sharedBuf[index++] = offset;
-	
+
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Arguments:
@@ -1614,140 +1544,110 @@ void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 		}
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	
+
 	//Payload length:
 	(*len) = index;
 }
 
-//Reception of a CMD_RICNU command
-void rx_cmd_ricnu(uint8_t *buf)
+//Gets called when our Master sends us a Read request
+void rx_cmd_ricnu_rw(uint8_t *buf)
+{
+	uint16_t index = 0;
+
+	//Temporary variables
+	uint8_t offset = 0;
+	uint8_t tmpController = 0, tmpSetGains = 0;
+	int32_t tmpSetpoint = 0;
+	int16_t tmpGain[4] = {0,0,0,0};
+
+	//Decode data received:
+	index = P_DATA1;
+	offset = buf[index++];
+	tmpController = buf[index++];
+	tmpSetpoint = (int32_t)REBUILD_UINT32(buf, &index);
+	tmpSetGains = buf[index++];
+	tmpGain[0] = (int16_t)REBUILD_UINT16(buf, &index);
+	tmpGain[1] = (int16_t)REBUILD_UINT16(buf, &index);
+	tmpGain[2] = (int16_t)REBUILD_UINT16(buf, &index);
+	tmpGain[3] = (int16_t)REBUILD_UINT16(buf, &index);
+
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+	//Act on the decoded data:
+	rx_cmd_ricnu_Action1(tmpController, tmpSetpoint, tmpSetGains, tmpGain[0],
+							tmpGain[1], tmpGain[2], tmpGain[3]);
+	#endif
+
+	//Generate the reply:
+//	numb = tx_cmd_ricnu_w(TX_CMD_DEFAULT, offset, 0, 0, 0, 0, 0, 0);	//ToDo
+//	COMM_GEN_STR_DEFAULT
+//	flexsea_send_serial_master(myPort, myData, myLen);	//ToDo
+}
+
+//Gets called when our Slave sends us a Reply to our Read Request
+void rx_cmd_ricnu_rr(uint8_t *buf)
 {
 	uint16_t index = 0;
 	uint8_t offset = 0;
 
-	//Structure pointer. ToDo replace by generic function
-	struct execute_s *exec_s_ptr = &exec1;
-	struct ricnu_s *ricnu_s_ptr = &ricnu_1;
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		(void)buf;
+		flexsea_error(SE_CMD_NOT_PROGRAMMED);
+		return;
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
-	RX_STARTOF_READ		//> > > > > > > > > > > > > > > >  Start of Read Section
+	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-		//Temporary variables
-		uint8_t tmpController = 0, tmpSetGains = 0;
-		int32_t tmpSetpoint = 0;
-		int16_t tmpGain[4] = {0,0,0,0};
+		struct execute_s *ex = &exec1;
+		struct ricnu_s *rn = &ricnu_1;
 
-		//Decode data received:
 		index = P_DATA1;
 		offset = buf[index++];
-		tmpController = buf[index++];
-		tmpSetpoint = (int32_t)REBUILD_UINT32(buf, &index);
-		tmpSetGains = buf[index++];
-		tmpGain[0] = (int16_t)REBUILD_UINT16(buf, &index);
-		tmpGain[1] = (int16_t)REBUILD_UINT16(buf, &index);
-		tmpGain[2] = (int16_t)REBUILD_UINT16(buf, &index);
-		tmpGain[3] = (int16_t)REBUILD_UINT16(buf, &index);
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		if(offset == 0)
+		{
+			rn->ex.gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.accel.x = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.accel.y = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+			rn->ex.enc_motor = (int32_t) REBUILD_UINT32(buf, &index);
+			rn->ex.enc_joint = (int32_t) REBUILD_UINT32(buf, &index);
+			rn->ex.current = (int16_t) REBUILD_UINT16(buf, &index);
+		}
+		else if(offset == 1)
+		{
+			rn->st.compressedBytes[0] = buf[index++];
+			rn->st.compressedBytes[1] = buf[index++];
+			rn->st.compressedBytes[2] = buf[index++];
+			rn->st.compressedBytes[3] = buf[index++];
+			rn->st.compressedBytes[4] = buf[index++];
+			rn->st.compressedBytes[5] = buf[index++];
+			rn->st.compressedBytes[6] = buf[index++];
+			rn->st.compressedBytes[7] = buf[index++];
+			rn->st.compressedBytes[8] = buf[index++];
 
-		//Act on the decoded data:
-		rx_cmd_ricnu_Action1(tmpController, tmpSetpoint, tmpSetGains, tmpGain[0],
-							tmpGain[1], tmpGain[2], tmpGain[3]);
+			//Include other variables here (ToDo)
+		}
+		else
+		{
+			//...
+		}
 
-		//Generate the reply:
-		numb = tx_cmd_ricnu(TX_CMD_DEFAULT, offset, 0, 0, 0, 0, 0, 0, 0);
-		COMM_GEN_STR_DEFAULT
+		//Copy RICNU to Exec:
+		*ex = rn->ex;
 
-		//< TODO Replace by flexsea_send_serial_master() >
+	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+}
 
-				//Delayed response:
-				rs485_reply_ready(comm_str_485_1, (numb));
+//Gets called when our Master Writes to us
+void rx_cmd_ricnu_w(uint8_t *buf)
+{
+	//Master Write isn't implemented for this command.
 
-				#ifdef USE_USB
-				usb_puts(comm_str_485_1, (numb));
-				#endif
-
-				#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-				#ifdef BOARD_TYPE_FLEXSEA_PLAN
-				//No code (yet), you shouldn't be here...
-				flexsea_error(SE_CMD_NOT_PROGRAMMED);
-				#endif	//BOARD_TYPE_FLEXSEA_PLAN
-
-		//<\ Replace by flexsea_send_serial_master() >
-
-	RX_ENDOF_READ		//< < < < < < < < < < < < < < < < <  End of Read Section
-	RX_STARTOF_WRITE	//> > > > > > > > > > > > > > > > Start of Write Section
-
-		RX_STARTOF_W_FROM_SLAVE	//> > > > > > > > > Start of Slave Write Section
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			index = P_DATA1;
-			offset = buf[index++];
-
-			if(offset == 0)
-			{
-				ricnu_s_ptr->ex.gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.accel.x = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.accel.y = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.accel.z = (int16_t) REBUILD_UINT16(buf, &index);
-				ricnu_s_ptr->ex.enc_motor = (int32_t) REBUILD_UINT32(buf, &index);
-				ricnu_s_ptr->ex.enc_joint = (int32_t) REBUILD_UINT32(buf, &index);
-				ricnu_s_ptr->ex.current = (int16_t) REBUILD_UINT16(buf, &index);
-			}
-			else if(offset == 1)
-			{
-				ricnu_s_ptr->st.compressedBytes[0] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[1] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[2] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[3] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[4] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[5] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[6] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[7] = buf[index++];
-				ricnu_s_ptr->st.compressedBytes[8] = buf[index++];
-
-				//Include other variables here (ToDo)
-			}
-			else
-			{
-				//...
-			}
-
-			//Copy RICNU to Exec:
-			*exec_s_ptr = ricnu_s_ptr->ex;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-		RX_ENDOF_W_FROM_SLAVE		//< < < < < < < < End of Slave Write Section
-		RX_STARTOF_W_FROM_MASTER	//> > > > > >  Start of Master Write Section
-
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-
-			#ifdef BOARD_TYPE_FLEXSEA_PLAN
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_PLAN
-
-		RX_ENDOF_W_FROM_MASTER	//< < < < < < < < <  End of Master Write Section
-	RX_ENDOF_WRITE	//< < < < < < < < < < < < < < < < < < < End of Write Section
+	(void)buf;
+	flexsea_error(SE_CMD_NOT_PROGRAMMED);
 }
 
 //Command = rx_cmd_ricnu, section = READ
