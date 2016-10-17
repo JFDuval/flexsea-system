@@ -1559,7 +1559,7 @@ void rx_cmd_ricnu(uint8_t *buf)
 {
     uint16_t index = 0;
     uint32_t numb = 0;
-    uint8_t offset = 0, tmpController = 0, setGains = 0;
+    uint8_t offset = 0, tmpController = 0, tmpSetGains = 0;
     int32_t tmpSetpoint = 0;
     int32_t tmpGain[4] = {0,0,0,0};
 
