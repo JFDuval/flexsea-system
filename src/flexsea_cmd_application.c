@@ -1452,6 +1452,7 @@ void rx_cmd_special_5(uint8_t *buf)
 //Transmission of a CMD_RICNU command: RIC/NU Knee R/W. We use this command
 //to communicate from Manage to Execute
 //setGains: KEEP/CHANGE
+//***TODO this function is being deprecated, see below for the new implementation ***
 uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						uint8_t offset, uint8_t controller, int32_t setpoint,
 						uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
@@ -1516,6 +1517,106 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
 	TX_ENDOF_WRITE		//< < < < < < < < < < < < < < < < < End of Write Section
 
 	TX_CLOSING	//Handle errors, and return number of bytes
+}
+
+//Command: CMD_RICNU. Type: R/W.
+//setGains: KEEP/CHANGE
+void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset, uint8_t controller, \
+					int32_t setpoint, uint8_t setGains, int16_t g0, int16_t g1,\
+					int16_t g2, int16_t g3)
+{
+	uint16_t index = 0;
+	
+	//Formatting:
+	(*cmd) = CMD_RICNU;
+	(*cmdType) = READ;
+	
+	//Data:
+	sharedBuf[index++] = offset;
+	sharedBuf[index++] = controller;
+	SPLIT_32(setpoint, sharedBuf, &index);
+	sharedBuf[index++] = setGains;
+	SPLIT_16(g0, sharedBuf, &index);
+	SPLIT_16(g1, sharedBuf, &index);
+	SPLIT_16(g2, sharedBuf, &index);
+	SPLIT_16(g3, sharedBuf, &index);
+	
+	//Payload length:
+	(*len) = index;
+}
+
+//Command: CMD_RICNU. Type: R.
+//setGains: KEEP/CHANGE
+void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset)
+{
+	uint16_t index = 0;
+	
+	//Formatting:
+	(*cmd) = CMD_RICNU;
+	(*cmdType) = READ;
+	
+	//Data:
+	sharedBuf[index++] = offset;
+	
+	//Payload length:
+	(*len) = index;
+}
+
+//Command: CMD_RICNU. Type: W.
+//setGains: KEEP/CHANGE
+void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset)
+{
+	uint16_t index = 0;
+	
+	//Formatting:
+	(*cmd) = CMD_RICNU;
+	(*cmdType) = WRITE;
+	
+	//Data:
+	sharedBuf[index++] = offset;
+	
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+		//Arguments:
+		if(offset == 0)
+		{
+			SPLIT_16((uint16_t)imu.gyro.x, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.gyro.y, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.gyro.z, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.x, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.y, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.z, sharedBuf, &index);
+			SPLIT_32((uint32_t)exec1.enc_motor, sharedBuf, &index);
+			SPLIT_32((uint32_t)exec1.enc_joint, sharedBuf, &index);
+			SPLIT_16((uint16_t)ctrl.current.actual_val, sharedBuf, &index);
+		}
+		else if(offset == 1)
+		{
+			//Compressed Strain:
+
+			sharedBuf[index++] = strain1.compressedBytes[0];
+			sharedBuf[index++] = strain1.compressedBytes[1];
+			sharedBuf[index++] = strain1.compressedBytes[2];
+			sharedBuf[index++] = strain1.compressedBytes[3];
+			sharedBuf[index++] = strain1.compressedBytes[4];
+			sharedBuf[index++] = strain1.compressedBytes[5];
+			sharedBuf[index++] = strain1.compressedBytes[6];
+			sharedBuf[index++] = strain1.compressedBytes[7];
+			sharedBuf[index++] = strain1.compressedBytes[8];
+			//Include other variables here (ToDo)
+		}
+		else
+		{
+			//Deal with other offsets here...
+		}
+
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+	
+	//Payload length:
+	(*len) = index;
 }
 
 //Reception of a CMD_RICNU command

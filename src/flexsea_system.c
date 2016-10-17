@@ -119,4 +119,39 @@ void init_flexsea_payload_ptr(void)
 }
 
 //Catch all function - does nothing
-void flexsea_payload_catchall(uint8_t *buf){return;}
+void flexsea_payload_catchall(uint8_t *buf)
+{
+	(void)buf;
+	return;
+}
+
+//Generic TX command
+uint32_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
+				uint32_t len, uint8_t receiver, uint8_t *buf)
+{
+	uint32_t bytes = 0;
+	uint16_t index = 0;
+
+	prepare_empty_payload(board_id, receiver, buf, len);
+	buf[P_CMDS] = 1;	//Fixed, 1 command
+
+	if(cmd_type == CMD_READ)
+	{
+		buf[P_CMD1] = CMD_R(cmdCode);
+	}
+	else if(cmd_type == CMD_WRITE)
+	{
+		buf[P_CMD1] = CMD_W(cmdCode);
+	}
+	else
+	{
+		flexsea_error(SE_INVALID_READ_TYPE);
+		return 0;
+	}
+
+	index = P_DATA1;
+	memcpy(&buf[index], payloadData, len);
+	bytes = index+len;
+
+	return bytes;
+}

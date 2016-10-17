@@ -51,6 +51,8 @@
 //****************************************************************************
 
 void init_flexsea_payload_ptr(void);
+uint32_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
+				uint32_t len, uint8_t receiver, uint8_t *buf);
 
 //****************************************************************************
 // Definition(s):
