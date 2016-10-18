@@ -77,6 +77,25 @@ unsigned char tmp_payload_xmit[PAYLOAD_BUF_LEN];
 // Function(s)
 //****************************************************************************
 
+//This gets called by flexsea_system's init_flexsea_payload_ptr(). Map all
+//functions from this file to the array here. Failure to do so will send all
+//commands to flexsea_payload_catchall().
+void init_flexsea_payload_ptr_data(void)
+{
+	//TODO
+	
+	flexsea_payload_ptr[CMD_ACQUI][RX_PTYPE_READ] = &rx_cmd_data_acqui;
+	
+	//Temporary hack:
+	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_READ] = &rx_cmd_data_read_all;
+	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_WRITE] = &rx_cmd_data_read_all;
+	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_REPLY] = &rx_cmd_data_read_all;
+	
+	
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
+	flexsea_payload_ptr[CMD_READ_ALL_RICNU][RX_PTYPE_READ] = &rx_cmd_data_read_all_ricnu;
+}
+
 //Transmission of an ACQUI command
 uint32_t tx_cmd_data_acqui(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t acqui)
 {
@@ -362,7 +381,7 @@ uint32_t tx_cmd_data_read_all(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, 
 
 //TODO this is awful code, requires significant work!
 //Reception of a READ_ALL command - used by all boards
-void rx_cmd_data_read_all(uint8_t *buf)
+void rx_cmd_data_read_all(uint8_t *buf, uint8_t *info)
 {
 	uint8_t numb = 0, sampling = 0;
 

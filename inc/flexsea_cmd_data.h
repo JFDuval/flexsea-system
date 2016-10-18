@@ -41,8 +41,10 @@
 // Prototype(s):
 //****************************************************************************
 
+void init_flexsea_payload_ptr_data(void);
+	
 void rx_cmd_data_acqui(uint8_t *buf);
-void rx_cmd_data_read_all(uint8_t *buf);
+void rx_cmd_data_read_all(uint8_t *buf, uint8_t *info);
 void rx_cmd_data_read_all_ricnu(uint8_t *buf);
 void rx_cmd_data_user(uint8_t *buf);
 void rx_cmd_data_read_all_ricnu(uint8_t *buf);

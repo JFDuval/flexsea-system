@@ -17,9 +17,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
 	[This file] flexsea_cmd_control: commands specific to the motor & control
 *****************************************************************************
@@ -67,6 +67,61 @@ unsigned char tmp_payload_xmit[PAYLOAD_BUF_LEN];
 // Function(s)
 //****************************************************************************
 
+//This gets called by flexsea_system's init_flexsea_payload_ptr(). Map all
+//functions from this file to the array here. Failure to do so will send all
+//commands to flexsea_payload_catchall().
+void init_flexsea_payload_ptr_control(void)
+{
+	//Control mode:
+	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_READ] = &rx_cmd_ctrl_mode_rw;
+	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_WRITE] = &rx_cmd_ctrl_mode_w;
+	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_REPLY] = &rx_cmd_ctrl_mode_rr;
+
+	//Controllers:
+	/* TODO
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_rr;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_w;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
+	*/
+
+	//Controller gains:
+	/* TODO
+	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_READ] = &rx_cmd_ctrl_i_g_rw;
+	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_g_w;
+	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_g_rr;
+	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_READ] = &rx_cmd_ctrl_p_g_rw;
+	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_g_w;
+	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_g_rr;
+	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_READ] = &rx_cmd_ctrl_z_g_rw;
+	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_z_g_w;
+	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_z_g_rr;
+	*/
+
+	//Controller setpoints:
+	/* TODO
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
+	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_r;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_r;
+	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
+	*/
+
+	//Misc:
+	//flexsea_payload_ptr[SHORTED_LEADS = &;
+//	flexsea_payload_ptr[CMD_IN_CONTROL][RX_PTYPE_READ] = &rx_cmd_in_control;
+}
+
+/*
 //Transmission of a CTRL_MODE command
 uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t ctrl)
 {
@@ -102,7 +157,46 @@ uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint
 
 	return bytes;
 }
+*/
 
+void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t ctrlMode)
+{
+	uint16_t index = 0;
+
+	//Formatting:
+	(*cmd) = CMD_CTRL_MODE;
+	(*cmdType) = WRITE;
+
+	//Data:
+	shBuf[index++] = ctrlMode;
+
+	//Payload length:
+	(*len) = index;
+}
+
+void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	uint16_t index = 0;
+
+	//Formatting:
+	(*cmd) = CMD_CTRL_MODE;
+	(*cmdType) = READ;
+
+	//Data:
+	//(none)
+	(void)shBuf;
+
+	//Payload length:
+	(*len) = index;
+}
+
+/*Unimplemented
+void tx_cmd_ctrl_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t ctrlMode){}*/
+
+/*
 //Reception of a CTRL_MODE command
 void rx_cmd_ctrl_mode(uint8_t *buf)
 {
@@ -120,7 +214,7 @@ void rx_cmd_ctrl_mode(uint8_t *buf)
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
-		
+
 		//(for now, send it)
 		rs485_puts(comm_str_485_1, numb);
 
@@ -157,6 +251,52 @@ void rx_cmd_ctrl_mode(uint8_t *buf)
 		}
 	}
 }
+*/
+
+void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+	
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+	control_strategy(buf[P_DATA1]);
+
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
+
+void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+	
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+//Generate the reply:
+//	numb = tx_cmd_ricnu_w(TX_CMD_DEFAULT, ctrl.active_ctrl);	//ToDo
+//	COMM_GEN_STR_DEFAULT
+//	flexsea_send_serial_master(myPort, myData, myLen);	//ToDo
+
+	#else
+		(void)buf;
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
+
+void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+	
+	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+	//Decode data:
+	uint8_t controller = buf[P_DATA1];
+	//Store value:
+//	exec1.ctrl.active_ctrl = controller;
+		//ToDo use pointer, too specific
+
+	#else
+		(void)buf;
+	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+}
+
 
 //Transmission of a CTRL_I command
 uint32_t tx_cmd_ctrl_i(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t wanted, int16_t measured)
@@ -219,7 +359,7 @@ void rx_cmd_ctrl_i(uint8_t *buf)
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
-		
+
 		//(for now, send it)
 		rs485_puts(comm_str_485_1, (numb));
 
@@ -348,7 +488,7 @@ void rx_cmd_ctrl_o(uint8_t *buf)
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
-		
+
 		//(for now, send it)
 		rs485_puts(comm_str_485_1, numb);
 
@@ -527,7 +667,7 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 			//Store value:
 			//ctrl.position.pos = tmp_pos;
 			//ctrl.position.posi = tmp_posi;
-            
+
 			ctrl.position.posf = tmp_posf;
 			ctrl.position.spdm = tmp_spdm;
 			ctrl.position.acc = tmp_acc;
@@ -535,7 +675,7 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 			if(ctrl.active_ctrl == CTRL_POSITION)
 			{
 				ctrl.position.posi = ctrl.position.setp;
-                steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
+				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
 			}
 			else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
 			{
@@ -550,9 +690,9 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 				ctrl.impedance.gain.Z_I = 0;
 
 				//New trajectory
-                ctrl.position.posi = ctrl.impedance.setpoint_val;
+				ctrl.position.posi = ctrl.impedance.setpoint_val;
 				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
-			
+
 
 				//Restore gains
 				ctrl.impedance.gain.Z_K = tmp_z_k;
@@ -946,7 +1086,7 @@ uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uin
 
 		//Arguments:
 
-        #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		buf[P_DATA1 + 1] = select_w; //Parameter written
 		uint32_to_bytes((uint32_t)in_control.w[select_w], &tmp0, &tmp1, &tmp2, &tmp3);
@@ -954,40 +1094,40 @@ uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uin
 		buf[P_DATA1 + 2] = tmp1;
 		buf[P_DATA1 + 3] = tmp2;
 		buf[P_DATA1 + 4] = tmp3;
-		
+
 		uint32_to_bytes((uint32_t)in_control.setp, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 5] = tmp0;
 		buf[P_DATA1 + 6] = tmp1;
 		buf[P_DATA1 + 7] = tmp2;
 		buf[P_DATA1 + 8] = tmp3;
-		
+
 		uint32_to_bytes((uint32_t)in_control.actual_val, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 9] = tmp0;
 		buf[P_DATA1 + 10] = tmp1;
 		buf[P_DATA1 + 11] = tmp2;
 		buf[P_DATA1 + 12] = tmp3;
-		
+
 		uint32_to_bytes((uint32_t)in_control.error, &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 13] = tmp0;
 		buf[P_DATA1 + 14] = tmp1;
 		buf[P_DATA1 + 15] = tmp2;
 		buf[P_DATA1 + 16] = tmp3;
-		
+
 		uint16_to_bytes((uint16_t)in_control.output, &tmp0, &tmp1);
 		buf[P_DATA1 + 17] = tmp0;
 		buf[P_DATA1 + 18] = tmp1;
-		
+
 		//Combine 3 fields in 1 uint16:
 		in_control_get_pwm_dir();
 		in_control_combine();
-        uint16_to_bytes((uint16_t)in_control.combined, &tmp0, &tmp1);
-        buf[P_DATA1 + 19] = tmp0;
-        buf[P_DATA1 + 20] = tmp1;
+		uint16_to_bytes((uint16_t)in_control.combined, &tmp0, &tmp1);
+		buf[P_DATA1 + 19] = tmp0;
+		buf[P_DATA1 + 20] = tmp1;
 
-        uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
-        buf[P_DATA1 + 21] = tmp0;
-        buf[P_DATA1 + 22] = tmp1;
-		
+		uint16_to_bytes((uint16_t)ctrl.current.actual_val, &tmp0, &tmp1);
+		buf[P_DATA1 + 21] = tmp0;
+		buf[P_DATA1 + 22] = tmp1;
+
 		//User fields:
 		uint32_to_bytes((uint32_t)in_control.r[0], &tmp0, &tmp1, &tmp2, &tmp3);
 		buf[P_DATA1 + 23] = tmp0;
@@ -1000,22 +1140,22 @@ uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uin
 		buf[P_DATA1 + 29] = tmp2;
 		buf[P_DATA1 + 30] = tmp3;
 
-        bytes = P_DATA1 + 31;     //Bytes is always last+1
+		bytes = P_DATA1 + 31;     //Bytes is always last+1
 
-        #endif //BOARD_TYPE_FLEXSEA_EXECUTE
+		#endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
-        #ifdef BOARD_TYPE_FLEXSEA_PLAN
+		#ifdef BOARD_TYPE_FLEXSEA_PLAN
 
-        buf[P_DATA1 + 0] = select_w; //Parameter written
-        uint32_to_bytes((uint32_t)in_control_1.w[select_w], &tmp0, &tmp1, &tmp2, &tmp3);
-        buf[P_DATA1 + 1] = tmp0;
-        buf[P_DATA1 + 2] = tmp1;
-        buf[P_DATA1 + 3] = tmp2;
-        buf[P_DATA1 + 4] = tmp3;
+		buf[P_DATA1 + 0] = select_w; //Parameter written
+		uint32_to_bytes((uint32_t)in_control_1.w[select_w], &tmp0, &tmp1, &tmp2, &tmp3);
+		buf[P_DATA1 + 1] = tmp0;
+		buf[P_DATA1 + 2] = tmp1;
+		buf[P_DATA1 + 3] = tmp2;
+		buf[P_DATA1 + 4] = tmp3;
 
-        bytes = P_DATA1 + 5;     //Bytes is always last+1
+		bytes = P_DATA1 + 5;     //Bytes is always last+1
 
-        #endif  //BOARD_TYPE_FLEXSEA_PLAN
+		#endif  //BOARD_TYPE_FLEXSEA_PLAN
 	}
 	else
 	{
@@ -1046,10 +1186,10 @@ void rx_cmd_in_control(uint8_t *buf)
 
 		//Notify the code that a buffer is ready to be transmitted:
 		//xmit_flag_1 = 1;
-		
+
 		//(for now, send it)
 		rs485_puts(comm_str_485_1, numb);
-		
+
 		#ifdef USE_USB
 		usb_puts(comm_str_485_1, (numb));
 		#endif
@@ -1073,16 +1213,16 @@ void rx_cmd_in_control(uint8_t *buf)
 			//Store value:
 			in_control_1.setp = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 5], buf[P_DATA1 + 6], buf[P_DATA1 + 7], buf[P_DATA1 + 8]));
 			in_control_1.actual_val = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 9], buf[P_DATA1 + 10], buf[P_DATA1 + 11], buf[P_DATA1 + 12]));
-			
+
 			in_control_1.error = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 13], buf[P_DATA1 + 14], buf[P_DATA1 + 15], buf[P_DATA1 + 16]));
-            in_control_1.output = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 17], buf[P_DATA1 + 18]));
-            
-			in_control_1.combined = (BYTES_TO_UINT16(buf[P_DATA1 + 19], buf[P_DATA1 + 20]));			
+			in_control_1.output = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 17], buf[P_DATA1 + 18]));
+
+			in_control_1.combined = (BYTES_TO_UINT16(buf[P_DATA1 + 19], buf[P_DATA1 + 20]));
 			in_control_1.current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 21], buf[P_DATA1 + 22]));
-			
-            in_control_1.r[0] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 23], buf[P_DATA1 + 24], buf[P_DATA1 + 25], buf[P_DATA1 + 26]));
-            in_control_1.r[1] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 27], buf[P_DATA1 + 28], buf[P_DATA1 + 29], buf[P_DATA1 + 30]));
-            
+
+			in_control_1.r[0] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 23], buf[P_DATA1 + 24], buf[P_DATA1 + 25], buf[P_DATA1 + 26]));
+			in_control_1.r[1] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 27], buf[P_DATA1 + 28], buf[P_DATA1 + 29], buf[P_DATA1 + 30]));
+
 			in_control_1.controller = IN_CONTROL_CONTROLLER(in_control_1.combined);
 			in_control_1.mot_dir = IN_CONTROL_MOT_DIR(in_control_1.combined);
 			in_control_1.pwm = IN_CONTROL_PWM(in_control_1.combined);

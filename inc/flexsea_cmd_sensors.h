@@ -41,6 +41,8 @@
 // Prototype(s):
 //****************************************************************************
 
+void init_flexsea_payload_ptr_sensors(void);
+	
 void rx_cmd_switch(uint8_t *buf);
 void rx_cmd_encoder(uint8_t *buf);
 void rx_cmd_strain(uint8_t *buf);

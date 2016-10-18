@@ -73,6 +73,17 @@ unsigned char tmp_payload_xmit[PAYLOAD_BUF_LEN];
 // Function(s)
 //****************************************************************************
 
+//This gets called by flexsea_system's init_flexsea_payload_ptr(). Map all
+//functions from this file to the array here. Failure to do so will send all
+//commands to flexsea_payload_catchall().
+void init_flexsea_payload_ptr_sensors(void)
+{
+	//TODO
+	
+	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_encoder;
+	flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
+}
+
 //Transmission of a SWITCH command: Read Manage's onboard switch
 uint32_t tx_cmd_switch(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len)
 {

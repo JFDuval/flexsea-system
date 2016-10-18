@@ -41,7 +41,13 @@
 // Prototype(s):
 //****************************************************************************
 
-void rx_cmd_ctrl_mode(uint8_t *buf);
+void init_flexsea_payload_ptr_control(void);
+	
+//void rx_cmd_ctrl_mode(uint8_t *buf);
+void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info);
+void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info);
+	
 void rx_cmd_ctrl_i(uint8_t *buf);
 void rx_cmd_ctrl_o(uint8_t *buf);
 void rx_cmd_ctrl_p(uint8_t *buf);
@@ -50,7 +56,12 @@ void rx_cmd_ctrl_p_g(uint8_t *buf);
 void rx_cmd_ctrl_z_g(uint8_t *buf);
 void rx_cmd_in_control(uint8_t *buf);
 
-uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t ctrl);
+//uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t ctrl);
+void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t ctrlMode);
+
 uint32_t tx_cmd_ctrl_i(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t wanted, int16_t measured);
 uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd);
 uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \

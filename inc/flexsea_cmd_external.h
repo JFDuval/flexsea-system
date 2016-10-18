@@ -41,6 +41,8 @@
 // Prototype(s):
 //****************************************************************************
 
+void init_flexsea_payload_ptr_external(void);
+	
 //void rx_cmd_digital_in(uint8_t *buf);
 //void rx_cmd_analog_in(uint8_t *buf);
 void rx_cmd_exp_pwro(uint8_t *buf);

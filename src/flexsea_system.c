@@ -29,6 +29,21 @@
 	*
 ****************************************************************************/
 
+/* Function naming convention:
+==============================
+1st: tx_* or rx_* for Transmission or Reception
+2nd: *cmd_* always there to indicate it's a command
+3rd: *Type_* where Type refers to the category (see filename)
+4th: *Cmd_* command name/code
+5th: *Dir where Dir can be w (write), rw (read/write), or r (read)
+Ex.: tx_cmd_ctrl_mode_w(): Transmission of a command from the Control family,
+		that will Write the Control Mode
+For rx_* functions, the suffix options are:
+		* rw (read/write): Master Reading Slave (might also be writing)
+		* rr (reply from read): Slave replying to Master (after receiving a rw)
+		* w (write): Master Writing to a slave
+*/
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
@@ -87,31 +102,15 @@ void init_flexsea_payload_ptr(void)
 	//======================================================
 
 	//External:
-	//flexsea_payload_ptr[CMD_ANALOG] = &rx_cmd_analog_in;
-	//flexsea_payload_ptr[CMD_DIGITAL] = &rx_cmd_digital_in;
-	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_READ] = &rx_cmd_exp_pwro;
-	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_WRITE] = &rx_cmd_exp_pwro;
-	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_REPLY] = &rx_cmd_exp_pwro;
+	init_flexsea_payload_ptr_external();
 
 	//Control:
-	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_READ] = &rx_cmd_ctrl_mode;
-	//flexsea_payload_ptr[CMD_CTRL_X_G] = &rx_cmd_ctrl_x_g;
-	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_READ] = &rx_cmd_ctrl_i_g;
-	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_READ] = &rx_cmd_ctrl_p_g;
-	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_READ] = &rx_cmd_ctrl_z_g;
-	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i;
-	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p;
-	//flexsea_payload_ptr[SHORTED_LEADS = &;
-	flexsea_payload_ptr[CMD_IN_CONTROL][RX_PTYPE_READ] = &rx_cmd_in_control;
+	init_flexsea_payload_ptr_control();
 
 	//Data:
-	flexsea_payload_ptr[CMD_ACQUI][RX_PTYPE_READ] = &rx_cmd_data_acqui;
-	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_READ] = &rx_cmd_data_read_all;
-	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
-	flexsea_payload_ptr[CMD_READ_ALL_RICNU][RX_PTYPE_READ] = &rx_cmd_data_read_all_ricnu;
+	init_flexsea_payload_ptr_data();
 
-	//Application:
+	//Application: TODO move to User
 	flexsea_payload_ptr[CMD_SPC1][RX_PTYPE_READ] = &rx_cmd_special_1;
 	flexsea_payload_ptr[CMD_SPC2][RX_PTYPE_READ] = &rx_cmd_special_2;
 	flexsea_payload_ptr[CMD_SPC3][RX_PTYPE_READ] = &rx_cmd_special_3;
@@ -123,16 +122,17 @@ void init_flexsea_payload_ptr(void)
 	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_REPLY] = &rx_cmd_ricnu_rr;
 
 	//Sensors:
-	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_encoder;
-	flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
+	init_flexsea_payload_ptr_sensors();
 
-	//ToDo Add support for flexsea-user here
+	//User functions:
+	init_flexsea_payload_ptr_user();
 }
 
-//Catch all function - does nothing
-void flexsea_payload_catchall(uint8_t *buf)
+//Catch all function - does nothing. Note: error catching code can be added here
+void flexsea_payload_catchall(uint8_t *buf, uint8_t *info)
 {
 	(void)buf;
+	(void)info;
 	return;
 }
 
@@ -166,3 +166,6 @@ uint32_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 
 	return bytes;
 }
+
+//Weak function, redefine in your own flexsea-user if needed.
+__attribute__((weak)) void init_flexsea_payload_ptr_user(void){};

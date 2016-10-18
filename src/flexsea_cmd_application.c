@@ -1451,8 +1451,8 @@ void rx_cmd_special_5(uint8_t *buf)
 
 //Command: CMD_RICNU. Type: R/W.
 //setGains: KEEP/CHANGE
-void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
-					uint16_t *len, uint8_t offset, uint8_t controller, \
+void tx_cmd_ricnu_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType,uint16_t *len,\
+					uint8_t offset, uint8_t controller, \
 					int32_t setpoint, uint8_t setGains, int16_t g0, int16_t g1,\
 					int16_t g2, int16_t g3)
 {
@@ -1463,14 +1463,14 @@ void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = READ;
 
 	//Data:
-	sharedBuf[index++] = offset;
-	sharedBuf[index++] = controller;
-	SPLIT_32(setpoint, sharedBuf, &index);
-	sharedBuf[index++] = setGains;
-	SPLIT_16(g0, sharedBuf, &index);
-	SPLIT_16(g1, sharedBuf, &index);
-	SPLIT_16(g2, sharedBuf, &index);
-	SPLIT_16(g3, sharedBuf, &index);
+	shBuf[index++] = offset;
+	shBuf[index++] = controller;
+	SPLIT_32(setpoint, shBuf, &index);
+	shBuf[index++] = setGains;
+	SPLIT_16(g0, shBuf, &index);
+	SPLIT_16(g1, shBuf, &index);
+	SPLIT_16(g2, shBuf, &index);
+	SPLIT_16(g3, shBuf, &index);
 
 	//Payload length:
 	(*len) = index;
@@ -1478,7 +1478,7 @@ void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 //Command: CMD_RICNU. Type: R.
 //setGains: KEEP/CHANGE
-void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_ricnu_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset)
 {
 	uint16_t index = 0;
@@ -1488,7 +1488,7 @@ void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = READ;
 
 	//Data:
-	sharedBuf[index++] = offset;
+	shBuf[index++] = offset;
 
 	//Payload length:
 	(*len) = index;
@@ -1496,7 +1496,7 @@ void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 //Command: CMD_RICNU. Type: W.
 //setGains: KEEP/CHANGE
-void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_ricnu_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset)
 {
 	uint16_t index = 0;
@@ -1506,36 +1506,36 @@ void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = WRITE;
 
 	//Data:
-	sharedBuf[index++] = offset;
+	shBuf[index++] = offset;
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Arguments:
 		if(offset == 0)
 		{
-			SPLIT_16((uint16_t)imu.gyro.x, sharedBuf, &index);
-			SPLIT_16((uint16_t)imu.gyro.y, sharedBuf, &index);
-			SPLIT_16((uint16_t)imu.gyro.z, sharedBuf, &index);
-			SPLIT_16((uint16_t)imu.accel.x, sharedBuf, &index);
-			SPLIT_16((uint16_t)imu.accel.y, sharedBuf, &index);
-			SPLIT_16((uint16_t)imu.accel.z, sharedBuf, &index);
-			SPLIT_32((uint32_t)exec1.enc_motor, sharedBuf, &index);
-			SPLIT_32((uint32_t)exec1.enc_joint, sharedBuf, &index);
-			SPLIT_16((uint16_t)ctrl.current.actual_val, sharedBuf, &index);
+			SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
+			SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
+			SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.x, shBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
+			SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
+			SPLIT_32((uint32_t)exec1.enc_motor, shBuf, &index);
+			SPLIT_32((uint32_t)exec1.enc_joint, shBuf, &index);
+			SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
 		}
 		else if(offset == 1)
 		{
 			//Compressed Strain:
 
-			sharedBuf[index++] = strain1.compressedBytes[0];
-			sharedBuf[index++] = strain1.compressedBytes[1];
-			sharedBuf[index++] = strain1.compressedBytes[2];
-			sharedBuf[index++] = strain1.compressedBytes[3];
-			sharedBuf[index++] = strain1.compressedBytes[4];
-			sharedBuf[index++] = strain1.compressedBytes[5];
-			sharedBuf[index++] = strain1.compressedBytes[6];
-			sharedBuf[index++] = strain1.compressedBytes[7];
-			sharedBuf[index++] = strain1.compressedBytes[8];
+			shBuf[index++] = strain1.compressedBytes[0];
+			shBuf[index++] = strain1.compressedBytes[1];
+			shBuf[index++] = strain1.compressedBytes[2];
+			shBuf[index++] = strain1.compressedBytes[3];
+			shBuf[index++] = strain1.compressedBytes[4];
+			shBuf[index++] = strain1.compressedBytes[5];
+			shBuf[index++] = strain1.compressedBytes[6];
+			shBuf[index++] = strain1.compressedBytes[7];
+			shBuf[index++] = strain1.compressedBytes[8];
 			//Include other variables here (ToDo)
 		}
 		else
@@ -1550,7 +1550,7 @@ void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
 }
 
 //Gets called when our Master sends us a Read request
-void rx_cmd_ricnu_rw(uint8_t *buf)
+void rx_cmd_ricnu_rw(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = 0;
 
@@ -1585,10 +1585,12 @@ void rx_cmd_ricnu_rw(uint8_t *buf)
 }
 
 //Gets called when our Slave sends us a Reply to our Read Request
-void rx_cmd_ricnu_rr(uint8_t *buf)
+void rx_cmd_ricnu_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = 0;
 	uint8_t offset = 0;
+	
+	(void)info;
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		(void)buf;
@@ -1642,11 +1644,12 @@ void rx_cmd_ricnu_rr(uint8_t *buf)
 }
 
 //Gets called when our Master Writes to us
-void rx_cmd_ricnu_w(uint8_t *buf)
+void rx_cmd_ricnu_w(uint8_t *buf, uint8_t *info)
 {
 	//Master Write isn't implemented for this command.
 
 	(void)buf;
+	(void)info;
 	flexsea_error(SE_CMD_NOT_PROGRAMMED);
 }
 
