@@ -21,47 +21,39 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_external: External/Expansion connector
-*****************************************************************************
-	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2016-09-09 | jfduval | Initial GPL-3.0 release
-	*
+	[This file] flexsea_global_structs: contains all the data structures 
+	used across the project
 ****************************************************************************/
-
-#ifndef INC_FLEXSEA_CMD_EXTERNAL_H
-#define INC_FLEXSEA_CMD_EXTERNAL_H
 
 //****************************************************************************
 // Include(s)
 //****************************************************************************
 
-#include "flexsea_system.h"
+#include "main.h"
+#include "../inc/flexsea_global_structs.h"
 
 //****************************************************************************
-// Prototype(s):
+// Variable(s)
 //****************************************************************************
 
-void init_flexsea_payload_ptr_external(void);
-	
-//void rx_cmd_digital_in(uint8_t *buf);
-//void rx_cmd_analog_in(uint8_t *buf);
-void rx_cmd_exp_pwro(uint8_t *buf);
+//Data structures:
+struct execute_s exec1, exec2, exec3, exec4;
+struct ricnu_s ricnu_1;
+struct manage_s manag1, manag2;
+struct strain_s strain1;
+struct in_control_s in_control_1;
+struct gossip_s gossip1, gossip2;
+struct battery_s batt1;
 
-uint32_t tx_cmd_digital_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_analog_in(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_exp_pwro(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t pwro_pwm);
+#if defined(BOARD_TYPE_FLEXSEA_PLAN)
+struct user_data_s user_data_1;
+#endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
+
+#if defined(BOARD_TYPE_FLEXSEA_MANAGE)
+struct user_data_s user_data;
+#endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
+
 
 //****************************************************************************
-// Definition(s):
+// Function(s)
 //****************************************************************************
-
-//****************************************************************************
-// Structure(s):
-//****************************************************************************
-
-//****************************************************************************
-// Shared variable(s)
-//****************************************************************************
-
-#endif	//INC_FLEXSEA_CMD_EXTERNAL_H

@@ -67,7 +67,7 @@ extern "C" {
 //****************************************************************************
 
 //Will change this, but for now the payloads will be stored in:
-unsigned char tmp_payload_xmit[PAYLOAD_BUF_LEN];
+uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 
 //****************************************************************************
 // Function(s)

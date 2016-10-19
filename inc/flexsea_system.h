@@ -170,43 +170,6 @@ __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 #define SE_INVALID_READ_TYPE			1024
 #define SE_WRONG_PARSING				2048
 
-//Slave Read Buffer Positions - Execute:
-#define SRB_EXECUTE_OFFSET				0
-#define SRB_EXECUTE_STATUS				1			//Status byte. Includes ?
-#define SRB_EXECUTE_ENC1_MSB			2			//Encoder #1, MSB
-#define SRB_EXECUTE_ENC1_LSB			3			//Encoder #1, LSB
-#define SRB_EXECUTE_AN0_MSB				4			//Analog 0, MSB
-#define SRB_EXECUTE_AN0_LSB				5			//Analog 0, LSB
-#define SRB_EXECUTE_AN1_MSB				6			//Analog 1, MSB
-#define SRB_EXECUTE_AN1_LSB				7			//Analog 1, LSB
-#define SRB_EXECUTE_CURRENT_MSB			8			//Motor current, MSB
-#define SRB_EXECUTE_CURRENT_LSB			9			//Motor current, LSB
-#define SRB_EXECUTE_BUS_VOLTAGE			10			//Bus voltage
-#define SRB_EXECUTE_TEMPERATURE			11			//Temperature
-
-//ToDO Redo that whole thing
-//Slave Read Buffer Positions - Manage:
-#define SRB_MANAGE_OFFSET				0
-#define SRB_MANAGE_STATUS				1			//Status byte. Includes the 2 switches
-#define SRB_MANAGE_DIGITAL_IO_B1		2			//First Digital IO byte: DIO0-7
-#define SRB_MANAGE_DIGITAL_IO_B2		3			//Second Digital IO byte: DIO8-11
-#define SRB_MANAGE_AN0_MSB				4			//MSB for Analog 0
-#define SRB_MANAGE_AN0_LSB				5			//LSB
-#define SRB_MANAGE_AN1_MSB				6			//MSB for Analog 1
-#define SRB_MANAGE_AN1_LSB				7			//LSB
-#define SRB_MANAGE_AN2_MSB				8			//MSB for Analog 2
-#define SRB_MANAGE_AN2_LSB				9			//LSB
-#define SRB_MANAGE_AN3_MSB				10			//MSB for Analog 3
-#define SRB_MANAGE_AN3_LSB				11			//LSB
-#define SRB_MANAGE_AN4_MSB				12			//MSB for Analog 4
-#define SRB_MANAGE_AN4_LSB				13			//LSB
-#define SRB_MANAGE_AN5_MSB				14			//MSB for Analog 5
-#define SRB_MANAGE_AN5_LSB				15			//LSB
-#define SRB_MANAGE_AN6_MSB				16			//MSB for Analog 6
-#define SRB_MANAGE_AN6_LSB				17			//LSB
-#define SRB_MANAGE_AN7_MSB				18			//MSB for Analog 7
-#define SRB_MANAGE_AN7_LSB				19			//LSB
-
 //Motor type:
 #define MOTOR_BRUSHED					0
 #define MOTOR_BRUSHLESS					1
@@ -215,276 +178,40 @@ __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 #define DISABLED						0
 #define ENABLED							1
 
+//List of controllers:
+#define CTRL_NONE						0		//No PID gains, no PWM (no motor)
+#define CTRL_OPEN						1		//Open loop controller. Use with CMD_CTRL_O_WRITE
+#define CTRL_POSITION					2		//Position controller. Use with CMD_MOVE_TRAP_ABSOLUTE
+#define CTRL_CURRENT					3		//Current controller. Use with CMD_CTRL_I_WRITE
+#define CTRL_IMPEDANCE					4		//Impedance controller. Use with CMD_MOVE_TRAP_ABSOLUTE
+#define CTRL_CUSTOM						5		//
+//  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
+
+//Nickname for the controller gains:
+#define I_KP	g0
+#define I_KI	g1
+#define I_KD	g2
+#define P_KP	g0
+#define P_KI	g1
+#define P_KD	g2
+#define Z_K		g0
+#define Z_B		g1
+#define Z_I		g2
+
+//In Control combined fields:
+#define IN_CONTROL_CONTROLLER(x)		((x & 0xE000) >> 13)
+#define IN_CONTROL_MOT_DIR(x)			((x & 0x1000) >> 12)
+#define IN_CONTROL_PWM(x)				((x & 0x0FFF))
+
 //****************************************************************************
 // Structure(s):
 //****************************************************************************
-
-/*Note: most structures will have two versions. The original, aka 'raw'
-version has multiple data types, and is used by the different boards.
-It includes a sub-structure named decoded_X that contains decoded values
-(physical units, not ticks). The decoded values are always int32*/
-
-//Inner structure for the IMU:
-
-struct decoded_xyz_s
-{
-	 int32_t x;
-	 int32_t y;
-	 int32_t z;
-};
-
-struct xyz_s
-{
-	 int16_t x;
-	 int16_t y;
-	 int16_t z;
-};
-
-//FlexSEA-Execute:
-
-struct decoded_execute_s
-{
-	struct decoded_xyz_s gyro;  //deg/s
-	struct decoded_xyz_s accel; //mg
-
-	int32_t strain;             //%
-	int32_t current;            //mA
-	int32_t volt_batt;          //mV
-	int32_t volt_int;           //mV
-	int32_t temp;               //Celsius x10
-	int32_t analog[8];          //mV
-};
-
-struct execute_s
-{
-	struct xyz_s gyro;
-	struct xyz_s accel;
-
-	uint16_t strain;
-	uint16_t analog[8];
-	int16_t current;
-	int32_t enc_display; //useful?
-	int32_t enc_control; //useful?
-	int32_t enc_commut; //useful?
-	int32_t enc_control_ang;
-	int32_t enc_control_vel;
-	int32_t enc_motor;
-	int32_t enc_joint;
-	uint8_t volt_batt;	//+VB
-	uint8_t volt_int;	//+VG
-	uint8_t temp;
-	uint8_t pwro;
-	uint8_t status1;
-	uint8_t status2;
-
-	struct ctrl_s ctrl;
-
-	//Decoded values:
-	struct decoded_execute_s decoded;
-};
-
-//FlexSEA-Manage:
-
-struct decoded_manage_s
-{
-	struct decoded_xyz_s gyro;  //deg/s
-	struct decoded_xyz_s accel; //mg
-
-	int32_t analog[8];          //mV
-};
-
-struct manage_s
-{
-	struct xyz_s gyro;
-	struct xyz_s accel;
-
-	uint16_t analog[8];
-	uint16_t digitalIn;
-
-	uint8_t status1;
-
-	uint8_t sw1;
-	uint8_t sampling;
-
-	//Decoded values:
-	struct decoded_manage_s decoded;
-};
-
-//FlexSEA-Strain:
-
-struct decoded_strain_s
-{
-	int32_t strain[6];
-};
-
-//Strain - single channel
-struct strain_1ch_s
-{
-	//Config:
-	uint8_t offset;
-	uint8_t gain;
-	uint8_t oref;
-
-	//Raw ADC values:
-	uint16_t strain_raw[4];
-	uint16_t vo1;
-	uint16_t vo2;
-
-	//Filtered value:
-	uint16_t strain_filtered;
-};
-
-//Strain - 6 channels
-struct strain_s
-{
-	//One structure per channel:
-	struct strain_1ch_s ch[6];
-	uint8_t compressedBytes[9];
-
-	//Decoded values:
-	struct decoded_strain_s decoded;
-};
-
-//Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
-
-struct decoded_ricnu_s
-{
-	int32_t ext_strain[6];
-};
-
-struct ricnu_s
-{
-	//Execute:
-	struct execute_s ex;
-
-	//Extra sensors (Strain):
-	//uint16_t ext_strain[6];
-	struct strain_s st;
-
-	//Decoded values (ext_strain only)
-	struct decoded_ricnu_s decoded;
-};
-
-//FlexSEA-Gossip:
-
-struct decoded_gossip_s
-{
-	struct decoded_xyz_s gyro;     //deg/s
-	struct decoded_xyz_s accel;    //mg
-	struct decoded_xyz_s magneto;  //uT
-};
-
-struct gossip_s
-{
-	struct xyz_s gyro;
-	struct xyz_s accel;
-	struct xyz_s magneto;
-
-	uint16_t capsense[4];
-
-	uint16_t io[2];
-	uint8_t status;
-
-	//Decoded values:
-	struct decoded_gossip_s decoded;
-};
-
-//FlexSEA-Battery:
-
-struct decoded_battery_s
-{
-	int32_t voltage;    //mV
-	int32_t current;    //mA
-	int32_t power;      //mW
-	int32_t temp;       //C*10
-};
-
-struct battery_s
-{
-	uint16_t voltage;
-	int16_t current;
-	uint8_t temp;
-	uint8_t pushbutton;
-	uint8_t status;
-
-	//Decoded values:
-	struct decoded_battery_s decoded;
-};
-
-//Commands, tools, specialty, etc.:
-
-//In Control Tool:
-struct in_control_s
-{
-	uint8_t controller;
-	int32_t setp;
-	int32_t actual_val;
-	int32_t error;
-	int32_t output;
-	int16_t pwm;
-	uint8_t mot_dir;
-	int16_t current;
-	uint16_t combined;	//[CTRL2:0][MOT_DIR][PWM]
-
-	int32_t r[4];
-	int32_t w[4];
-};
-
-struct user_data_s
-{
-	int32_t r[4];
-	int32_t w[4];
-};
-
-//IMU data & config
-struct imu_s
-{
-	 struct xyz_s accel;
-	 struct xyz_s gyro;
-	 struct xyz_s magneto;
-	 uint32_t config;
-};
-
-//AS504x Magnetic encoders:
-struct as504x_s
-{
-	int32_t angle_raws[10]; //last 10 raw readings
-	int32_t angle_conts[10]; // last 10 continuous angle readings
-
-	int32_t angle_vel_denoms[8]; //the number of 1 MHz counts between the last two angle readings
-	int32_t num_rot;        //number of rotations
-	int32_t angle_vel[2];		//sensor reading - last sensor reading
-	int32_t angle_vel_filt[2];		//sensor reading - last sensor reading
-	int32_t angle_vel_RPMS_raw[2];		//sensor reading - last sensor reading
-	int32_t angle_vel_RPMS_filt[2];
-	int32_t angle_vel_RPM;
-	uint16_t angle_comp;	//Sensor reading, 2/ Compensation enabled
-	uint16_t angle_ctrl;	//Modified version (gain, zero). Used by controllers.
-
-	int32_t last_angtimer_read;
-	int32_t counts_since_last_ang_read;
-	int32_t last_ang_read_period;
-	int32_t samplefreq; //sampling frequency of the sensor
-};
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
-extern struct execute_s exec1, exec2, exec3, exec4;
-extern struct ricnu_s ricnu_1;
-extern struct manage_s manag1, manag2;
-extern struct strain_s strain1;
-extern struct in_control_s in_control_1;
-extern struct gossip_s gossip1, gossip2;
-extern struct battery_s batt1;
-
-#if defined(BOARD_TYPE_FLEXSEA_PLAN)
-extern struct user_data_s user_data_1;
-#endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
-
-#if defined(BOARD_TYPE_FLEXSEA_MANAGE)
-extern struct user_data_s user_data;
-#endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
+//Structures and shared variables are now in:
+#include "flexsea_global_structs.h"
 
 #endif	//INC_FLEXSEA_SYSTEM_H

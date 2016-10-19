@@ -47,7 +47,7 @@ extern "C" {
 //****************************************************************************
 
 //Will change this, but for now the payloads will be stored in:
-unsigned char tmp_payload_xmit[PAYLOAD_BUF_LEN];
+uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 
 //Special code for Manage:
 struct spc4_s spc4_ex1, spc4_ex2;
