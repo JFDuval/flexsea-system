@@ -74,13 +74,13 @@ uint32_t tx_cmd_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t
 						uint8_t setGains, int16_t g0, int16_t g1, int16_t g2,
 						int16_t g3);
 
-void tx_cmd_ricnu_rw(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_ricnu_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset, uint8_t controller, \
 					int32_t setpoint, uint8_t setGains, int16_t g0, int16_t g1,\
 					int16_t g2, int16_t g3);
-void tx_cmd_ricnu_r(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_ricnu_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset);
-void tx_cmd_ricnu_w(uint8_t *sharedBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_ricnu_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len, uint8_t offset);
 
 //Decoding:

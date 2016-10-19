@@ -166,7 +166,7 @@ void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Formatting:
 	(*cmd) = CMD_CTRL_MODE;
-	(*cmdType) = WRITE;
+	(*cmdType) = CMD_WRITE;
 
 	//Data:
 	shBuf[index++] = ctrlMode;
@@ -182,7 +182,7 @@ void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Formatting:
 	(*cmd) = CMD_CTRL_MODE;
-	(*cmdType) = READ;
+	(*cmdType) = CMD_READ;
 
 	//Data:
 	//(none)
