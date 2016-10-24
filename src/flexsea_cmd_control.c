@@ -121,43 +121,8 @@ void init_flexsea_payload_ptr_control(void)
 //	flexsea_payload_ptr[CMD_IN_CONTROL][RX_PTYPE_READ] = &rx_cmd_in_control;
 }
 
-/*
-//Transmission of a CTRL_MODE command
-uint32_t tx_cmd_ctrl_mode(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t ctrl)
-{
-	uint32_t bytes = 0;
-
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
-
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
-
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_MODE);
-
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_MODE);
-
-		//Arguments:
-		buf[P_DATA1] = ctrl;
-
-		bytes = P_DATA1 + 1;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
-}
-*/
+//Transmit Control Mode:
+//======================
 
 void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t ctrlMode)
@@ -192,74 +157,20 @@ void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
-/*Unimplemented
-void tx_cmd_ctrl_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t ctrlMode){}*/
-
-/*
-//Reception of a CTRL_MODE command
-void rx_cmd_ctrl_mode(uint8_t *buf)
-{
-	uint8_t numb = 0, controller = 0;
-
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
-
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		//Generate the reply:
-		numb = tx_cmd_ctrl_mode(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, ctrl.active_ctrl);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
-
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		controller = buf[P_DATA1];
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			exec1.ctrl.active_ctrl = controller;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-			control_strategy(controller);
-
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
-}
-*/
+//Receive Control Mode:
+//======================
 
 void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
-	
+
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-	control_strategy(buf[P_DATA1]);
+		control_strategy(buf[P_DATA1]);
+
+	#else
+
+		(void)buf;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -267,7 +178,7 @@ void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
-	
+
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 //Generate the reply:
@@ -283,7 +194,7 @@ void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
-	
+
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 	//Decode data:
@@ -297,138 +208,114 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
+//Transmit Control Current Setpoint:
+//==================================
 
-//Transmission of a CTRL_I command
-uint32_t tx_cmd_ctrl_i(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t wanted, int16_t measured)
+void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t currentSetpoint)
 {
-	uint8_t tmp0 = 0, tmp1 = 0;
-	uint32_t bytes = 0;
+	uint16_t index = 0;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Formatting:
+	(*cmd) = CMD_CTRL_I;
+	(*cmdType) = CMD_WRITE;
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Data:
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		//Execute: reply only
+		(void)currentSetpoint;
+		SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
+		SPLIT_16((uint16_t)ctrl.current.setpoint_val, shBuf, &index);
+	#else
+		//Other boards can write a new setpoint
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)currentSetpoint, shBuf, &index);
+	#endif
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_I);
-
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_I);
-
-		//Arguments:
-		uint16_to_bytes(measured, &tmp0, &tmp1);
-		buf[P_DATA1] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes(wanted, &tmp0, &tmp1);
-		buf[P_DATA1 + 2] = tmp0;
-		buf[P_DATA1 + 3] = tmp1;
-
-		bytes = P_DATA1 + 4;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
-//Reception of a CTRL_I command
-void rx_cmd_ctrl_i(uint8_t *buf)
+void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
 {
-	uint32_t numb = 0;
+	uint16_t index = 0;
+
+	//Formatting:
+	(*cmd) = CMD_CTRL_I;
+	(*cmdType) = CMD_READ;
+
+	//Data:
+	//(none)
+	(void)shBuf;
+
+	//Payload length:
+	(*len) = index;
+}
+
+//Receive Control Current Setpoint:
+//=================================
+
+void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
+{
+	uint16_t index = P_DATA1;
 	int16_t tmp_wanted_current = 0, tmp_measured_current = 0;
 
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
+	tmp_measured_current = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp_wanted_current = (int16_t) REBUILD_UINT16(buf, &index);
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	(void)info;
 
-		//Generate the reply:
-		numb = tx_cmd_ctrl_i(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.current.actual_val, ctrl.current.setpoint_val);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, (numb));
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_measured_current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]));
-		tmp_wanted_current = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
+		//Only change the setpoint if we are in current control mode:
+		if(ctrl.active_ctrl == CTRL_CURRENT)
 		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-			//Store value:
-			exec1.current = tmp_measured_current;
-
-			#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-
-			#ifdef BOARD_TYPE_FLEXSEA_PLAN
-
-			#ifdef USE_PRINTF
-			printf("Received CMD_CTRL_I_READ_REPLY. Wanted = %i, Measured = %i.\n", tmp_wanted_current, tmp_measured_current);
-			#endif	//USE_PRINTF
-
-			#endif	//BOARD_TYPE_FLEXSEA_PLAN
+			ctrl.current.setpoint_val = tmp_wanted_current;
 		}
-		else
-		{
-			//Master is writing a value to this board
 
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	#else
 
-			//Only change the setpoint if we are in current control mode:
-			if(ctrl.active_ctrl == CTRL_CURRENT)
-			{
-				ctrl.current.setpoint_val = tmp_wanted_current;
-			}
+		(void)buf;
 
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
-/*
-void test_cmd_ctrl_i(void)
+void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 {
-	//First, we generate a TX Write:
-	tx_cmd_ctrl_i(FLEXSEA_EXECUTE_1, CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, -333, 666);
+	(void)info;
 
-	//Minimalist parsing:
-	if(CMD_7BITS(tmp_payload_xmit[CP_CMD1]) == CMD_CTRL_I)
-	{
-		//Decode it:
-		rx_cmd_ctrl_i(tmp_payload_xmit);
-	}
+//Generate the reply:
+	//Return (0)
+//	numb = tx_cmd_ricnu_w(TX_CMD_DEFAULT, ctrl.active_ctrl);	//ToDo
+//	COMM_GEN_STR_DEFAULT
+//	flexsea_send_serial_master(myPort, myData, myLen);	//ToDo
+
 }
-*/
+
+void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
+{
+	uint16_t index = P_DATA1;
+	int16_t tmp_wanted_current = 0, tmp_measured_current = 0;
+
+	tmp_measured_current = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp_wanted_current = (int16_t) REBUILD_UINT16(buf, &index);
+
+	(void)info;
+
+	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+	//Store value:
+	exec1.current = tmp_measured_current;
+	//ToDo shouldn't be exec1!
+
+	#else
+		(void)buf;
+	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+}
+
+//Transmit Control Open Setpoint:
+//===============================
 
 //Transmission of a CTRL_O command
 uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd)
@@ -468,6 +355,9 @@ uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 
 	return bytes;
 }
+
+//Receive Control Open Setpoint:
+//==============================
 
 //Reception of a CTRL_O command
 void rx_cmd_ctrl_o(uint8_t *buf)
@@ -537,6 +427,9 @@ void rx_cmd_ctrl_o(uint8_t *buf)
 	}
 }
 
+//Transmit Control Position Setpoint:
+//===================================
+
 //Transmission of a CTRL_P command
 uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						int32_t pos, int32_t posi, int32_t posf, int32_t spdm, int32_t acc)
@@ -598,6 +491,9 @@ uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 
 	return bytes;
 }
+
+//Receive Control Position Setpoint:
+//==================================
 
 //Reception of a CTRL_P command
 void rx_cmd_ctrl_p(uint8_t *buf)
@@ -706,6 +602,9 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 	}
 }
 
+//Transmit Control Current Gains:
+//===============================
+
 //Transmission of a CTRL_I_G command
 uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						int16_t kp, int16_t ki, int16_t kd)
@@ -752,6 +651,9 @@ uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint3
 
 	return bytes;
 }
+
+//Receive Control Current Gains:
+//==============================
 
 //Reception of a CTRL_I_G command
 void rx_cmd_ctrl_i_g(uint8_t *buf)
@@ -824,6 +726,9 @@ void rx_cmd_ctrl_i_g(uint8_t *buf)
 	}
 }
 
+//Transmit Control Position Gains:
+//================================
+
 //Transmission of a CTRL_P_G command
 uint32_t tx_cmd_ctrl_p_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						int16_t kp, int16_t ki, int16_t kd)
@@ -870,6 +775,9 @@ uint32_t tx_cmd_ctrl_p_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint3
 
 	return bytes;
 }
+
+//Receive Control Position Gains:
+//===============================
 
 //Reception of a CTRL_P_G command
 void rx_cmd_ctrl_p_g(uint8_t *buf)
@@ -942,6 +850,9 @@ void rx_cmd_ctrl_p_g(uint8_t *buf)
 	}
 }
 
+//Transmit Control Impedance Gains:
+//=================================
+
 //Transmission of a CTRL_Z_G command
 uint32_t tx_cmd_ctrl_z_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						int16_t zk, int16_t zb, int16_t zi)
@@ -988,6 +899,9 @@ uint32_t tx_cmd_ctrl_z_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint3
 
 	return bytes;
 }
+
+//Receive Control Impedance Gains:
+//================================
 
 //Reception of a CTRL_Z_G command
 void rx_cmd_ctrl_z_g(uint8_t *buf)
@@ -1059,6 +973,9 @@ void rx_cmd_ctrl_z_g(uint8_t *buf)
 		}
 	}
 }
+
+//Transmit In Control Command:
+//============================
 
 //Transmission of an IN_CONTROL command
 //Note: we can only write one parameter at the time (that's what we need for typical use cases).
@@ -1166,6 +1083,9 @@ uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uin
 
 	return bytes;
 }
+
+//Receive In Control Command:
+//===========================
 
 //Reception of an IN_CONTROL command
 void rx_cmd_in_control(uint8_t *buf)

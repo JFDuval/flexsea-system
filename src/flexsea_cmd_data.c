@@ -103,6 +103,7 @@ void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Data:
 	//(none)
+	(void)shBuf;
 
 	//Payload length:
 	(*len) = index;
