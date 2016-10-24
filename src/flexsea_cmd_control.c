@@ -124,6 +124,7 @@ void init_flexsea_payload_ptr_control(void)
 //Transmit Control Mode:
 //======================
 
+//Test code? Yes
 void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t ctrlMode)
 {
@@ -140,6 +141,7 @@ void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+//Test code? Yes
 void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
 {
@@ -160,6 +162,7 @@ void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive Control Mode:
 //======================
 
+//Test code? No
 void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
@@ -175,6 +178,7 @@ void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
+//Test code? No
 void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
@@ -191,6 +195,7 @@ void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
+//Test code? No
 void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
@@ -211,6 +216,7 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 //Transmit Control Current Setpoint:
 //==================================
 
+//Test code? Yes
 void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, int16_t currentSetpoint)
 {
@@ -236,6 +242,7 @@ void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+//Test code? Yes
 void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
 {
@@ -256,6 +263,7 @@ void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive Control Current Setpoint:
 //=================================
 
+//Test code? No
 void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
@@ -281,6 +289,7 @@ void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
+//Test code? No
 void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
@@ -293,6 +302,7 @@ void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 
 }
 
+//Test code? No
 void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
@@ -318,6 +328,7 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 //===============================
 
 //Transmission of a CTRL_O command
+//Test code? No
 uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd)
 {
 	uint8_t tmp0 = 0, tmp1 = 0;
