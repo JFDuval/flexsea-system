@@ -17,16 +17,17 @@ void test_tx_cmd_ctrl_mode_w(void)
 	uint8_t controller = 5;
 	prepTxCmdTest();
 
-	tx_cmd_ctrl_mode_w(tmpPayload, &cmdCode, &cmdType, &len, controller);
+	tx_cmd_ctrl_mode_w(test_tmpPayload, &test_cmdCode, &test_cmdType, \
+					   &test_len, controller);
 
-	TEST_ASSERT_EQUAL(CMD_CTRL_MODE, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_WRITE, cmdType);
-	TEST_ASSERT_EQUAL(1, len);
+	TEST_ASSERT_EQUAL(CMD_CTRL_MODE, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_WRITE, test_cmdType);
+	TEST_ASSERT_EQUAL(1, test_len);
 
-	TEST_ASSERT_EQUAL(controller, tmpPayload[0]);
+	TEST_ASSERT_EQUAL(controller, test_tmpPayload[0]);
 	for(i = 1; i < PAYLOAD_BUF_LEN; i++)
 	{
-		TEST_ASSERT_EQUAL(FILLER, tmpPayload[i]);
+		TEST_ASSERT_EQUAL(FILLER, test_tmpPayload[i]);
 	}
 }
 
@@ -35,15 +36,16 @@ void test_tx_cmd_ctrl_mode_r(void)
 	int i = 0;
 	prepTxCmdTest();
 
-	tx_cmd_ctrl_mode_r(tmpPayload, &cmdCode, &cmdType, &len);
+	tx_cmd_ctrl_mode_r(test_tmpPayload, &test_cmdCode, &test_cmdType, \
+					   &test_len);
 
-	TEST_ASSERT_EQUAL(CMD_CTRL_MODE, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_READ, cmdType);
-	TEST_ASSERT_EQUAL(0, len);
+	TEST_ASSERT_EQUAL(CMD_CTRL_MODE, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_READ, test_cmdType);
+	TEST_ASSERT_EQUAL(0, test_len);
 
 	for(i = 0; i < PAYLOAD_BUF_LEN; i++)
 	{
-		TEST_ASSERT_EQUAL(FILLER, tmpPayload[i]);
+		TEST_ASSERT_EQUAL(FILLER, test_tmpPayload[i]);
 	}
 }
 
@@ -73,19 +75,20 @@ void test_tx_cmd_ctrl_i_w(void)
 	uint16_t index = 0;
 	prepTxCmdTest();
 
-	tx_cmd_ctrl_i_w(tmpPayload, &cmdCode, &cmdType, &len, setP);
+	tx_cmd_ctrl_i_w(test_tmpPayload, &test_cmdCode, &test_cmdType, \
+					&test_len, setP);
 
-	TEST_ASSERT_EQUAL(CMD_CTRL_I, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_WRITE, cmdType);
-	TEST_ASSERT_EQUAL(4, len);
+	TEST_ASSERT_EQUAL(CMD_CTRL_I, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_WRITE, test_cmdType);
+	TEST_ASSERT_EQUAL(4, test_len);
 
 	//Only testing the 2nd word:
-	res = (int16_t) REBUILD_UINT16(&tmpPayload[2], &index);
+	res = (int16_t) REBUILD_UINT16(&test_tmpPayload[2], &index);
 	TEST_ASSERT_EQUAL(setP, res);
-	
+
 	for(i = 4; i < PAYLOAD_BUF_LEN; i++)
 	{
-		TEST_ASSERT_EQUAL(FILLER, tmpPayload[i]);
+		TEST_ASSERT_EQUAL(FILLER, test_tmpPayload[i]);
 	}
 }
 
@@ -94,15 +97,15 @@ void test_tx_cmd_ctrl_i_r(void)
 	int i = 0;
 	prepTxCmdTest();
 
-	tx_cmd_ctrl_i_r(tmpPayload, &cmdCode, &cmdType, &len);
+	tx_cmd_ctrl_i_r(test_tmpPayload, &test_cmdCode, &test_cmdType, &test_len);
 
-	TEST_ASSERT_EQUAL(CMD_CTRL_I, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_READ, cmdType);
-	TEST_ASSERT_EQUAL(0, len);
+	TEST_ASSERT_EQUAL(CMD_CTRL_I, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_READ, test_cmdType);
+	TEST_ASSERT_EQUAL(0, test_len);
 
 	for(i = 0; i < PAYLOAD_BUF_LEN; i++)
 	{
-		TEST_ASSERT_EQUAL(FILLER, tmpPayload[i]);
+		TEST_ASSERT_EQUAL(FILLER, test_tmpPayload[i]);
 	}
 }
 

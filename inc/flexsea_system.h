@@ -53,6 +53,10 @@
 void init_flexsea_payload_ptr(void);
 uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 				uint32_t len, uint8_t receiver, uint8_t *buf);
+void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
+			uint8_t rid, uint8_t *info, uint16_t *numBytes, uint8_t *commStr);
+void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
+				 uint8_t rid, uint8_t *info, uint8_t ms);
 __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 
 //****************************************************************************
@@ -204,12 +208,22 @@ __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 #define IN_CONTROL_PWM(x)				((x & 0x0FFF))
 
 //****************************************************************************
-// Structure(s):
+// Macro(s):
 //****************************************************************************
+
+//To simplify user's life, here are two macros:
+#define TX_N_DEFAULT		tmpPayload,&cmdCode,&cmdType,&cmdLen
+#define P_AND_S_DEFAULT		tmpPayload,cmdCode,cmdType,cmdLen
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
+
+//We use this buffer to exchange information between tx_N() and tx_cmd():
+extern uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
+//Similarly, we exchange command code, type and length:
+extern uint8_t cmdCode, cmdType;
+extern uint16_t cmdLen;
 
 //Structures and shared variables are now in:
 #include "flexsea_global_structs.h"

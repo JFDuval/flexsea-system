@@ -10,10 +10,10 @@ extern "C" {
 // Variables used for these sets of tests:
 //****************************************************************************
 
-uint8_t tmpPayload[PAYLOAD_BUF_LEN];
-uint8_t transferBuf[COMM_STR_BUF_LEN];
-uint8_t cmdCode = 0, cmdType = 0;
-uint16_t len = 0;
+uint8_t test_tmpPayload[PAYLOAD_BUF_LEN];
+uint8_t test_transferBuf[COMM_STR_BUF_LEN];
+uint8_t test_cmdCode = 0, test_cmdType = 0;
+uint16_t test_len = 0;
 
 //****************************************************************************
 // Helper function(s):
@@ -21,11 +21,11 @@ uint16_t len = 0;
 
 void prepTxCmdTest(void)
 {
-	memset(tmpPayload, FILLER, PAYLOAD_BUF_LEN);
-	memset(transferBuf, FILLER, COMM_STR_BUF_LEN);
-	cmdCode = 0;
-	cmdType = 0;
-	len = 0;
+	memset(test_tmpPayload, FILLER, PAYLOAD_BUF_LEN);
+	memset(test_transferBuf, FILLER, COMM_STR_BUF_LEN);
+	test_cmdCode = 0;
+	test_cmdType = 0;
+	test_len = 0;
 }
 
 //****************************************************************************

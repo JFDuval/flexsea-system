@@ -60,8 +60,16 @@ extern "C" {
 // Variable(s)
 //****************************************************************************
 
-//Will change this, but for now the payloads will be stored in:
+//Will change this, but for now the payloads will be stored in: (ToDo eliminate soon)
 uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
+
+/*
+//We use this buffer to exchange information between tx_N() and tx_cmd():
+uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
+//Similarly, we exchange command code, type and length:
+uint8_t cmdCode = 0, cmdType = 0;
+uint16_t cmdLen = 0;
+*/
 
 //****************************************************************************
 // Function(s)
@@ -82,13 +90,14 @@ void init_flexsea_payload_ptr_control(void)
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_rr;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
+
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_w;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
 	*/
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
+	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
 
 	//Controller gains:
 	/* TODO
@@ -128,9 +137,8 @@ void init_flexsea_payload_ptr_control(void)
 void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t ctrlMode)
 {
+	//Variable(s) & command:
 	uint16_t index = 0;
-
-	//Formatting:
 	(*cmd) = CMD_CTRL_MODE;
 	(*cmdType) = CMD_WRITE;
 
@@ -145,15 +153,13 @@ void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
 {
+	//Variable(s) & command:
 	uint16_t index = 0;
-
-	//Formatting:
 	(*cmd) = CMD_CTRL_MODE;
 	(*cmdType) = CMD_READ;
 
 	//Data:
-	//(none)
-	(void)shBuf;
+	(void)shBuf; //(none)
 
 	//Payload length:
 	(*len) = index;
@@ -172,9 +178,7 @@ void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 		control_strategy(buf[P_DATA1]);
 
 	#else
-
 		(void)buf;
-
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
@@ -185,10 +189,8 @@ void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-//Generate the reply:
-//	numb = tx_cmd_ricnu_w(TX_CMD_DEFAULT, ctrl.active_ctrl);	//ToDo
-//	COMM_GEN_STR_DEFAULT
-//	flexsea_send_serial_master(myPort, myData, myLen);	//ToDo
+		tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrl.active_ctrl);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
 
 	#else
 		(void)buf;
@@ -202,10 +204,10 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//Decode data:
-	uint8_t controller = buf[P_DATA1];
-	//Store value:
-//	exec1.ctrl.active_ctrl = controller;
+		//Decode data:
+		uint8_t controller = buf[P_DATA1];
+		//Store value:
+		exec1.ctrl.active_ctrl = controller;
 		//ToDo use pointer, too specific
 
 	#else
@@ -220,9 +222,8 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, int16_t currentSetpoint)
 {
+	//Variable(s) & command:
 	uint16_t index = 0;
-
-	//Formatting:
 	(*cmd) = CMD_CTRL_I;
 	(*cmdType) = CMD_WRITE;
 
@@ -246,15 +247,13 @@ void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
 {
+	//Variable(s) & command:
 	uint16_t index = 0;
-
-	//Formatting:
 	(*cmd) = CMD_CTRL_I;
 	(*cmdType) = CMD_READ;
 
 	//Data:
-	//(none)
-	(void)shBuf;
+	(void)shBuf; //(none)
 
 	//Payload length:
 	(*len) = index;

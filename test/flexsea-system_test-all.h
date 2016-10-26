@@ -8,10 +8,10 @@
 #define TEST_PL_LEN		4
 #define FILLER			0
 
-extern uint8_t tmpPayload[PAYLOAD_BUF_LEN];
-extern uint8_t transferBuf[COMM_STR_BUF_LEN];
-extern uint8_t cmdCode, cmdType;
-extern uint16_t len;
+extern uint8_t test_tmpPayload[PAYLOAD_BUF_LEN];
+extern uint8_t test_transferBuf[COMM_STR_BUF_LEN];
+extern uint8_t test_cmdCode, test_cmdType;
+extern uint16_t test_len;
 
 void prepTxCmdTest(void);
 int flexsea_system_test(void);

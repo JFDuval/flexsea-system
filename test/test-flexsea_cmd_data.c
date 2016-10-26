@@ -13,15 +13,16 @@ void test_tx_cmd_data_read_all_r(void)
 	int i = 0;
 	prepTxCmdTest();
 
-	tx_cmd_data_read_all_r(tmpPayload, &cmdCode, &cmdType, &len);
+	tx_cmd_data_read_all_r(test_tmpPayload, &test_cmdCode, &test_cmdType, \
+						   &test_len);
 
-	TEST_ASSERT_EQUAL(CMD_READ_ALL, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_READ, cmdType);
-	TEST_ASSERT_EQUAL(0, len);
+	TEST_ASSERT_EQUAL(CMD_READ_ALL, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_READ, test_cmdType);
+	TEST_ASSERT_EQUAL(0, test_len);
 
 	for(i = 0; i < PAYLOAD_BUF_LEN; i++)
 	{
-		TEST_ASSERT_EQUAL(FILLER, tmpPayload[i]);
+		TEST_ASSERT_EQUAL(FILLER, test_tmpPayload[i]);
 	}
 }
 
@@ -30,10 +31,11 @@ void test_tx_cmd_data_read_all_w(void)
 	uint16_t expectedLen = 0;
 	prepTxCmdTest();
 
-	tx_cmd_data_read_all_w(tmpPayload, &cmdCode, &cmdType, &len);
+	tx_cmd_data_read_all_w(test_tmpPayload, &test_cmdCode, &test_cmdType, \
+						   &test_len);
 
-	TEST_ASSERT_EQUAL(CMD_READ_ALL, cmdCode);
-	TEST_ASSERT_EQUAL(CMD_WRITE, cmdType);
+	TEST_ASSERT_EQUAL(CMD_READ_ALL, test_cmdCode);
+	TEST_ASSERT_EQUAL(CMD_WRITE, test_cmdType);
 
 	//Length depends on board type:
 
@@ -53,7 +55,8 @@ void test_tx_cmd_data_read_all_w(void)
 	expectedLen = 9;
 	#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
-	TEST_ASSERT_EQUAL_MESSAGE(expectedLen, len, "Data length (manual input)");
+	TEST_ASSERT_EQUAL_MESSAGE(expectedLen, test_len, \
+							  "Data length (manual input)");
 }
 
 //****************************************************************************

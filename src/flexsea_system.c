@@ -55,6 +55,12 @@ For rx_* functions, the suffix options are:
 // Variable(s)
 //****************************************************************************
 
+//We use this buffer to exchange information between tx_N() and tx_cmd():
+uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
+//Similarly, we exchange command code, type and length:
+uint8_t cmdCode = 0, cmdType = 0;
+uint16_t cmdLen = 0;
+
 //****************************************************************************
 // Function(s)
 //****************************************************************************
@@ -144,6 +150,42 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 	bytes = index+len;
 
 	return bytes;
+}
+
+//Package payload, generate communication string. Returns buffer + numb
+void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
+			uint8_t rid, uint8_t *info, uint16_t *numBytes, uint8_t *commStr)
+{
+	uint8_t finalPayload[PAYLOAD_BUF_LEN];
+	uint16_t numb = 0;
+
+	(void)info;	//Unused for now
+
+	numb = tx_cmd(shBuf, cmd, cmdType, len, rid, finalPayload);
+	numb = comm_gen_str(finalPayload, commStr, numb);
+	numb = COMM_STR_BUF_LEN;	//Fixed length
+	(*numBytes) = numb;
+}
+
+//Call pack(), and send result to master/slave.
+//Use that after your tx_N() function.
+void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
+				 uint8_t rid, uint8_t *info, uint8_t ms)
+{
+	uint16_t numb = 0;
+
+	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
+
+	if(!ms)
+	{
+		//Send to slave:
+		flexsea_send_serial_slave(info[0], comm_str_1, numb);
+	}
+	else
+	{
+		//Send to master:
+		flexsea_send_serial_master(info[0], comm_str_1, numb);
+	}
 }
 
 //Weak function, redefine in your own flexsea-user if needed.
