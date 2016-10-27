@@ -43,28 +43,17 @@
 
 void init_flexsea_payload_ptr_data(void);
 
-
-
+//Read All
 void rx_cmd_data_read_all_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info);
-
-void rx_cmd_data_read_all_ricnu(uint8_t *buf);
-void rx_cmd_data_user(uint8_t *buf);
-void rx_cmd_data_read_all_ricnu(uint8_t *buf);
-
-
-
 void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len);
 void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len);
 
+//User Data
 uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
-uint32_t tx_cmd_data_read_all_ricnu(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-
-//Older function - disabled until further notice:
-//void rx_cmd_data_acqui(uint8_t *buf);
-//uint32_t tx_cmd_data_acqui(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t acqui);
+void rx_cmd_data_user(uint8_t *buf);
 
 //****************************************************************************
 // Definition(s):

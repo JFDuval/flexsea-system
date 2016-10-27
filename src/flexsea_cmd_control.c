@@ -41,16 +41,6 @@ extern "C" {
 #include "../inc/flexsea_system.h"
 #include "../inc/flexsea_cmd_control.h"
 
-//Plan boards only:
-#ifdef BOARD_TYPE_FLEXSEA_PLAN
-//...
-#endif	//BOARD_TYPE_FLEXSEA_PLAN
-
-//Manage boards only:
-#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-//...
-#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-
 //Execute boards only:
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 #include "main.h"
@@ -62,14 +52,6 @@ extern "C" {
 
 //Will change this, but for now the payloads will be stored in: (ToDo eliminate soon)
 uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
-
-/*
-//We use this buffer to exchange information between tx_N() and tx_cmd():
-uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
-//Similarly, we exchange command code, type and length:
-uint8_t cmdCode = 0, cmdType = 0;
-uint16_t cmdLen = 0;
-*/
 
 //****************************************************************************
 // Function(s)

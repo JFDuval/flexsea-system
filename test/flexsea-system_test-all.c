@@ -39,7 +39,6 @@ int flexsea_system_test(void)
 
 	//One call per file here:
 	test_flexsea_system();
-	test_flexsea_cmd_application();
 	test_flexsea_cmd_control();
 	test_flexsea_cmd_data();
 	test_flexsea_cmd_external();

@@ -95,17 +95,6 @@ void init_flexsea_payload_ptr(void)
 	//Data:
 	init_flexsea_payload_ptr_data();
 
-	//Application: TODO move to User
-	flexsea_payload_ptr[CMD_SPC1][RX_PTYPE_READ] = &rx_cmd_special_1;
-	flexsea_payload_ptr[CMD_SPC2][RX_PTYPE_READ] = &rx_cmd_special_2;
-	flexsea_payload_ptr[CMD_SPC3][RX_PTYPE_READ] = &rx_cmd_special_3;
-	flexsea_payload_ptr[CMD_SPC4][RX_PTYPE_READ] = &rx_cmd_special_4;
-	flexsea_payload_ptr[CMD_SPC5][RX_PTYPE_READ] = &rx_cmd_special_5;
-
-	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_READ] = &rx_cmd_ricnu_rw;
-	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_WRITE] = &rx_cmd_ricnu_w;
-	flexsea_payload_ptr[CMD_RICNU][RX_PTYPE_REPLY] = &rx_cmd_ricnu_rr;
-
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
 

@@ -37,14 +37,14 @@
 //****************************************************************************
 
 #include "flexsea_board.h"
-#include "../../flexsea-comm/inc/flexsea.h"
-//Include all your own files:
+#include "../flexsea-comm/inc/flexsea.h"
+//Include the core flexsea-system files:
 #include "flexsea_cmd_control.h"
 #include "flexsea_cmd_sensors.h"
 #include "flexsea_cmd_external.h"
-#include "flexsea_cmd_application.h"
 #include "flexsea_cmd_data.h"
-//...
+//Include the user files:
+#include "../flexsea-user/inc/flexsea_cmd_user.h"
 
 //****************************************************************************
 // Prototype(s):
@@ -69,96 +69,98 @@ __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 
 //System commands:
 
-#define CMD_NULL						0
-#define CMD_TEST						1
-#define CMD_PING						10
-#define CMD_STATUS						11
-#define CMD_RESET						12
-#define CMD_ACK							13
+#define CMD_NULL				0
+#define CMD_TEST				1
+#define CMD_PING				10
+#define CMD_STATUS				11
+#define CMD_RESET				12
+#define CMD_ACK					13
 
 //Data commands:
 
-#define CMD_MEM							20
-#define CMD_ACQUI						21
-#define CMD_READ_ALL					22
-#define CMD_USER_DATA					23
+#define CMD_MEM					20
+#define CMD_ACQUI				21
+#define CMD_READ_ALL			22
+#define CMD_USER_DATA			23
 
 //Sensor commands:
 
-#define CMD_TEMP						40
-#define CMD_SWITCH						41
-#define CMD_IMU							42
-#define CMD_ENCODER						43
-#define CMD_STRAIN						44
-#define CMD_STRAIN_CONFIG				45
-#define CMD_VOLT						46
-#define CMD_BATT						47
+#define CMD_TEMP				40
+#define CMD_SWITCH				41
+#define CMD_IMU					42
+#define CMD_ENCODER				43
+#define CMD_STRAIN				44
+#define CMD_STRAIN_CONFIG		45
+#define CMD_VOLT				46
+#define CMD_BATT				47
 
 //Expansion/external commands:
 
-#define CMD_POWER_OUT					60	//ToDo can we berge both?
-#define CMD_PWRO						61
-#define CMD_ADV_ANA_CONFIG				62
-#define CMD_ANALOG						63
-#define CMD_DIGITAL						64
-#define CMD_DIGITAL_CONFIG				65
-#define CMD_EXP_PERIPH_CONFIG			66
+#define CMD_POWER_OUT			60	//ToDo can we berge both?
+#define CMD_PWRO				61
+#define CMD_ADV_ANA_CONFIG		62
+#define CMD_ANALOG				63
+#define CMD_DIGITAL				64
+#define CMD_DIGITAL_CONFIG		65
+#define CMD_EXP_PERIPH_CONFIG	66
 
 //Motor & Control commands:
 
-#define CMD_CTRL_MODE					80
-#define CMD_CTRL_X_G					81
-#define CMD_CTRL_I_G					82
-#define CMD_CTRL_P_G					83
-#define CMD_CTRL_Z_G					84
-#define CMD_CTRL_O						85
-#define CMD_CTRL_I						86
-#define CMD_CTRL_P						87
-#define SHORTED_LEADS					88
-#define CMD_IN_CONTROL					90
+#define CMD_CTRL_MODE			80
+#define CMD_CTRL_X_G			81
+#define CMD_CTRL_I_G			82
+#define CMD_CTRL_P_G			83
+#define CMD_CTRL_Z_G			84
+#define CMD_CTRL_O				85
+#define CMD_CTRL_I				86
+#define CMD_CTRL_P				87
+#define SHORTED_LEADS			88
+#define CMD_IN_CONTROL			90
 
-//Special commands:
+//User commands (100-127):
 
-#define CMD_SPC1						100     //ShuoBot Exo
-#define CMD_SPC2						101		//CSEA Knee
-#define CMD_SPC3						102		//Current controller tuning
-#define CMD_READ_ALL_RICNU				105		//RIC/NU Knee, Read All function
-#define CMD_SPC4						120		//Dual ShuoBot
-#define CMD_SPC5						121		//Ankle 2-Dof Plan <> Manage
-#define CMD_RICNU						122		//RIC/NU R/W
+#define CMD_USER1				100
+#define CMD_USER2				101
+#define CMD_USER3				102
+#define CMD_USER4				103
+#define CMD_USER5				104
+//(feel free to expand and/or redefine in flexsea-user, as long as it stays in
+// the 100-127 range)
 
 //===================
 
 //Board types:
-#define FLEXSEA_PLAN					1
-#define FLEXSEA_MANAGE					2
-#define FLEXSEA_EXECUTE					3
-#define FLEXSEA_BATTERY					4
-#define FLEXSEA_STRAIN					5
-#define FLEXSEA_GOSSIP					6
+#define FLEXSEA_PLAN			1
+#define FLEXSEA_MANAGE			2
+#define FLEXSEA_EXECUTE			3
+#define FLEXSEA_BATTERY			4
+#define FLEXSEA_STRAIN			5
+#define FLEXSEA_GOSSIP			6
+//ToDo: remove Goosip?
 
 //Board addresses:
-#define FLEXSEA_DEFAULT					0
-#define FLEXSEA_PLAN_BASE			 	10						//Plan: from 10 to 19
-#define FLEXSEA_PLAN_1					(FLEXSEA_PLAN_BASE + 0)
-#define FLEXSEA_MANAGE_BASE				20						//Manage: from 20 to 39
-#define FLEXSEA_MANAGE_1				(FLEXSEA_MANAGE_BASE + 0)
-#define FLEXSEA_MANAGE_2				(FLEXSEA_MANAGE_BASE + 1)
-#define FLEXSEA_EXECUTE_BASE			40						//Execute: from 40 to 59
-#define FLEXSEA_EXECUTE_1				(FLEXSEA_EXECUTE_BASE + 0)
-#define FLEXSEA_EXECUTE_2				(FLEXSEA_EXECUTE_BASE + 1)
-#define FLEXSEA_EXECUTE_3				(FLEXSEA_EXECUTE_BASE + 2)
-#define FLEXSEA_EXECUTE_4				(FLEXSEA_EXECUTE_BASE + 3)
-#define FLEXSEA_BATTERY_BASE			60						//Battery: from 60 to 69
-#define FLEXSEA_BATTERY_1				(FLEXSEA_BATTERY_BASE + 0)
-#define FLEXSEA_STRAIN_BASE				70						//Strain: from 70 to 79
-#define FLEXSEA_STRAIN_1				(FLEXSEA_STRAIN_BASE + 0)
-#define FLEXSEA_GOSSIP_BASE				80						//Gossip: from 80 to 89
-#define FLEXSEA_GOSSIP_1				(FLEXSEA_GOSSIP_BASE + 0)
-#define FLEXSEA_GOSSIP_2				(FLEXSEA_GOSSIP_BASE + 1)
-#define FLEXSEA_VIRTUAL_BASE			100						//Virtual boards from 100 to N
-#define FLEXSEA_VIRTUAL_1				(FLEXSEA_VIRTUAL_BASE + 0)
-#define FLEXSEA_VIRTUAL_2				(FLEXSEA_VIRTUAL_BASE + 1)
+#define FLEXSEA_DEFAULT			0
+#define FLEXSEA_PLAN_BASE		10						//Plan: from 10 to 19
+#define FLEXSEA_PLAN_1			(FLEXSEA_PLAN_BASE + 0)
+#define FLEXSEA_MANAGE_BASE		20						//Manage: from 20 to 39
+#define FLEXSEA_MANAGE_1		(FLEXSEA_MANAGE_BASE + 0)
+#define FLEXSEA_MANAGE_2		(FLEXSEA_MANAGE_BASE + 1)
+#define FLEXSEA_EXECUTE_BASE	40						//Execute: from 40 to 59
+#define FLEXSEA_EXECUTE_1		(FLEXSEA_EXECUTE_BASE + 0)
+#define FLEXSEA_EXECUTE_2		(FLEXSEA_EXECUTE_BASE + 1)
+#define FLEXSEA_EXECUTE_3		(FLEXSEA_EXECUTE_BASE + 2)
+#define FLEXSEA_EXECUTE_4		(FLEXSEA_EXECUTE_BASE + 3)
+#define FLEXSEA_BATTERY_BASE	60						//Battery: from 60 to 69
+#define FLEXSEA_BATTERY_1		(FLEXSEA_BATTERY_BASE + 0)
+#define FLEXSEA_STRAIN_BASE		70						//Strain: from 70 to 79
+#define FLEXSEA_STRAIN_1		(FLEXSEA_STRAIN_BASE + 0)
+#define FLEXSEA_GOSSIP_BASE		80						//Gossip: from 80 to 89
+#define FLEXSEA_GOSSIP_1		(FLEXSEA_GOSSIP_BASE + 0)
+#define FLEXSEA_GOSSIP_2		(FLEXSEA_GOSSIP_BASE + 1)
+#define FLEXSEA_VIRTUAL_BASE	100						//Virtual boards from 100 to N
+#define FLEXSEA_VIRTUAL_1		(FLEXSEA_VIRTUAL_BASE + 0)
+#define FLEXSEA_VIRTUAL_2		(FLEXSEA_VIRTUAL_BASE + 1)
+//ToDo: The "Virtual" board idea was ill-conceived. Is it used? Can we get rid of it?
 
 //Software error (SE) codes. Values will be ORed
 #define SE_DEFAULT						0

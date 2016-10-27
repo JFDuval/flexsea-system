@@ -18,7 +18,6 @@ int flexsea_system_test(void);
 
 //Prototypes for public functions defined in individual test files:
 void test_flexsea_system(void);
-void test_flexsea_cmd_application(void);
 void test_flexsea_cmd_control(void);
 void test_flexsea_cmd_data(void);
 void test_flexsea_cmd_external(void);
