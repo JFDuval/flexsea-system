@@ -43,7 +43,7 @@ extern "C" {
 
 //Manage boards only:
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
-#include "user.h"
+#include "user-mn.h"
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
