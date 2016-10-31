@@ -65,10 +65,14 @@ void test_tx_cmd_data_read_all_w(void)
 
 void test_flexsea_cmd_data(void)
 {
+	UNITY_BEGIN();
+	
 	//Add all your unit tests to this list:
 	RUN_TEST(test_tx_cmd_data_read_all_r);
 	RUN_TEST(test_tx_cmd_data_read_all_w);
 	//...
+	
+	UNITY_END();
 }
 
 #ifdef __cplusplus

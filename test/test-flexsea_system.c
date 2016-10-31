@@ -28,7 +28,11 @@ void test_tx_cmd(void)
 
 void test_flexsea_system(void)
 {
+	UNITY_BEGIN();
+	
 	RUN_TEST(test_tx_cmd);
+	
+	UNITY_END();
 }
 
 #ifdef __cplusplus

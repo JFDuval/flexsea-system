@@ -16,9 +16,13 @@ extern "C" {
 
 void test_flexsea_cmd_sensors(void)
 {
+	//UNITY_BEGIN();
+
 	//Add all your unit tests to this list:
 	//RUN_TEST();
 	//...
+
+	//UNITY_END();
 }
 
 #ifdef __cplusplus

@@ -68,11 +68,12 @@ void init_flexsea_payload_ptr_control(void)
 	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_REPLY] = &rx_cmd_ctrl_mode_rr;
 
 	//Controllers:
-	/* TODO
+
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_rr;
 
+	/* TODO
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_w;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
@@ -275,12 +276,14 @@ void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
 
-//Generate the reply:
-	//Return (0)
-//	numb = tx_cmd_ricnu_w(TX_CMD_DEFAULT, ctrl.active_ctrl);	//ToDo
-//	COMM_GEN_STR_DEFAULT
-//	flexsea_send_serial_master(myPort, myData, myLen);	//ToDo
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
+		tx_cmd_ctrl_i_w(TX_N_DEFAULT, exec1.ctrl.current.setpoint_val);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+
+	#else
+		(void)buf;
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
 //Test code? No
@@ -308,115 +311,108 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 //Transmit Control Open Setpoint:
 //===============================
 
-//Transmission of a CTRL_O command
-//Test code? No
-uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd)
+//Test code? Yes
+void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t setpoint)
 {
-	uint8_t tmp0 = 0, tmp1 = 0;
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_O;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Data:
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		//Execute: reply only
+		(void)setpoint;
+		SPLIT_16((uint16_t)exec1.ctrl.pwm, shBuf, &index);
+		//ToDo: not sure that this field is updated
+	#else
+		//Other boards can write a new setpoint
+		SPLIT_16((uint16_t)setpoint, shBuf, &index);
+	#endif
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Payload length:
+	(*len) = index;
+}
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_O);
+//Test code? Yes
+void tx_cmd_ctrl_o_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_O;
+	(*cmdType) = CMD_READ;
 
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_O);
+	//Data:
+	(void)shBuf; //(none)
 
-		//Arguments:
-		uint16_to_bytes(open_spd, &tmp0, &tmp1);
-		buf[P_DATA1] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-
-		bytes = P_DATA1 + 2;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
 //Receive Control Open Setpoint:
 //==============================
 
-//Reception of a CTRL_O command
-void rx_cmd_ctrl_o(uint8_t *buf)
+//Test code? No
+void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info)
 {
-	uint32_t numb = 0;
-	int16_t tmp_open_spd = 0;
+	uint16_t index = P_DATA1;
+	int16_t tmp = 0;
 
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
+	tmp = (int16_t) REBUILD_UINT16(buf, &index);
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	(void)info;
 
-		//Generate the reply:
-		numb = tx_cmd_ctrl_o(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.pwm);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_open_spd = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
+		//Only change the setpoint if we are in open control mode:
+		if(ctrl.active_ctrl == CTRL_OPEN)
 		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-			//Store value:
-			exec1.ctrl.pwm = tmp_open_spd;
-
-			#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-
-			#ifdef BOARD_TYPE_FLEXSEA_PLAN
-
-			#ifdef USE_PRINTF
-			printf("Received CMD_CTRL_O. PWM DC = %i.\n", tmp_open_spd);
-			#endif	//USE_PRINTF
-
-			#endif	//BOARD_TYPE_FLEXSEA_PLAN
+			motor_open_speed_1(tmp);
 		}
-		else
-		{
-			//Master is writing a value to this board
 
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	#else
 
-			if(ctrl.active_ctrl == CTRL_OPEN)
-			{
-				motor_open_speed_1(tmp_open_spd);
-			}
+		(void)buf;
 
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
+
+//Test code? No
+void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+		tx_cmd_ctrl_o_w(TX_N_DEFAULT, exec1.ctrl.pwm);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+
+	#else
+		(void)buf;
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
+
+//Test code? No
+void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
+{
+	uint16_t index = P_DATA1;
+	int16_t tmp = 0;
+
+	tmp = (int16_t) REBUILD_UINT16(buf, &index);
+
+	(void)info;
+
+	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+	//Store value:
+	exec1.ctrl.pwm = tmp;
+	//ToDo shouldn't be exec1!
+
+	#else
+		(void)buf;
+	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
 //Transmit Control Position Setpoint:

@@ -61,16 +61,24 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info);
 
-//ToDo:
+//Open setpoint:
+void tx_cmd_ctrl_o_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t setpoint);
+void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info);
+void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info);
 
-void rx_cmd_ctrl_o(uint8_t *buf);
+//ToDo: *************************
+
 void rx_cmd_ctrl_p(uint8_t *buf);
 void rx_cmd_ctrl_i_g(uint8_t *buf);
 void rx_cmd_ctrl_p_g(uint8_t *buf);
 void rx_cmd_ctrl_z_g(uint8_t *buf);
 void rx_cmd_in_control(uint8_t *buf);
 
-uint32_t tx_cmd_ctrl_o(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int16_t open_spd);
+
 uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
 						int32_t pos, int32_t posi, int32_t posf, int32_t spdm, int32_t acc);
 uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
