@@ -70,23 +70,46 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info);
 
+//Position setpoint:
+void tx_cmd_ctrl_p_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int32_t pos, int32_t posi, int32_t posf,\
+						int32_t spdm, int32_t acc);
+void tx_cmd_ctrl_p_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+//(ToDo rx)
+
+//Current gain:
+
+void tx_cmd_ctrl_i_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t kp, int16_t ki, int16_t kd);
+void tx_cmd_ctrl_i_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+//(ToDo rx)
+
+//Position gain:
+
+void tx_cmd_ctrl_p_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t kp, int16_t ki, int16_t kd);
+void tx_cmd_ctrl_p_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+//(ToDo rx)
+
+//Impedance gain:
+
+void tx_cmd_ctrl_z_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t zk, int16_t zb, int16_t zi);
+void tx_cmd_ctrl_z_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+//(ToDo rx)
+
 //ToDo: *************************
 
 void rx_cmd_ctrl_p(uint8_t *buf);
 void rx_cmd_ctrl_i_g(uint8_t *buf);
 void rx_cmd_ctrl_p_g(uint8_t *buf);
 void rx_cmd_ctrl_z_g(uint8_t *buf);
+
 void rx_cmd_in_control(uint8_t *buf);
-
-
-uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int32_t pos, int32_t posi, int32_t posf, int32_t spdm, int32_t acc);
-uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd);
-uint32_t tx_cmd_ctrl_p_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd);
-uint32_t tx_cmd_ctrl_z_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t zk, int16_t zb, int16_t zi);
 uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
 
 //****************************************************************************

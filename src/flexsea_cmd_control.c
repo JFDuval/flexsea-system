@@ -406,9 +406,9 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//Store value:
-	exec1.ctrl.pwm = tmp;
-	//ToDo shouldn't be exec1!
+		//Store value:
+		exec1.ctrl.pwm = tmp;
+		//ToDo shouldn't be exec1!
 
 	#else
 		(void)buf;
@@ -418,66 +418,41 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 //Transmit Control Position Setpoint:
 //===================================
 
-//Transmission of a CTRL_P command
-uint32_t tx_cmd_ctrl_p(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int32_t pos, int32_t posi, int32_t posf, int32_t spdm, int32_t acc)
+//Test code? Yes
+void tx_cmd_ctrl_p_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int32_t pos, int32_t posi, int32_t posf,\
+						int32_t spdm, int32_t acc)
 {
-	uint8_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_P;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Data:
+	SPLIT_32((uint32_t)pos, shBuf, &index);
+	SPLIT_32((uint32_t)posi, shBuf, &index);
+	SPLIT_32((uint32_t)posf, shBuf, &index);
+	SPLIT_32((uint32_t)spdm, shBuf, &index);
+	SPLIT_32((uint32_t)acc, shBuf, &index);
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Payload length:
+	(*len) = index;
+}
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_P);
+//Test code? Yes
+void tx_cmd_ctrl_p_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_P;
+	(*cmdType) = CMD_READ;
 
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_P);
+	//Data:
+	(void)shBuf; //(none)
 
-		//Arguments:
-		uint32_to_bytes((uint32_t)pos, &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		buf[P_DATA1 + 2] = tmp2;
-		buf[P_DATA1 + 3] = tmp3;
-		uint32_to_bytes((uint32_t)posi, &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 4] = tmp0;
-		buf[P_DATA1 + 5] = tmp1;
-		buf[P_DATA1 + 6] = tmp2;
-		buf[P_DATA1 + 7] = tmp3;
-		uint32_to_bytes((uint32_t)posf, &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 8] = tmp0;
-		buf[P_DATA1 + 9] = tmp1;
-		buf[P_DATA1 + 10] = tmp2;
-		buf[P_DATA1 + 11] = tmp3;
-		uint32_to_bytes((uint32_t)spdm, &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 12] = tmp0;
-		buf[P_DATA1 + 13] = tmp1;
-		buf[P_DATA1 + 14] = tmp2;
-		buf[P_DATA1 + 15] = tmp3;
-		uint32_to_bytes((uint32_t)acc, &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 16] = tmp0;
-		buf[P_DATA1 + 17] = tmp1;
-		buf[P_DATA1 + 18] = tmp2;
-		buf[P_DATA1 + 19] = tmp3;
-
-		bytes = P_DATA1 + 20;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
 //Receive Control Position Setpoint:
@@ -577,13 +552,11 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 				ctrl.position.posi = ctrl.impedance.setpoint_val;
 				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
 
-
 				//Restore gains
 				ctrl.impedance.gain.Z_K = tmp_z_k;
 				ctrl.impedance.gain.Z_B = tmp_z_b;
 				ctrl.impedance.gain.Z_I = tmp_z_i;
 			}
-
 
 			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 		}
@@ -593,51 +566,38 @@ void rx_cmd_ctrl_p(uint8_t *buf)
 //Transmit Control Current Gains:
 //===============================
 
-//Transmission of a CTRL_I_G command
-uint32_t tx_cmd_ctrl_i_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd)
+//Test code? Yes
+void tx_cmd_ctrl_i_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t kp, int16_t ki, int16_t kd)
 {
-	uint8_t tmp0 = 0, tmp1 = 0;
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_I_G;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Data:
+	SPLIT_16((uint16_t)kp, shBuf, &index);
+	SPLIT_16((uint16_t)ki, shBuf, &index);
+	SPLIT_16((uint16_t)kd, shBuf, &index);
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Payload length:
+	(*len) = index;
+}
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_I_G);
+//Test code? Yes
+void tx_cmd_ctrl_i_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_I_G;
+	(*cmdType) = CMD_READ;
 
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_I_G);
+	//Data:
+	(void)shBuf; //(none)
 
-		//Arguments:
-		uint16_to_bytes((uint16_t)kp, &tmp0, &tmp1);
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)ki, &tmp0, &tmp1);
-		buf[P_DATA1 + 2] = tmp0;
-		buf[P_DATA1 + 3] = tmp1;
-		uint16_to_bytes((uint16_t)kd, &tmp0, &tmp1);
-		buf[P_DATA1 + 4] = tmp0;
-		buf[P_DATA1 + 5] = tmp1;
-
-
-		bytes = P_DATA1 + 6;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
 //Receive Control Current Gains:
@@ -717,51 +677,38 @@ void rx_cmd_ctrl_i_g(uint8_t *buf)
 //Transmit Control Position Gains:
 //================================
 
-//Transmission of a CTRL_P_G command
-uint32_t tx_cmd_ctrl_p_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t kp, int16_t ki, int16_t kd)
+//Test code? Yes
+void tx_cmd_ctrl_p_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t kp, int16_t ki, int16_t kd)
 {
-	uint8_t tmp0 = 0, tmp1 = 0;
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_P_G;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Data:
+	SPLIT_16((uint16_t)kp, shBuf, &index);
+	SPLIT_16((uint16_t)ki, shBuf, &index);
+	SPLIT_16((uint16_t)kd, shBuf, &index);
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Payload length:
+	(*len) = index;
+}
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_P_G);
+//Test code? Yes
+void tx_cmd_ctrl_p_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_P_G;
+	(*cmdType) = CMD_READ;
 
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_P_G);
+	//Data:
+	(void)shBuf; //(none)
 
-		//Arguments:
-		uint16_to_bytes((uint16_t)kp, &tmp0, &tmp1);
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)ki, &tmp0, &tmp1);
-		buf[P_DATA1 + 2] = tmp0;
-		buf[P_DATA1 + 3] = tmp1;
-		uint16_to_bytes((uint16_t)kd, &tmp0, &tmp1);
-		buf[P_DATA1 + 4] = tmp0;
-		buf[P_DATA1 + 5] = tmp1;
-
-
-		bytes = P_DATA1 + 6;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
 //Receive Control Position Gains:
@@ -841,51 +788,38 @@ void rx_cmd_ctrl_p_g(uint8_t *buf)
 //Transmit Control Impedance Gains:
 //=================================
 
-//Transmission of a CTRL_Z_G command
-uint32_t tx_cmd_ctrl_z_g(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-						int16_t zk, int16_t zb, int16_t zi)
+//Test code? Yes
+void tx_cmd_ctrl_z_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, int16_t zk, int16_t zb, int16_t zi)
 {
-	uint8_t tmp0 = 0, tmp1 = 0;
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_Z_G;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Data:
+	SPLIT_16((uint16_t)zk, shBuf, &index);
+	SPLIT_16((uint16_t)zb, shBuf, &index);
+	SPLIT_16((uint16_t)zi, shBuf, &index);
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
+	//Payload length:
+	(*len) = index;
+}
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_CTRL_Z_G);
+//Test code? Yes
+void tx_cmd_ctrl_z_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CTRL_Z_G;
+	(*cmdType) = CMD_READ;
 
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_CTRL_Z_G);
+	//Data:
+	(void)shBuf; //(none)
 
-		//Arguments:
-		uint16_to_bytes((uint16_t)zk, &tmp0, &tmp1);
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		uint16_to_bytes((uint16_t)zb, &tmp0, &tmp1);
-		buf[P_DATA1 + 2] = tmp0;
-		buf[P_DATA1 + 3] = tmp1;
-		uint16_to_bytes((uint16_t)zi, &tmp0, &tmp1);
-		buf[P_DATA1 + 4] = tmp0;
-		buf[P_DATA1 + 5] = tmp1;
-
-
-		bytes = P_DATA1 + 6;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
 //Receive Control Impedance Gains:
