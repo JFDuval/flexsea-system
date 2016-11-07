@@ -506,7 +506,9 @@ void rx_cmd_ctrl_p_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_p_w(TX_N_DEFAULT);
+		tx_cmd_ctrl_p_w(TX_N_DEFAULT, ctrl.position.pos, ctrl.position.posi, \
+						ctrl.position.posf, ctrl.position.spdm, \
+						ctrl.position.acc);
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
 
 	#else

@@ -357,9 +357,9 @@ void rx_cmd_ctrl_z_g_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Store value:
-		ctrl.impedance.gain.Z_K = tmp_kp;
-		ctrl.impedance.gain.Z_B = tmp_ki;
-		ctrl.impedance.gain.Z_I = tmp_kd;
+		ctrl.impedance.gain.Z_K = tmp_zk;
+		ctrl.impedance.gain.Z_B = tmp_zb;
+		ctrl.impedance.gain.Z_I = tmp_zi;
 		//ToDo: do we need to call something?
 
 	#else

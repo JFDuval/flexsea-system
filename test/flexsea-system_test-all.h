@@ -14,7 +14,7 @@ extern uint8_t test_cmdCode, test_cmdType;
 extern uint16_t test_len;
 
 void prepTxCmdTest(void);
-int flexsea_system_test(void);
+void flexsea_system_test(void);
 
 //Prototypes for public functions defined in individual test files:
 void test_flexsea_system(void);
