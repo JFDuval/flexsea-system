@@ -176,9 +176,9 @@ void test_tx_cmd_ctrl_o_r(void)
 void test_tx_cmd_ctrl_p_w(void)
 {
 	int i = 0;
-	int32_t pos = 3456, posi = -1234567, posf = 2345678, spdm = 70000, acc = 1000000; 
+	int32_t pos = 3456, posi = -1234567, posf = 2345678, spdm = 70000, acc = 1000000;
 	int32_t r_pos = 0, r_posi = 0, r_posf = 0, r_spdm = 0, r_acc = 0;
-	
+
 	uint16_t index = 0;
 	prepTxCmdTest();
 
@@ -194,7 +194,7 @@ void test_tx_cmd_ctrl_p_w(void)
 	r_posf = (int32_t) REBUILD_UINT32(test_tmpPayload, &index);
 	r_spdm = (int32_t) REBUILD_UINT32(test_tmpPayload, &index);
 	r_acc = (int32_t) REBUILD_UINT32(test_tmpPayload, &index);
-	
+
 	TEST_ASSERT_EQUAL(pos, r_pos);
 	TEST_ASSERT_EQUAL(posi, r_posi);
 	TEST_ASSERT_EQUAL(posf, r_posf);
@@ -232,9 +232,9 @@ void test_tx_cmd_ctrl_p_r(void)
 void test_tx_cmd_ctrl_i_g_w(void)
 {
 	int i = 0;
-	int16_t g1 = -35123, g2 = 100, g3 = 24567;
+	int16_t g1 = -31234, g2 = 100, g3 = 24567;
 	int16_t r_g1 = 0, r_g2 = 0, r_g3 = 0;
-	
+
 	uint16_t index = 0;
 	prepTxCmdTest();
 
@@ -248,7 +248,7 @@ void test_tx_cmd_ctrl_i_g_w(void)
 	r_g1 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g2 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g3 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
-	
+
 	TEST_ASSERT_EQUAL(g1, r_g1);
 	TEST_ASSERT_EQUAL(g2, r_g2);
 	TEST_ASSERT_EQUAL(g3, r_g3);
@@ -284,9 +284,9 @@ void test_tx_cmd_ctrl_i_g_r(void)
 void test_tx_cmd_ctrl_p_g_w(void)
 {
 	int i = 0;
-	int16_t g1 = -35123, g2 = 100, g3 = 24567;
+	int16_t g1 = -31234, g2 = 100, g3 = 24567;
 	int16_t r_g1 = 0, r_g2 = 0, r_g3 = 0;
-	
+
 	uint16_t index = 0;
 	prepTxCmdTest();
 
@@ -300,7 +300,7 @@ void test_tx_cmd_ctrl_p_g_w(void)
 	r_g1 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g2 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g3 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
-	
+
 	TEST_ASSERT_EQUAL(g1, r_g1);
 	TEST_ASSERT_EQUAL(g2, r_g2);
 	TEST_ASSERT_EQUAL(g3, r_g3);
@@ -336,9 +336,9 @@ void test_tx_cmd_ctrl_p_g_r(void)
 void test_tx_cmd_ctrl_z_g_w(void)
 {
 	int i = 0;
-	int16_t g1 = -35123, g2 = 100, g3 = 24567;
+	int16_t g1 = -31234, g2 = 100, g3 = 24567;
 	int16_t r_g1 = 0, r_g2 = 0, r_g3 = 0;
-	
+
 	uint16_t index = 0;
 	prepTxCmdTest();
 
@@ -352,7 +352,7 @@ void test_tx_cmd_ctrl_z_g_w(void)
 	r_g1 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g2 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
 	r_g3 = (int16_t) REBUILD_UINT16(test_tmpPayload, &index);
-	
+
 	TEST_ASSERT_EQUAL(g1, r_g1);
 	TEST_ASSERT_EQUAL(g2, r_g2);
 	TEST_ASSERT_EQUAL(g3, r_g3);
@@ -389,53 +389,53 @@ void test_tx_cmd_ctrl_z_g_r(void)
 void test_flexsea_cmd_control(void)
 {
 	UNITY_BEGIN();
-	
+
 	//Add all your unit tests to this list:
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_mode_w);
 	RUN_TEST(test_tx_cmd_ctrl_mode_r);
 	//RUN_TEST(test_rx_cmd_ctrl_mode_w);
 	//RUN_TEST(test_rx_cmd_ctrl_mode_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_mode_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_i_w);
 	RUN_TEST(test_tx_cmd_ctrl_i_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_o_w);
 	RUN_TEST(test_tx_cmd_ctrl_o_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_p_w);
 	RUN_TEST(test_tx_cmd_ctrl_p_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_i_g_w);
 	RUN_TEST(test_tx_cmd_ctrl_i_g_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_p_g_w);
 	RUN_TEST(test_tx_cmd_ctrl_p_g_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	RUN_TEST(test_tx_cmd_ctrl_z_g_w);
 	RUN_TEST(test_tx_cmd_ctrl_z_g_r);
 	//RUN_TEST(test_rx_cmd_ctrl_i_w);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rw);
 	//RUN_TEST(test_rx_cmd_ctrl_i_rr);
-	
+
 	//...
-	
+
 	UNITY_END();
 }
 

@@ -196,6 +196,8 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
 
+	(void)info;	//Unused for now
+
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 	//Structure pointers ***TODO this isn't clean
@@ -251,15 +253,15 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 	}
 	else if(buf[P_XID] == FLEXSEA_STRAIN_1)
 	{
-		strain1.compressedBytes[0] = buf[index++];
-		strain1.compressedBytes[1] = buf[index++];
-		strain1.compressedBytes[2] = buf[index++];
-		strain1.compressedBytes[3] = buf[index++];
-		strain1.compressedBytes[4] = buf[index++];
-		strain1.compressedBytes[5] = buf[index++];
-		strain1.compressedBytes[6] = buf[index++];
-		strain1.compressedBytes[7] = buf[index++];
-		strain1.compressedBytes[8] = buf[index++];
+		stPtr->compressedBytes[0] = buf[index++];
+		stPtr->compressedBytes[1] = buf[index++];
+		stPtr->compressedBytes[2] = buf[index++];
+		stPtr->compressedBytes[3] = buf[index++];
+		stPtr->compressedBytes[4] = buf[index++];
+		stPtr->compressedBytes[5] = buf[index++];
+		stPtr->compressedBytes[6] = buf[index++];
+		stPtr->compressedBytes[7] = buf[index++];
+		stPtr->compressedBytes[8] = buf[index++];
 	}
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
