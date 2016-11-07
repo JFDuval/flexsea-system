@@ -21,12 +21,18 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_control: commands specific to the motor & control
+	[This file] flexsea_cmd_control_1: commands specific to the motor & 
+	control loops. Code split in 2 files, see flexsea_cmd_control_2.c
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
 	* 2016-09-09 | jfduval | Initial GPL-3.0 release
-	*
+	* 2016-11-07 | jfduval | Renamed *_1, updated to new convention
 ****************************************************************************/
+
+/*Note: flexsea_cmd_control.c was getting too long so it was split in two
+files. *_1 has all the setpoints, plus the In Control command. *_2 has the 
+Set Gains functions.
+*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,53 +66,27 @@ uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 //This gets called by flexsea_system's init_flexsea_payload_ptr(). Map all
 //functions from this file to the array here. Failure to do so will send all
 //commands to flexsea_payload_catchall().
-void init_flexsea_payload_ptr_control(void)
+void init_flexsea_payload_ptr_control_1(void)
 {
 	//Control mode:
 	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_READ] = &rx_cmd_ctrl_mode_rw;
 	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_WRITE] = &rx_cmd_ctrl_mode_w;
 	flexsea_payload_ptr[CMD_CTRL_MODE][RX_PTYPE_REPLY] = &rx_cmd_ctrl_mode_rr;
 
-	//Controllers:
-
+	//Open - Setpoint:
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
 	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_rr;
 
-	/* TODO
+	//Position - Setpoint:
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_w;
 	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
-	*/
+
+	//Current - Setpoint:
 	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
 	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
 	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
-
-	//Controller gains:
-	/* TODO
-	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_READ] = &rx_cmd_ctrl_i_g_rw;
-	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_g_w;
-	flexsea_payload_ptr[CMD_CTRL_I_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_g_rr;
-	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_READ] = &rx_cmd_ctrl_p_g_rw;
-	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_g_w;
-	flexsea_payload_ptr[CMD_CTRL_P_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_g_rr;
-	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_READ] = &rx_cmd_ctrl_z_g_rw;
-	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_WRITE] = &rx_cmd_ctrl_z_g_w;
-	flexsea_payload_ptr[CMD_CTRL_Z_G][RX_PTYPE_REPLY] = &rx_cmd_ctrl_z_g_rr;
-	*/
-
-	//Controller setpoints:
-	/* TODO
-	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_READ] = &rx_cmd_ctrl_o_rw;
-	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_WRITE] = &rx_cmd_ctrl_o_w;
-	flexsea_payload_ptr[CMD_CTRL_O][RX_PTYPE_REPLY] = &rx_cmd_ctrl_o_r;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_READ] = &rx_cmd_ctrl_i_rw;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_WRITE] = &rx_cmd_ctrl_i_w;
-	flexsea_payload_ptr[CMD_CTRL_I][RX_PTYPE_REPLY] = &rx_cmd_ctrl_i_rr;
-	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_READ] = &rx_cmd_ctrl_p_rw;
-	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_WRITE] = &rx_cmd_ctrl_p_r;
-	flexsea_payload_ptr[CMD_CTRL_P][RX_PTYPE_REPLY] = &rx_cmd_ctrl_p_rr;
-	*/
 
 	//Misc:
 	//flexsea_payload_ptr[SHORTED_LEADS = &;
@@ -458,442 +438,110 @@ void tx_cmd_ctrl_p_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive Control Position Setpoint:
 //==================================
 
-//Reception of a CTRL_P command
-void rx_cmd_ctrl_p(uint8_t *buf)
+//Test code? No
+void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 {
-	uint32_t numb = 0;
+	uint16_t index = P_DATA1;
 	int32_t tmp_pos = 0, tmp_posi = 0, tmp_posf = 0, tmp_spdm = 0, tmp_acc = 0;
-	int16_t tmp_z_k = 0, tmp_z_b = 0, tmp_z_i = 0;
 
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
+	(void)info;	//Unused for now
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	//Decode data:
+	tmp_pos = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_posi = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_posf = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_spdm = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_acc = (int32_t) REBUILD_UINT32(buf, &index);
 
-		//Generate the reply:
-		numb = tx_cmd_ctrl_p(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.position.pos, ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
+		int16_t tmp_z_k = 0, tmp_z_b = 0, tmp_z_i = 0;
 
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
+		ctrl.position.posf = tmp_posf;
+		ctrl.position.spdm = tmp_spdm;
+		ctrl.position.acc = tmp_acc;
 
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_pos = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 0], buf[P_DATA1 + 1], buf[P_DATA1 + 2], buf[P_DATA1 + 3]));
-		tmp_posi = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 4], buf[P_DATA1 + 5], buf[P_DATA1 + 6], buf[P_DATA1 + 7]));
-		tmp_posf = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 8], buf[P_DATA1 + 9], buf[P_DATA1 + 10], buf[P_DATA1 + 11]));
-		tmp_spdm = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 12], buf[P_DATA1 + 13], buf[P_DATA1 + 14], buf[P_DATA1 + 15]));
-		tmp_acc = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 16], buf[P_DATA1 + 17], buf[P_DATA1 + 18], buf[P_DATA1 + 19]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
+		if(ctrl.active_ctrl == CTRL_POSITION)
 		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			exec1.ctrl.position.pos = tmp_pos;
-			exec1.ctrl.position.posi = tmp_posi;
-			exec1.ctrl.position.posf = tmp_posf;
-			exec1.ctrl.position.spdm = tmp_spdm;
-			exec1.ctrl.position.acc = tmp_acc;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
+			ctrl.position.posi = ctrl.position.setp;
+			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
+										ctrl.position.spdm, \
+										ctrl.position.acc = tmp_acc);
 		}
-		else
+		else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
 		{
-			//Master is writing a value to this board
+			//Backup gains
+			tmp_z_k = ctrl.impedance.gain.Z_K;
+			tmp_z_b = ctrl.impedance.gain.Z_B;
+			tmp_z_i = ctrl.impedance.gain.Z_I;
 
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+			//Zero them
+			ctrl.impedance.gain.Z_K = 0;
+			ctrl.impedance.gain.Z_B = 0;
+			ctrl.impedance.gain.Z_I = 0;
 
-			//Store value:
-			//ctrl.position.pos = tmp_pos;
-			//ctrl.position.posi = tmp_posi;
+			//New trajectory
+			ctrl.position.posi = ctrl.impedance.setpoint_val;
+			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
+										ctrl.position.spdm, \
+										ctrl.position.acc = tmp_acc);
 
-			ctrl.position.posf = tmp_posf;
-			ctrl.position.spdm = tmp_spdm;
-			ctrl.position.acc = tmp_acc;
-
-			if(ctrl.active_ctrl == CTRL_POSITION)
-			{
-				ctrl.position.posi = ctrl.position.setp;
-				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
-			}
-			else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
-			{
-				//Backup gains
-				tmp_z_k = ctrl.impedance.gain.Z_K;
-				tmp_z_b = ctrl.impedance.gain.Z_B;
-				tmp_z_i = ctrl.impedance.gain.Z_I;
-
-				//Zero them
-				ctrl.impedance.gain.Z_K = 0;
-				ctrl.impedance.gain.Z_B = 0;
-				ctrl.impedance.gain.Z_I = 0;
-
-				//New trajectory
-				ctrl.position.posi = ctrl.impedance.setpoint_val;
-				steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf, ctrl.position.spdm, ctrl.position.acc = tmp_acc);
-
-				//Restore gains
-				ctrl.impedance.gain.Z_K = tmp_z_k;
-				ctrl.impedance.gain.Z_B = tmp_z_b;
-				ctrl.impedance.gain.Z_I = tmp_z_i;
-			}
-
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+			//Restore gains
+			ctrl.impedance.gain.Z_K = tmp_z_k;
+			ctrl.impedance.gain.Z_B = tmp_z_b;
+			ctrl.impedance.gain.Z_I = tmp_z_i;
 		}
-	}
+
+	#else
+
+		(void)buf;
+
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
-//Transmit Control Current Gains:
-//===============================
-
-//Test code? Yes
-void tx_cmd_ctrl_i_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, int16_t kp, int16_t ki, int16_t kd)
+//Test code? No
+void rx_cmd_ctrl_p_rw(uint8_t *buf, uint8_t *info)
 {
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_I_G;
-	(*cmdType) = CMD_WRITE;
+	(void)info;
 
-	//Data:
-	SPLIT_16((uint16_t)kp, shBuf, &index);
-	SPLIT_16((uint16_t)ki, shBuf, &index);
-	SPLIT_16((uint16_t)kd, shBuf, &index);
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-	//Payload length:
-	(*len) = index;
+		tx_cmd_ctrl_p_w(TX_N_DEFAULT);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+
+	#else
+		(void)buf;
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
-//Test code? Yes
-void tx_cmd_ctrl_i_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len)
+//Test code? No
+void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 {
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_I_G;
-	(*cmdType) = CMD_READ;
-
-	//Data:
-	(void)shBuf; //(none)
-
-	//Payload length:
-	(*len) = index;
-}
-
-//Receive Control Current Gains:
-//==============================
-
-//Reception of a CTRL_I_G command
-void rx_cmd_ctrl_i_g(uint8_t *buf)
-{
-	uint32_t numb = 0;
-	int16_t tmp_kp = 0, tmp_ki = 0, tmp_kd = 0;
-
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
-
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		//Generate the reply:
-		numb = tx_cmd_ctrl_i_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.current.gain.I_KP, ctrl.current.gain.I_KI, ctrl.current.gain.I_KD);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
-
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_kp = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 0], buf[P_DATA1 + 1]));
-		tmp_ki = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 2], buf[P_DATA1 + 3]));
-		tmp_kd = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 4], buf[P_DATA1 + 5]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			exec1.ctrl.current.gain.I_KP = tmp_kp;
-			exec1.ctrl.current.gain.I_KI = tmp_ki;
-			exec1.ctrl.current.gain.I_KD = tmp_kd;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-			//Store value:
-			ctrl.current.gain.I_KP = tmp_kp;
-			ctrl.current.gain.I_KI = tmp_ki;
-			ctrl.current.gain.I_KD = tmp_kd;
-			//ToDo: do we need to call something?
-
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
-}
-
-//Transmit Control Position Gains:
-//================================
-
-//Test code? Yes
-void tx_cmd_ctrl_p_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, int16_t kp, int16_t ki, int16_t kd)
-{
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_P_G;
-	(*cmdType) = CMD_WRITE;
-
-	//Data:
-	SPLIT_16((uint16_t)kp, shBuf, &index);
-	SPLIT_16((uint16_t)ki, shBuf, &index);
-	SPLIT_16((uint16_t)kd, shBuf, &index);
-
-	//Payload length:
-	(*len) = index;
-}
-
-//Test code? Yes
-void tx_cmd_ctrl_p_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len)
-{
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_P_G;
-	(*cmdType) = CMD_READ;
-
-	//Data:
-	(void)shBuf; //(none)
-
-	//Payload length:
-	(*len) = index;
-}
-
-//Receive Control Position Gains:
-//===============================
-
-//Reception of a CTRL_P_G command
-void rx_cmd_ctrl_p_g(uint8_t *buf)
-{
-	uint32_t numb = 0;
-	int16_t tmp_kp = 0, tmp_ki = 0, tmp_kd = 0;
-
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
-
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		//Generate the reply:
-		numb = tx_cmd_ctrl_p_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.position.gain.P_KP, ctrl.position.gain.P_KI, ctrl.position.gain.P_KD);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
-
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_kp = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 0], buf[P_DATA1 + 1]));
-		tmp_ki = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 2], buf[P_DATA1 + 3]));
-		tmp_kd = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 4], buf[P_DATA1 + 5]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			exec1.ctrl.position.gain.I_KP = tmp_kp;
-			exec1.ctrl.position.gain.I_KI = tmp_ki;
-			exec1.ctrl.position.gain.I_KD = tmp_kd;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-			//Store value:
-			ctrl.position.gain.P_KP = tmp_kp;
-			ctrl.position.gain.P_KI = tmp_ki;
-			ctrl.position.gain.P_KD = tmp_kd;
-			//ToDo: do we need to call something?
-
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
-}
-
-//Transmit Control Impedance Gains:
-//=================================
-
-//Test code? Yes
-void tx_cmd_ctrl_z_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, int16_t zk, int16_t zb, int16_t zi)
-{
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_Z_G;
-	(*cmdType) = CMD_WRITE;
-
-	//Data:
-	SPLIT_16((uint16_t)zk, shBuf, &index);
-	SPLIT_16((uint16_t)zb, shBuf, &index);
-	SPLIT_16((uint16_t)zi, shBuf, &index);
-
-	//Payload length:
-	(*len) = index;
-}
-
-//Test code? Yes
-void tx_cmd_ctrl_z_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len)
-{
-	//Variable(s) & command:
-	uint16_t index = 0;
-	(*cmd) = CMD_CTRL_Z_G;
-	(*cmdType) = CMD_READ;
-
-	//Data:
-	(void)shBuf; //(none)
-
-	//Payload length:
-	(*len) = index;
-}
-
-//Receive Control Impedance Gains:
-//================================
-
-//Reception of a CTRL_Z_G command
-void rx_cmd_ctrl_z_g(uint8_t *buf)
-{
-	uint32_t numb = 0;
-	int16_t tmp_zk = 0, tmp_zb = 0, tmp_zi = 0;
-
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
-
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		//Generate the reply:
-		numb = tx_cmd_ctrl_z_g(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-			ctrl.impedance.gain.Z_K, ctrl.impedance.gain.Z_B, ctrl.impedance.gain.Z_I);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
-
-		//Notify the code that a buffer is ready to be transmitted:
-		//xmit_flag_1 = 1;
-
-		//(for now, send it)
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		tmp_zk = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 0], buf[P_DATA1 + 1]));
-		tmp_zb = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 2], buf[P_DATA1 + 3]));
-		tmp_zi = (int16_t) (BYTES_TO_UINT16(buf[P_DATA1 + 4], buf[P_DATA1 + 5]));
-		//ToDo store that value somewhere useful
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-			//No code (yet), you shouldn't be here...
-			flexsea_error(SE_CMD_NOT_PROGRAMMED);
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-
-			#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			exec1.ctrl.impedance.gain.Z_K = tmp_zk;
-			exec1.ctrl.impedance.gain.Z_B = tmp_zb;
-			exec1.ctrl.impedance.gain.Z_I = tmp_zi;
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
-
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-			//Store value:
-			ctrl.impedance.gain.Z_K = tmp_zk;
-			ctrl.impedance.gain.Z_B = tmp_zb;
-			ctrl.impedance.gain.Z_I = tmp_zi;
-			//ToDo: do we need to call something?
-
-			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		}
-	}
+	uint16_t index = P_DATA1;
+	int32_t tmp_pos = 0, tmp_posi = 0, tmp_posf = 0, tmp_spdm = 0, tmp_acc = 0;
+
+	(void)info;	//Unused for now
+
+	//Decode data:
+	tmp_pos = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_posi = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_posf = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_spdm = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_acc = (int32_t) REBUILD_UINT32(buf, &index);
+
+	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+
+		//Store value:
+		exec1.ctrl.position.pos = tmp_pos;
+		exec1.ctrl.position.posi = tmp_posi;
+		exec1.ctrl.position.posf = tmp_posf;
+		exec1.ctrl.position.spdm = tmp_spdm;
+		exec1.ctrl.position.acc = tmp_acc;
+		//ToDo: shouldn't be exec1!
+
+	#else
+		(void)buf;
+	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
 //Transmit In Control Command:

@@ -66,10 +66,6 @@ uint16_t cmdLen = 0;
 //****************************************************************************
 
 //Initialize function pointer array
-//BUG IMPORTANT: this is being reworked. Not all functions should be of type
-//RX_PTYPE_READ!
-//Note: soon this will only take care of the core functions. The user functions
-//will be done in different files
 void init_flexsea_payload_ptr(void)
 {
 	int i = 0;
@@ -90,7 +86,8 @@ void init_flexsea_payload_ptr(void)
 	init_flexsea_payload_ptr_external();
 
 	//Control:
-	init_flexsea_payload_ptr_control();
+	init_flexsea_payload_ptr_control_1();
+	init_flexsea_payload_ptr_control_2();
 
 	//Data:
 	init_flexsea_payload_ptr_data();
