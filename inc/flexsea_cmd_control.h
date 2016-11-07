@@ -112,10 +112,15 @@ void rx_cmd_ctrl_z_g_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_z_g_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_z_g_rr(uint8_t *buf, uint8_t *info);
 
-//ToDo: *************************
+//In Control Tool:
 
-void rx_cmd_in_control(uint8_t *buf);
-uint32_t tx_cmd_in_control(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
+void tx_cmd_in_control_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t select_w);
+void tx_cmd_in_control_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void rx_cmd_in_control_w(uint8_t *buf, uint8_t *info);
+void rx_cmd_in_control_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_in_control_rr(uint8_t *buf, uint8_t *info);
 
 //****************************************************************************
 // Definition(s):
