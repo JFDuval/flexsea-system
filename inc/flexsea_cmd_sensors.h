@@ -43,6 +43,7 @@
 
 void init_flexsea_payload_ptr_sensors(void);
 	
+//Switch:
 void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 								uint16_t *len);
 void tx_cmd_sensors_switch_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -51,12 +52,20 @@ void rx_cmd_sensors_switch_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_sensors_switch_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_sensors_switch_rr(uint8_t *buf, uint8_t *info);
 
-void rx_cmd_encoder(uint8_t *buf);
-void rx_cmd_strain(uint8_t *buf);
+//Encoder:
+void tx_cmd_sensors_encoder_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len, int32_t enc);
+void tx_cmd_sensors_encoder_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len);
+void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info);
+void rx_cmd_sensors_encoder_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_sensors_encoder_rr(uint8_t *buf, uint8_t *info);
 
-uint32_t tx_cmd_switch(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
-uint32_t tx_cmd_encoder(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int32_t enc);
-uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len);
+/*
+void rx_cmd_strain(uint8_t *buf);
+uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, \
+						uint32_t len);
+*/
 
 //****************************************************************************
 // Definition(s):

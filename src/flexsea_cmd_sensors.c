@@ -78,14 +78,15 @@ uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 //commands to flexsea_payload_catchall().
 void init_flexsea_payload_ptr_sensors(void)
 {
-	//TODO
-	
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_READ] = &rx_cmd_sensors_switch_rw;
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_WRITE] = &rx_cmd_sensors_switch_w;
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_REPLY] = &rx_cmd_sensors_switch_rr;
 	
-	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_encoder;
-	flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
+	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_sensors_encoder_rw;
+	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_WRITE] = &rx_cmd_sensors_encoder_w;
+	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_REPLY] = &rx_cmd_sensors_encoder_rr;
+
+	//flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
 }
 
 //Transmit Switch:
@@ -176,103 +177,94 @@ void rx_cmd_sensors_switch_rr(uint8_t *buf, uint8_t *info)
 	#endif	//BOARD_TYPE_FLEXSEA_PLAN
 }
 
-//Transmission of an ENCODER command.
-uint32_t tx_cmd_encoder(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, int32_t enc)
+//Transmit Encoder:
+//=================
+
+//Test code? No
+void tx_cmd_sensors_encoder_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len, int32_t enc)
 {
-	uint32_t bytes = 0;
-	uint8_t tmp0 = 0, tmp1 = 0, tmp2 = 0, tmp3 = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_ENCODER;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	SPLIT_32((uint32_t) enc, shBuf, &index);
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
-
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_ENCODER);
-
-		//Arguments:
-		//(none)
-
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_ENCODER);
-
-		uint32_to_bytes((uint32_t)enc, &tmp0, &tmp1, &tmp2, &tmp3);
-
-		//Arguments:
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		buf[P_DATA1 + 2] = tmp2;
-		buf[P_DATA1 + 3] = tmp3;
-
-		bytes = P_DATA1 + 4;     //Bytes is always last+1
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
-//Reception of an ENCODER command
-void rx_cmd_encoder(uint8_t *buf)
+//Test code? No
+void tx_cmd_sensors_encoder_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len)
 {
-	uint32_t numb = 0;
-	int32_t tmp = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_ENCODER;
+	(*cmdType) = CMD_READ;
 
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master.
+	//Data:
+	(void)shBuf; //(none)
 
-		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		//Generate the reply:
-		//===================
-
-		numb = tx_cmd_encoder(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, qei_read());
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
-		numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		rs485_puts(comm_str_485_1, numb);
-
-		#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-		tmp = (int32_t)BYTES_TO_UINT32(buf[P_DATA1], buf[P_DATA1+1], buf[P_DATA1+2], buf[P_DATA1+3]);
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#ifdef BOARD_TYPE_FLEXSEA_PLAN
-
-			_USE_PRINTF("Encoder = %i.\n", tmp);
-
-			#endif	//BOARD_TYPE_FLEXSEA_PLAN
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-			qei_write(tmp);
-
-			#endif
-
-		}
-	}
+	//Payload length:
+	(*len) = index;
 }
 
+//Receive Encoder:
+//===============
+
+//Test code? No
+void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info)
+{
+	uint16_t index = P_DATA1;
+	int32_t tmpEnc = 0;
+	
+	(void)info;	//Unused for now
+	
+	tmpEnc = (int32_t) REBUILD_UINT32(buf, &index);
+	qei_write(tmpEnc);
+
+}
+
+//Test code? No
+void rx_cmd_sensors_encoder_rw(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+		tx_cmd_sensors_encoder_w(TX_N_DEFAULT, qei_read());
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+
+	#else
+		
+		(void)buf;
+		
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
+
+//Test code? No
+void rx_cmd_sensors_encoder_rr(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+		//ToDo store
+
+	#else
+		
+		(void)buf;
+		
+	#endif	//BOARD_TYPE_FLEXSEA_PLAN
+}
+
+//****************************************************************************
+// Antiquated but valid function(s) - rework & integrate:
+//****************************************************************************
+
+/*
 //Transmission of a STRAIN command.
 //TODO: add support for gains & offsets
 //Note: the Reading part can be (and should be) done via Read All
@@ -414,6 +406,7 @@ void rx_cmd_strain(uint8_t *buf)
 		}
 	}
 }
+*/
 
 #ifdef __cplusplus
 }
