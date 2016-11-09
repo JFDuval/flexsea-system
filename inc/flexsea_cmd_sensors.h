@@ -43,7 +43,14 @@
 
 void init_flexsea_payload_ptr_sensors(void);
 	
-void rx_cmd_switch(uint8_t *buf);
+void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len);
+void tx_cmd_sensors_switch_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len);
+void rx_cmd_sensors_switch_w(uint8_t *buf, uint8_t *info);
+void rx_cmd_sensors_switch_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_sensors_switch_rr(uint8_t *buf, uint8_t *info);
+
 void rx_cmd_encoder(uint8_t *buf);
 void rx_cmd_strain(uint8_t *buf);
 

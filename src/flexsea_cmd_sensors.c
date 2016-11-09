@@ -80,104 +80,100 @@ void init_flexsea_payload_ptr_sensors(void)
 {
 	//TODO
 	
+	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_READ] = &rx_cmd_sensors_switch_rw;
+	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_WRITE] = &rx_cmd_sensors_switch_w;
+	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_REPLY] = &rx_cmd_sensors_switch_rr;
+	
 	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_encoder;
 	flexsea_payload_ptr[CMD_STRAIN][RX_PTYPE_READ] = &rx_cmd_strain;
 }
 
-//Transmission of a SWITCH command: Read Manage's onboard switch
-uint32_t tx_cmd_switch(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len)
+//Transmit Switch:
+//================
+
+//Test code? No
+void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len)
 {
-	uint32_t bytes = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_SWITCH;
+	(*cmdType) = CMD_WRITE;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+		
+		//Data:
+		shBuf[index++] = read_sw1();
+		
+	#else
+		
+		(void)shBuf;
+		
+	#endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
-	//Command:
-	buf[P_CMDS] = 1;                     //1 command in string
-
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_SWITCH);
-
-		//Arguments:
-		//(none)
-
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		//In that case Write is only used for the Reply
-
-		buf[P_CMD1] = CMD_W(CMD_SWITCH);
-
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-		//Arguments:
-		buf[P_DATA1 + 0] = read_sw1();
-
-		bytes = P_DATA1 + 1;     //Bytes is always last+1
-
-		#else
-
-		bytes = 0;
-
-		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
-//Reception of a CMD_SWITCH command
-void rx_cmd_switch(uint8_t *buf)
+//Test code? No
+void tx_cmd_sensors_switch_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+								uint16_t *len)
 {
-	uint32_t numb = 0;
-	uint8_t tmp_sw = 0;
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_SWITCH;
+	(*cmdType) = CMD_READ;
 
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master.
+	//Data:
+	(void)shBuf; //(none)
 
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+	//Payload length:
+	(*len) = index;
+}
 
-		//Generate the reply:
-		//===================
+//Receive Switch:
+//===============
 
-		numb = tx_cmd_switch(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_spi, numb);
-		numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		//(the SPI driver will grab comm_str_spi directly)
-		//flexsea_send_serial_master(0, comm_str, numb);
+//Test code? No
+void rx_cmd_sensors_switch_w(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
+	(void)buf;
+		
+	//(We should never receive a Write switch)
+}
 
-		#endif	//BOARD_TYPE_FLEXSEA_MANAGE
+//Test code? No
+void rx_cmd_sensors_switch_rw(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
 
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
+		tx_cmd_sensors_switch_w(TX_N_DEFAULT);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
-			#ifdef BOARD_TYPE_FLEXSEA_PLAN
+	#else
+		
+		(void)buf;
+		
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+}
 
-			printf("Received data\n");//ToDo remove
-			manag1.sw1 = buf[P_DATA1];
+//Test code? No
+void rx_cmd_sensors_switch_rr(uint8_t *buf, uint8_t *info)
+{
+	(void)info;
 
-			#endif	//BOARD_TYPE_FLEXSEA_PLAN
-		}
-		else
-		{
-			//Master is writing a value to this board
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 
-		}
-	}
+		manag1.sw1 = buf[P_DATA1];
+
+	#else
+		
+		(void)buf;
+		
+	#endif	//BOARD_TYPE_FLEXSEA_PLAN
 }
 
 //Transmission of an ENCODER command.
