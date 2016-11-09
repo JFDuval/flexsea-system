@@ -43,9 +43,13 @@
 
 void init_flexsea_payload_ptr_external(void);
 
-void rx_cmd_exp_pwro(uint8_t *buf);
-uint32_t tx_cmd_exp_pwro(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
-								uint8_t pwro_pwm);
+void tx_cmd_exp_pwro_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t pwroPwm);
+void tx_cmd_exp_pwro_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void rx_cmd_exp_pwro_w(uint8_t *buf, uint8_t *info);
+void rx_cmd_exp_pwro_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_exp_pwro_rr(uint8_t *buf, uint8_t *info);
 
 //Older function - disabled until further notice:
 //void rx_cmd_digital_in(uint8_t *buf);
