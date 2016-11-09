@@ -158,7 +158,7 @@ void rx_cmd_ctrl_i_g_rw(uint8_t *buf, uint8_t *info)
 		tx_cmd_ctrl_i_g_w(TX_N_DEFAULT, ctrl.current.gain.I_KP, \
 						  ctrl.current.gain.I_KI, ctrl.current.gain.I_KD);
 		//ToDo: should it be exec1.ctrl?
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -269,7 +269,7 @@ void rx_cmd_ctrl_p_g_rw(uint8_t *buf, uint8_t *info)
 		tx_cmd_ctrl_p_g_w(TX_N_DEFAULT, ctrl.position.gain.P_KP, \
 						  ctrl.position.gain.P_KI, ctrl.position.gain.P_KD);
 		//ToDo: should it be exec1.ctrl?
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -381,7 +381,7 @@ void rx_cmd_ctrl_z_g_rw(uint8_t *buf, uint8_t *info)
 		tx_cmd_ctrl_z_g_w(TX_N_DEFAULT, ctrl.impedance.gain.Z_K, \
 						  ctrl.impedance.gain.Z_B, ctrl.impedance.gain.Z_I);
 		//ToDo: should it be exec1.ctrl?
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;

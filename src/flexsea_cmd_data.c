@@ -25,7 +25,7 @@
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
 	* 2016-09-09 | jfduval | Initial GPL-3.0 release
-	*
+	* 2016-11-09 | jfduval | Updated to new stack standard
 ****************************************************************************/
 
 #ifdef __cplusplus
@@ -174,113 +174,99 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 void rx_cmd_data_read_all_rw(uint8_t *buf, uint8_t *info)
 {
-	/*
-	uint8_t cmdCode = 0, cmdType = 0;
-	uint16_t len = 0, numb = 0;
-	uint8_t transferBuf[COMM_STR_BUF_LEN];
-	*/
-
-	//Note: for Read All, there is no RW per say, it's always a pure read,
-	//so we send a tx_ command right away:
-
-	/*
-	//ToDo: we need to use something more generic than 'comm_str_usb'
-	tx_cmd_data_read_all_w(tmp_payload_xmit, &cmdCode, &cmdType, &len);
-	numb = tx_cmd(tmp_payload_xmit, cmdCode, cmdType, len, buf[P_XID], transferBuf);
-	numb = comm_gen_str(transferBuf, comm_str_usb, numb);
-	numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
-	flexsea_send_serial_master(info[0], comm_str_usb, numb);
-	*/
-
 	tx_cmd_data_read_all_w(TX_N_DEFAULT);
-	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
 void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 {
-	uint16_t index = P_DATA1;
-	uint8_t tmp = 0, baseAddr = 0;
-
 	(void)info;	//Unused for now
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+		
+		uint16_t index = P_DATA1;
+		uint8_t tmp = 0, baseAddr = 0;
 
-	//Structure pointers:
-	struct execute_s *exec_s_ptr = &exec1;
-	struct manage_s *mn_s_ptr = &manag1;
-	struct gossip_s *go_s_ptr = &gossip1;
-	struct strain_s *st_s_ptr = &strain1;
-	executePtrXid(&exec_s_ptr, buf[P_XID]);
-	managePtrXid(&mn_s_ptr, buf[P_XID]);
-	gossipPtrXid(&go_s_ptr, buf[P_XID]);
-	strainPtrXid(&st_s_ptr, buf[P_XID]);
+		//Structure pointers:
+		struct execute_s *exec_s_ptr = &exec1;
+		struct manage_s *mn_s_ptr = &manag1;
+		struct gossip_s *go_s_ptr = &gossip1;
+		struct strain_s *st_s_ptr = &strain1;
+		executePtrXid(&exec_s_ptr, buf[P_XID]);
+		managePtrXid(&mn_s_ptr, buf[P_XID]);
+		gossipPtrXid(&go_s_ptr, buf[P_XID]);
+		strainPtrXid(&st_s_ptr, buf[P_XID]);
 
-	//Extract base address:
-	tmp = buf[P_XID]/10;
-	baseAddr = 10*tmp;
+		//Extract base address:
+		tmp = buf[P_XID]/10;
+		baseAddr = 10*tmp;
 
-	switch(baseAddr)
-	{
-		case FLEXSEA_EXECUTE_BASE:
+		switch(baseAddr)
+		{
+			case FLEXSEA_EXECUTE_BASE:
 
-			exec_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
 
-			exec_s_ptr->strain = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->analog[0] = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->analog[1] = (int16_t) REBUILD_UINT16(buf, &index);
-			exec_s_ptr->enc_display = (int32_t) REBUILD_UINT32(buf, &index);
-			exec_s_ptr->current = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->strain = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->analog[0] = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->analog[1] = (int16_t) REBUILD_UINT16(buf, &index);
+				exec_s_ptr->enc_display = (int32_t) REBUILD_UINT32(buf, &index);
+				exec_s_ptr->current = (int16_t) REBUILD_UINT16(buf, &index);
 
-			exec_s_ptr->volt_batt = buf[index++];
-			exec_s_ptr->volt_int = buf[index++];
-			exec_s_ptr->temp = buf[index++];
-			exec_s_ptr->status1 = buf[index++];
-			exec_s_ptr->status2 = buf[index++];
-			break;
+				exec_s_ptr->volt_batt = buf[index++];
+				exec_s_ptr->volt_int = buf[index++];
+				exec_s_ptr->temp = buf[index++];
+				exec_s_ptr->status1 = buf[index++];
+				exec_s_ptr->status2 = buf[index++];
+				break;
 
-		case FLEXSEA_MANAGE_BASE:
+			case FLEXSEA_MANAGE_BASE:
 
-			mn_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
-			mn_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
-			mn_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
-			mn_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
-			mn_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
-			mn_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
+				mn_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
 
-			//...
-			break;
+				//...
+				break;
 
-		case FLEXSEA_GOSSIP_BASE:
+			case FLEXSEA_GOSSIP_BASE:
 
-			go_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->magneto.x = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->magneto.y = (int16_t) REBUILD_UINT16(buf, &index);
-			go_s_ptr->magneto.z = (int16_t) REBUILD_UINT16(buf, &index);
-			break;
+				go_s_ptr->gyro.x = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->gyro.y = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->gyro.z = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->magneto.x = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->magneto.y = (int16_t) REBUILD_UINT16(buf, &index);
+				go_s_ptr->magneto.z = (int16_t) REBUILD_UINT16(buf, &index);
+				break;
 
-		case FLEXSEA_STRAIN_BASE:
+			case FLEXSEA_STRAIN_BASE:
 
-			st_s_ptr->compressedBytes[0] = buf[index++];
-			st_s_ptr->compressedBytes[1] = buf[index++];
-			st_s_ptr->compressedBytes[2] = buf[index++];
-			st_s_ptr->compressedBytes[3] = buf[index++];
-			st_s_ptr->compressedBytes[4] = buf[index++];
-			st_s_ptr->compressedBytes[5] = buf[index++];
-			st_s_ptr->compressedBytes[6] = buf[index++];
-			st_s_ptr->compressedBytes[7] = buf[index++];
-			st_s_ptr->compressedBytes[8] = buf[index++];
-			break;
-	}
+				st_s_ptr->compressedBytes[0] = buf[index++];
+				st_s_ptr->compressedBytes[1] = buf[index++];
+				st_s_ptr->compressedBytes[2] = buf[index++];
+				st_s_ptr->compressedBytes[3] = buf[index++];
+				st_s_ptr->compressedBytes[4] = buf[index++];
+				st_s_ptr->compressedBytes[5] = buf[index++];
+				st_s_ptr->compressedBytes[6] = buf[index++];
+				st_s_ptr->compressedBytes[7] = buf[index++];
+				st_s_ptr->compressedBytes[8] = buf[index++];
+				break;
+		}
+	
+	#else
+		
+		(void)buf;
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }

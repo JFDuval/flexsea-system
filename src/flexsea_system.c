@@ -162,7 +162,7 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 
 	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
 
-	if(!ms)
+	if(SEND_TO_SLAVE)
 	{
 		//Send to slave:
 		flexsea_send_serial_slave(info[0], comm_str_1, numb);

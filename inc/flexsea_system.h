@@ -214,6 +214,10 @@ __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 #define IN_CONTROL_MOT_DIR(x)			((x & 0x1000) >> 12)
 #define IN_CONTROL_PWM(x)				((x & 0x0FFF))
 
+//Pack and Send:
+#define SEND_TO_SLAVE					0
+#define SEND_TO_MASTER					1
+
 //****************************************************************************
 // Macro(s):
 //****************************************************************************

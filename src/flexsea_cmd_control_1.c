@@ -153,7 +153,7 @@ void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrl.active_ctrl);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -260,7 +260,7 @@ void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		tx_cmd_ctrl_i_w(TX_N_DEFAULT, exec1.ctrl.current.setpoint_val);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -368,7 +368,7 @@ void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		tx_cmd_ctrl_o_w(TX_N_DEFAULT, exec1.ctrl.pwm);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -511,7 +511,7 @@ void rx_cmd_ctrl_p_rw(uint8_t *buf, uint8_t *info)
 		tx_cmd_ctrl_p_w(TX_N_DEFAULT, ctrl.position.pos, ctrl.position.posi, \
 						ctrl.position.posf, ctrl.position.spdm, \
 						ctrl.position.acc);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
@@ -644,7 +644,7 @@ void rx_cmd_in_control_rw(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		tx_cmd_in_control_w(TX_N_DEFAULT, 0);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
 		(void)buf;
