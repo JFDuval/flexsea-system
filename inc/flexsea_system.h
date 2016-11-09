@@ -39,6 +39,7 @@
 #include "flexsea_board.h"
 #include "../flexsea-comm/inc/flexsea.h"
 //Include the core flexsea-system files:
+#include "flexsea_global_structs.h"
 #include "flexsea_cmd_control.h"
 #include "flexsea_cmd_sensors.h"
 #include "flexsea_cmd_external.h"
@@ -57,6 +58,10 @@ void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 			uint8_t rid, uint8_t *info, uint16_t *numBytes, uint8_t *commStr);
 void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 				 uint8_t rid, uint8_t *info, uint8_t ms);
+void executePtrXid(struct execute_s **myPtr, uint8_t p_xid);
+void managePtrXid(struct manage_s **myPtr, uint8_t p_xid);
+void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
+void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 __attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 
 //****************************************************************************

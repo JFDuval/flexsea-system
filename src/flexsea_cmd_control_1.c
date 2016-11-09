@@ -58,6 +58,7 @@ extern "C" {
 
 //Will change this, but for now the payloads will be stored in: (ToDo eliminate soon)
 uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
+struct execute_s *exPtr1 = &exec1;
 
 //****************************************************************************
 // Function(s)
@@ -168,9 +169,10 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 
 		//Decode data:
 		uint8_t controller = buf[P_DATA1];
+
 		//Store value:
-		exec1.ctrl.active_ctrl = controller;
-		//ToDo use pointer, too specific
+		executePtrXid(&exPtr1, buf[P_XID]);
+		exPtr1->ctrl.active_ctrl = controller;
 
 	#else
 		(void)buf;
@@ -279,8 +281,8 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 	//Store value:
-	exec1.current = tmp_measured_current;
-	//ToDo shouldn't be exec1!
+	executePtrXid(&exPtr1, buf[P_XID]);
+	exPtr1->current = tmp_measured_current;
 
 	#else
 		(void)buf;
@@ -386,7 +388,8 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-		exec1.ctrl.pwm = tmp;
+		executePtrXid(&exPtr1, buf[P_XID]);
+		exPtr1->ctrl.pwm = tmp;
 		//ToDo shouldn't be exec1!
 
 	#else
@@ -533,11 +536,12 @@ void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-		exec1.ctrl.position.pos = tmp_pos;
-		exec1.ctrl.position.posi = tmp_posi;
-		exec1.ctrl.position.posf = tmp_posf;
-		exec1.ctrl.position.spdm = tmp_spdm;
-		exec1.ctrl.position.acc = tmp_acc;
+		executePtrXid(&exPtr1, buf[P_XID]);
+		exPtr1->ctrl.position.pos = tmp_pos;
+		exPtr1->ctrl.position.posi = tmp_posi;
+		exPtr1->ctrl.position.posf = tmp_posf;
+		exPtr1->ctrl.position.spdm = tmp_spdm;
+		exPtr1->ctrl.position.acc = tmp_acc;
 		//ToDo: shouldn't be exec1!
 
 	#else

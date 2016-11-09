@@ -67,13 +67,10 @@ uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 //commands to flexsea_payload_catchall().
 void init_flexsea_payload_ptr_data(void)
 {
-	//TODO
-
 	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_READ] = &rx_cmd_data_read_all_rw;
 	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_REPLY] = &rx_cmd_data_read_all_rr;
 
-
-	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
+	//flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
 }
 
 void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -200,11 +197,15 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//Structure pointers ***TODO this isn't clean
+	//Structure pointers:
 	struct execute_s *exec_s_ptr = &exec1;
 	struct manage_s *mn_s_ptr = &manag1;
 	struct gossip_s *go_s_ptr = &gossip1;
-	struct strain_s *stPtr = &strain1;
+	struct strain_s *st_s_ptr = &strain1;
+	executePtrXid(&exec_s_ptr, buf[P_XID]);
+	managePtrXid(&mn_s_ptr, buf[P_XID]);
+	gossipPtrXid(&go_s_ptr, buf[P_XID]);
+	strainPtrXid(&st_s_ptr, buf[P_XID]);
 
 	//***TODO*** replace that by a board type call!
 	if(buf[P_XID] == FLEXSEA_EXECUTE_1 || buf[P_XID] == FLEXSEA_EXECUTE_2)
@@ -253,24 +254,25 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 	}
 	else if(buf[P_XID] == FLEXSEA_STRAIN_1)
 	{
-		stPtr->compressedBytes[0] = buf[index++];
-		stPtr->compressedBytes[1] = buf[index++];
-		stPtr->compressedBytes[2] = buf[index++];
-		stPtr->compressedBytes[3] = buf[index++];
-		stPtr->compressedBytes[4] = buf[index++];
-		stPtr->compressedBytes[5] = buf[index++];
-		stPtr->compressedBytes[6] = buf[index++];
-		stPtr->compressedBytes[7] = buf[index++];
-		stPtr->compressedBytes[8] = buf[index++];
+		st_s_ptr->compressedBytes[0] = buf[index++];
+		st_s_ptr->compressedBytes[1] = buf[index++];
+		st_s_ptr->compressedBytes[2] = buf[index++];
+		st_s_ptr->compressedBytes[3] = buf[index++];
+		st_s_ptr->compressedBytes[4] = buf[index++];
+		st_s_ptr->compressedBytes[5] = buf[index++];
+		st_s_ptr->compressedBytes[6] = buf[index++];
+		st_s_ptr->compressedBytes[7] = buf[index++];
+		st_s_ptr->compressedBytes[8] = buf[index++];
 	}
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
 //****************************************************************************
-// Antiquated but valid function(s) - rework:
+// Antiquated but valid function(s) - rework & integrate:
 //****************************************************************************
 
+/*
 //Transmission of a USER_DATA command
 //Note: we can only write one parameter at the time (that's what we need for typical use cases).
 //'select_w' will determine what variable is written.
@@ -408,6 +410,7 @@ void rx_cmd_data_user(uint8_t *buf)
 		}
 	}
 }
+*/
 
 #ifdef __cplusplus
 }

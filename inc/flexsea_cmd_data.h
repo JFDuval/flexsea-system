@@ -52,8 +52,11 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 					uint16_t *len);
 
 //User Data
-uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w);
+/*
+uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, \
+							uint32_t len, uint8_t select_w);
 void rx_cmd_data_user(uint8_t *buf);
+*/
 
 //****************************************************************************
 // Definition(s):

@@ -21,7 +21,7 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_control_1: commands specific to the motor & 
+	[This file] flexsea_cmd_control_1: commands specific to the motor &
 	control loops. Code split in 2 files, see flexsea_cmd_control_1.c
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
@@ -53,6 +53,7 @@ extern "C" {
 
 //Will change this, but for now the payloads will be stored in: (ToDo eliminate soon)
 uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
+struct execute_s *exPtr2 = &exec1;
 
 //****************************************************************************
 // Function(s)
@@ -180,10 +181,10 @@ void rx_cmd_ctrl_i_g_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-		exec1.ctrl.current.gain.I_KP = tmp_kp;
-		exec1.ctrl.current.gain.I_KI = tmp_ki;
-		exec1.ctrl.current.gain.I_KD = tmp_kd;
-		//ToDo: can't be exec1!
+		executePtrXid(&exPtr2, buf[P_XID]);
+		exPtr2->ctrl.current.gain.I_KP = tmp_kp;
+		exPtr2->ctrl.current.gain.I_KI = tmp_ki;
+		exPtr2->ctrl.current.gain.I_KD = tmp_kd;
 
 	#else
 		(void)buf;
@@ -291,9 +292,10 @@ void rx_cmd_ctrl_p_g_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-		exec1.ctrl.position.gain.P_KP = tmp_kp;
-		exec1.ctrl.position.gain.P_KI = tmp_ki;
-		exec1.ctrl.position.gain.P_KD = tmp_kd;
+		executePtrXid(&exPtr2, buf[P_XID]);
+		exPtr2->ctrl.position.gain.P_KP = tmp_kp;
+		exPtr2->ctrl.position.gain.P_KI = tmp_ki;
+		exPtr2->ctrl.position.gain.P_KD = tmp_kd;
 		//ToDo: can't be exec1!
 
 	#else
@@ -402,10 +404,10 @@ void rx_cmd_ctrl_z_g_rr(uint8_t *buf, uint8_t *info)
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-		exec1.ctrl.impedance.gain.Z_K = tmp_zk;
-		exec1.ctrl.impedance.gain.Z_B = tmp_zb;
-		exec1.ctrl.impedance.gain.Z_I = tmp_zi;
-		//ToDo: can't be exec1!
+		executePtrXid(&exPtr2, buf[P_XID]);
+		exPtr2->ctrl.impedance.gain.Z_K = tmp_zk;
+		exPtr2->ctrl.impedance.gain.Z_B = tmp_zb;
+		exPtr2->ctrl.impedance.gain.Z_I = tmp_zi;
 
 	#else
 		(void)buf;

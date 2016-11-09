@@ -174,5 +174,80 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 	}
 }
 
+//Assign a pointer based on P_XID:
+void executePtrXid(struct execute_s **myPtr, uint8_t p_xid)
+{
+	//Based on selected slave, what structure do we use?
+	switch(p_xid)
+	{
+		case FLEXSEA_EXECUTE_1:
+			*myPtr = &exec1;
+			break;
+		case FLEXSEA_EXECUTE_2:
+			*myPtr = &exec2;
+			break;
+		case FLEXSEA_EXECUTE_3:
+			*myPtr = &exec3;
+			break;
+		case FLEXSEA_EXECUTE_4:
+			*myPtr = &exec4;
+			break;
+		default:
+			*myPtr = &exec1;
+			break;
+	}
+}
+
+//Assign a pointer based on P_XID:
+void managePtrXid(struct manage_s **myPtr, uint8_t p_xid)
+{
+	//Based on selected slave, what structure do we use?
+	switch(p_xid)
+	{
+		case FLEXSEA_MANAGE_1:
+			*myPtr = &manag1;
+			break;
+		case FLEXSEA_MANAGE_2:
+			*myPtr = &manag2;
+			break;
+		default:
+			*myPtr = &manag1;
+			break;
+	}
+}
+
+//Assign a pointer based on P_XID:
+void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid)
+{
+	//Based on selected slave, what structure do we use?
+	switch(p_xid)
+	{
+		case FLEXSEA_GOSSIP_1:
+			*myPtr = &gossip1;
+			break;
+		case FLEXSEA_GOSSIP_2:
+			*myPtr = &gossip2;
+			break;
+		default:
+			*myPtr = &gossip1;
+			break;
+	}
+}
+
+//Assign a pointer based on P_XID:
+void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid)
+{
+	//Based on selected slave, what structure do we use?
+	switch(p_xid)
+	{
+		case FLEXSEA_STRAIN_1:
+			*myPtr = &strain1;
+			break;
+		default:
+			*myPtr = &strain1;
+			break;
+	}
+}
+
 //Weak function, redefine in your own flexsea-user if needed.
 __attribute__((weak)) void init_flexsea_payload_ptr_user(void){}
