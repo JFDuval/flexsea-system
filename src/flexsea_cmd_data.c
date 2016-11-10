@@ -133,6 +133,8 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
 	SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
 
+	shBuf[index++] = manag1.sw1;
+
 	//...
 
 	#endif  //BOARD_TYPE_FLEXSEA_MANAGE
@@ -233,6 +235,8 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				mn_s_ptr->accel.x = (int16_t) REBUILD_UINT16(buf, &index);
 				mn_s_ptr->accel.y = (int16_t) REBUILD_UINT16(buf, &index);
 				mn_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
+
+				mn_s_ptr->sw1 = buf[index++];
 
 				//...
 				break;
