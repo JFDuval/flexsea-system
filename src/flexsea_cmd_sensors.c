@@ -17,9 +17,9 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
 	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
 	[This file] flexsea_cmd_sensors: commands specific sensors
 *****************************************************************************
@@ -81,7 +81,7 @@ void init_flexsea_payload_ptr_sensors(void)
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_READ] = &rx_cmd_sensors_switch_rw;
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_WRITE] = &rx_cmd_sensors_switch_w;
 	flexsea_payload_ptr[CMD_SWITCH][RX_PTYPE_REPLY] = &rx_cmd_sensors_switch_rr;
-	
+
 	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_READ] = &rx_cmd_sensors_encoder_rw;
 	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_WRITE] = &rx_cmd_sensors_encoder_w;
 	flexsea_payload_ptr[CMD_ENCODER][RX_PTYPE_REPLY] = &rx_cmd_sensors_encoder_rr;
@@ -102,14 +102,14 @@ void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = CMD_WRITE;
 
 	#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-		
+
 		//Data:
 		shBuf[index++] = read_sw1();
-		
+
 	#else
-		
+
 		(void)shBuf;
-		
+
 	#endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 	//Payload length:
@@ -140,7 +140,7 @@ void rx_cmd_sensors_switch_w(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
 	(void)buf;
-		
+
 	//(We should never receive a Write switch)
 }
 
@@ -155,9 +155,9 @@ void rx_cmd_sensors_switch_rw(uint8_t *buf, uint8_t *info)
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
-		
+
 		(void)buf;
-		
+
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
@@ -171,9 +171,9 @@ void rx_cmd_sensors_switch_rr(uint8_t *buf, uint8_t *info)
 		manag1.sw1 = buf[P_DATA1];
 
 	#else
-		
+
 		(void)buf;
-		
+
 	#endif	//BOARD_TYPE_FLEXSEA_PLAN
 }
 
@@ -219,11 +219,18 @@ void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
 	int32_t tmpEnc = 0;
-	
+
 	(void)info;	//Unused for now
-	
+
 	tmpEnc = (int32_t) REBUILD_UINT32(buf, &index);
-	qei_write(tmpEnc);
+
+	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+		qei_write(tmpEnc);
+
+	#else
+
+	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
 }
 
@@ -238,9 +245,9 @@ void rx_cmd_sensors_encoder_rw(uint8_t *buf, uint8_t *info)
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
-		
+
 		(void)buf;
-		
+
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
@@ -252,11 +259,12 @@ void rx_cmd_sensors_encoder_rr(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 
 		//ToDo store
+		(void)buf; //(for now)
 
 	#else
-		
+
 		(void)buf;
-		
+
 	#endif	//BOARD_TYPE_FLEXSEA_PLAN
 }
 
@@ -293,11 +301,11 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 		buf[P_CMD1] = CMD_W(CMD_STRAIN);
 
 		//ToDo gains & offsets
-		
+
 		#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
-			
-		//Arguments:	
-		uint16_to_bytes((uint16_t)strain1.ch[0].strain_filtered, &tmp0, &tmp1);		
+
+		//Arguments:
+		uint16_to_bytes((uint16_t)strain1.ch[0].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 0] = tmp0;
 		buf[P_DATA1 + 1] = tmp1;
 		uint16_to_bytes((uint16_t)strain1.ch[1].strain_filtered, &tmp0, &tmp1);
@@ -315,7 +323,7 @@ uint32_t tx_cmd_strain(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_
 		uint16_to_bytes((uint16_t)strain1.ch[5].strain_filtered, &tmp0, &tmp1);
 		buf[P_DATA1 + 10] = tmp0;
 		buf[P_DATA1 + 11] = tmp1;
-		
+
 		#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
 		bytes = P_DATA1 + 12;     //Bytes is always last+1
@@ -335,7 +343,7 @@ void rx_cmd_strain(uint8_t *buf)
 {
 	uint32_t numb = 0;
 	int32_t tmp = 0;
-    struct strain_s *strainPtr = &strain1;
+	struct strain_s *strainPtr = &strain1;
 
 	if(IS_CMD_RW(buf[P_CMD1]) == READ)
 	{
@@ -349,21 +357,21 @@ void rx_cmd_strain(uint8_t *buf)
 		//ToDo...
 
 		#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-		
+
 		#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
-			
+
 		//Generate the reply:
 		//===================
 
 		numb = tx_cmd_strain(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN);
 		numb = comm_gen_str(tmp_payload_xmit, comm_str_485_1, numb);
 		numb = COMM_STR_BUF_LEN;    //Fixed length for now
-		//rs485_puts(comm_str_485_1, numb);	
-		
+		//rs485_puts(comm_str_485_1, numb);
+
 		#ifdef USE_USB
-		usb_puts(comm_str_485_1, (numb));	
+		usb_puts(comm_str_485_1, (numb));
 		#endif
-			
+
 		#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 	}
 	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
@@ -375,13 +383,13 @@ void rx_cmd_strain(uint8_t *buf)
 			//We received a reply to our read request
 
 			#ifdef BOARD_TYPE_FLEXSEA_PLAN
-				
-            strainPtr->ch[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
-            strainPtr->ch[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
-            strainPtr->ch[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
-            strainPtr->ch[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
-            strainPtr->ch[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
-            strainPtr->ch[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);
+
+			strainPtr->ch[0].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1], buf[P_DATA1+1]);
+			strainPtr->ch[1].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+2], buf[P_DATA1+3]);
+			strainPtr->ch[2].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+4], buf[P_DATA1+5]);
+			strainPtr->ch[3].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+6], buf[P_DATA1+7]);
+			strainPtr->ch[4].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+8], buf[P_DATA1+9]);
+			strainPtr->ch[5].strain_filtered = (uint16_t)BYTES_TO_UINT16(buf[P_DATA1+10], buf[P_DATA1+11]);
 
 			_USE_PRINTF("Strain[0] = %i.\n", strain[0].strain_filtered);
 
@@ -396,7 +404,7 @@ void rx_cmd_strain(uint8_t *buf)
 			qei_write(tmp);
 
 			#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
-			
+
 			#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
 			//ToDo
