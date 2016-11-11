@@ -250,4 +250,4 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid)
 }
 
 //Weak function, redefine in your own flexsea-user if needed.
-__attribute__((weak)) void init_flexsea_payload_ptr_user(void){}
+//__attribute__((weak)) void init_flexsea_payload_ptr_user(void){}
