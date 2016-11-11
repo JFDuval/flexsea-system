@@ -126,9 +126,12 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-	SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
-	SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
-	SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
+	SPLIT_16((uint16_t)glob_var_1, shBuf, &index);
+	SPLIT_16((uint16_t)glob_var_2, shBuf, &index);
+	SPLIT_16((uint16_t)glob_var_3, shBuf, &index);
+	//SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
+	//SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
+	//SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
 	SPLIT_16((uint16_t)imu.accel.x, shBuf, &index);
 	SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
 	SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
