@@ -49,6 +49,7 @@ For rx_* functions, the suffix options are:
 //****************************************************************************
 
 #include "main.h"
+#include <string.h>
 #include "../inc/flexsea_system.h"
 
 //****************************************************************************
