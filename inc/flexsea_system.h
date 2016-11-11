@@ -62,7 +62,7 @@ void executePtrXid(struct execute_s **myPtr, uint8_t p_xid);
 void managePtrXid(struct manage_s **myPtr, uint8_t p_xid);
 void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
-__attribute__((weak)) void init_flexsea_payload_ptr_user(void);
+//__attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 
 //****************************************************************************
 // Definition(s):

@@ -50,6 +50,7 @@ For rx_* functions, the suffix options are:
 
 #include "main.h"
 #include "../inc/flexsea_system.h"
+#include "../flexsea-user/inc/flexsea_cmd_user.h"
 
 //****************************************************************************
 // Variable(s)
