@@ -101,7 +101,6 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 
 //Expansion/external commands:
 
-#define CMD_POWER_OUT			60	//ToDo can we berge both?
 #define CMD_PWRO				61
 #define CMD_ADV_ANA_CONFIG		62
 #define CMD_ANALOG				63
