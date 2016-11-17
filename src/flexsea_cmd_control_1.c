@@ -56,8 +56,6 @@ extern "C" {
 // Variable(s)
 //****************************************************************************
 
-//Will change this, but for now the payloads will be stored in: (ToDo eliminate soon)
-uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 struct execute_s *exPtr1 = &exec1;
 
 //****************************************************************************
