@@ -26,6 +26,7 @@
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
 	* 2016-09-09 | jfduval | Initial GPL-3.0 release
 	* 2016-11-09 | jfduval | Updated to new stack standard
+	* 2016-12-02 | jfduval | Re-integrating User R/W
 ****************************************************************************/
 
 #ifdef __cplusplus
@@ -38,6 +39,7 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "../inc/flexsea.h"
 #include "../inc/flexsea_system.h"
 #include "../inc/flexsea_cmd_data.h"
 
@@ -67,10 +69,14 @@ uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 //commands to flexsea_payload_catchall().
 void init_flexsea_payload_ptr_data(void)
 {
+	//Read All:
 	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_READ] = &rx_cmd_data_read_all_rw;
 	flexsea_payload_ptr[CMD_READ_ALL][RX_PTYPE_REPLY] = &rx_cmd_data_read_all_rr;
 
-	//flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user;
+	//User R/W:
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user_rw;
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_REPLY] = &rx_cmd_data_user_rr;
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user_w;
 }
 
 void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -113,7 +119,7 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16(read_analog(0), shBuf, &index);
 	SPLIT_16(read_analog(1), shBuf, &index);
 
-	SPLIT_32((uint32_t)(uint32_t)refresh_enc_display(), shBuf, &index);
+	SPLIT_32((uint32_t)refresh_enc_display(), shBuf, &index);
 	SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
 
 	shBuf[index++] = safety_cop.v_vb;
@@ -275,92 +281,78 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
-//****************************************************************************
-// Antiquated but valid function(s) - rework & integrate:
-//****************************************************************************
+//Transmit User R/W:
+//==================
 
-/*
-//Transmission of a USER_DATA command
-//Note: we can only write one parameter at the time (that's what we need for typical use cases).
-//'select_w' will determine what variable is written.
-uint32_t tx_cmd_data_user(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, uint8_t select_w )
+void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
 {
-	uint8_t tmp0  = 0, tmp1  = 0, tmp2  = 0, tmp3  = 0;
-	uint32_t bytes = 0;
+	uint16_t index = 0;
 
-	//Fresh payload string:
-	prepare_empty_payload(board_id, receiver, buf, len);
+	//Formatting:
+	(*cmd) = CMD_USER_DATA;
+	(*cmdType) = CMD_READ;
 
-	//Command:
-	buf[P_CMDS] = 1;	//1 command in string
+	//Data:
+	(void)shBuf;	//(none)
 
-	if(cmd_type == CMD_READ)
-	{
-		buf[P_CMD1] = CMD_R(CMD_USER_DATA);
-
-		bytes = P_CMD1 + 1;     //Bytes is always last+1
-	}
-	else if(cmd_type == CMD_WRITE)
-	{
-		buf[P_CMD1] = CMD_W(CMD_USER_DATA);
-
-		//Arguments:
-
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-		//Manage: Send all the R variables.
-
-		uint32_to_bytes((uint32_t)user_data.r[0], &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 0] = tmp0;
-		buf[P_DATA1 + 1] = tmp1;
-		buf[P_DATA1 + 2] = tmp2;
-		buf[P_DATA1 + 3] = tmp3;
-
-		uint32_to_bytes((uint32_t)user_data.r[1], &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 4] = tmp0;
-		buf[P_DATA1 + 5] = tmp1;
-		buf[P_DATA1 + 6] = tmp2;
-		buf[P_DATA1 + 7] = tmp3;
-
-		uint32_to_bytes((uint32_t)user_data.r[2], &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 8] = tmp0;
-		buf[P_DATA1 + 9] = tmp1;
-		buf[P_DATA1 + 10] = tmp2;
-		buf[P_DATA1 + 11] = tmp3;
-
-		uint32_to_bytes((uint32_t)user_data.r[3], &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 12] = tmp0;
-		buf[P_DATA1 + 13] = tmp1;
-		buf[P_DATA1 + 14] = tmp2;
-		buf[P_DATA1 + 15] = tmp3;
-
-		bytes = P_DATA1 + 31;     //Bytes is always last+1
-
-		#endif //BOARD_TYPE_FLEXSEA_EXECUTE
-
-		#ifdef BOARD_TYPE_FLEXSEA_PLAN
-
-		buf[P_DATA1 + 0] = select_w; //Parameter written
-		uint32_to_bytes((uint32_t)user_data_1.w[select_w], &tmp0, &tmp1, &tmp2, &tmp3);
-		buf[P_DATA1 + 1] = tmp0;
-		buf[P_DATA1 + 2] = tmp1;
-		buf[P_DATA1 + 3] = tmp2;
-		buf[P_DATA1 + 4] = tmp3;
-
-		bytes = P_DATA1 + 5;     //Bytes is always last+1
-
-		#endif  //BOARD_TYPE_FLEXSEA_PLAN
-	}
-	else
-	{
-		//Invalid
-		flexsea_error(SE_INVALID_READ_TYPE);
-		bytes = 0;
-	}
-
-	return bytes;
+	//Payload length:
+	(*len) = index;
 }
 
+/*Writes one of the User W fields. Note: only Plan can set a W field; this
+command is made to be used by Plan and a slave, not between say Manage &
+Execute */
+void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t select_w)
+{
+	uint16_t index = 0;
+
+	//Formatting:
+	(*cmd) = CMD_USER_DATA;
+	(*cmdType) = CMD_WRITE;
+
+	//Data:
+
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+		//Plan can set W:
+		shBuf[index++] = select_w;
+		SPLIT_32((uint32_t)user_data_1.w[select_w], shBuf, &index);
+
+	#else
+
+		//All other boards can only reply
+		SPLIT_32((uint32_t)user_data_1.r[0], shBuf, &index);
+		SPLIT_32((uint32_t)user_data_1.r[1], shBuf, &index);
+		SPLIT_32((uint32_t)user_data_1.r[2], shBuf, &index);
+		SPLIT_32((uint32_t)user_data_1.r[3], shBuf, &index);
+
+	#endif	//BOARD_TYPE_FLEXSEA_PLAN
+
+	//Payload length:
+	(*len) = index;
+}
+
+//Receive User R/W:
+//==================
+
+void rx_cmd_data_user_rw(uint8_t *buf, uint8_t *info)
+{
+	//***ToDo!***
+}
+
+void rx_cmd_data_user_rr(uint8_t *buf, uint8_t *info)
+{
+	//***ToDo!***
+}
+
+void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info)
+{
+	//***ToDo!***
+}
+
+/*
 //Reception of a USER_DATA command
 void rx_cmd_data_user(uint8_t *buf)
 {
