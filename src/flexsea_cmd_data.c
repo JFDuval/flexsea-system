@@ -337,79 +337,36 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive User R/W:
 //==================
 
+void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info)
+{
+	uint16_t index = P_DATA1;
+	uint8_t wSelect = 0;
+	uint32_t wVal = 0;
+	(void)info;	//Unused for now
+
+	wSelect = buf[index++];
+	wVal = (int32_t) REBUILD_UINT32(buf, &index);
+	user_data_1.w[wSelect] = wVal;
+}
+
 void rx_cmd_data_user_rw(uint8_t *buf, uint8_t *info)
 {
-	//***ToDo!***
+	(void)info;	//Unused for now
+
+	tx_cmd_data_user_w(TX_N_DEFAULT, 0);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
 void rx_cmd_data_user_rr(uint8_t *buf, uint8_t *info)
 {
-	//***ToDo!***
+	uint16_t index = P_DATA1;
+	(void)info;	//Unused for now
+
+	user_data_1.r[0] = (int32_t)REBUILD_UINT32(buf, &index);
+	user_data_1.r[1] = (int32_t)REBUILD_UINT32(buf, &index);
+	user_data_1.r[2] = (int32_t)REBUILD_UINT32(buf, &index);
+	user_data_1.r[3] = (int32_t)REBUILD_UINT32(buf, &index);
 }
-
-void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info)
-{
-	//***ToDo!***
-}
-
-/*
-//Reception of a USER_DATA command
-void rx_cmd_data_user(uint8_t *buf)
-{
-	uint8_t numb = 0, w_select = 0;
-	int32_t w_val = 0;
-
-	if(IS_CMD_RW(buf[P_CMD1]) == READ)
-	{
-		//Received a Read command from our master, prepare a reply:
-
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-		//Generate the reply:
-		numb = tx_cmd_data_user(buf[P_XID], CMD_WRITE, tmp_payload_xmit, PAYLOAD_BUF_LEN, \
-									0);
-		numb = comm_gen_str(tmp_payload_xmit, comm_str_spi, numb);
-		numb = COMM_STR_BUF_LEN;	//Fixed length for now to accomodate the DMA
-		flexsea_send_serial_master(PORT_USB, comm_str_spi, numb);	//Same comment here - ToDo fix
-		//(the SPI driver will grab comm_str_spi directly)
-
-		#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-	}
-	else if(IS_CMD_RW(buf[P_CMD1]) == WRITE)
-	{
-		//Two options: from Master of from slave (a read reply)
-
-		//Decode data:
-		w_select = buf[P_DATA1];
-		w_val = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 1], buf[P_DATA1 + 2], buf[P_DATA1 + 3], buf[P_DATA1 + 4]));
-
-		if(sent_from_a_slave(buf))
-		{
-			//We received a reply to our read request
-
-			#if((defined BOARD_TYPE_FLEXSEA_PLAN))
-
-			//Store value:
-			user_data_1.r[0] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 0], buf[P_DATA1 + 1], buf[P_DATA1 + 2], buf[P_DATA1 + 3]));
-			user_data_1.r[1] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 4], buf[P_DATA1 + 5], buf[P_DATA1 + 6], buf[P_DATA1 + 7]));
-			user_data_1.r[2] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 8], buf[P_DATA1 + 9], buf[P_DATA1 + 10], buf[P_DATA1 + 11]));
-			user_data_1.r[3] = (int32_t) (BYTES_TO_UINT32(buf[P_DATA1 + 12], buf[P_DATA1 + 13], buf[P_DATA1 + 14], buf[P_DATA1 + 15]));
-
-			#endif	//((defined BOARD_TYPE_FLEXSEA_PLAN))
-		}
-		else
-		{
-			//Master is writing a value to this board
-
-			#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-
-			user_data.w[w_select] = w_val;
-
-			#endif	//BOARD_TYPE_FLEXSEA_MANAGE
-		}
-	}
-}
-*/
 
 #ifdef __cplusplus
 }
