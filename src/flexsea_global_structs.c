@@ -21,7 +21,7 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_global_structs: contains all the data structures 
+	[This file] flexsea_global_structs: contains all the data structures
 	used across the project
 ****************************************************************************/
 
@@ -50,7 +50,7 @@ struct user_data_s user_data_1;
 #endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_MANAGE)
-struct user_data_s user_data;
+struct user_data_s user_data_1;
 #endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
 
 

@@ -411,7 +411,7 @@ extern struct user_data_s user_data_1;
 #endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
 
 #if defined(BOARD_TYPE_FLEXSEA_MANAGE)
-extern struct user_data_s user_data;
+extern struct user_data_s user_data_1;
 #endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
 
 #endif	//INC_FLEXSEA_GLOBAL_STRUCT_H

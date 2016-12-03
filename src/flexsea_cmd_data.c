@@ -46,6 +46,7 @@ extern "C" {
 //Manage boards only:
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 #include "user-mn.h"
+#include "main.h"
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
@@ -76,7 +77,7 @@ void init_flexsea_payload_ptr_data(void)
 	//User R/W:
 	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user_rw;
 	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_REPLY] = &rx_cmd_data_user_rr;
-	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user_w;
+	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_WRITE] = &rx_cmd_data_user_w;
 }
 
 void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
