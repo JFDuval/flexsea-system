@@ -44,15 +44,7 @@ struct strain_s strain1;
 struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
 struct battery_s batt1;
-
-#if defined(BOARD_TYPE_FLEXSEA_PLAN)
 struct user_data_s user_data_1;
-#endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
-
-#if defined(BOARD_TYPE_FLEXSEA_MANAGE)
-struct user_data_s user_data_1;
-#endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
-
 
 //****************************************************************************
 // Function(s)

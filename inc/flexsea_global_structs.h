@@ -405,13 +405,6 @@ extern struct strain_s strain1;
 extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
-
-#if defined(BOARD_TYPE_FLEXSEA_PLAN)
 extern struct user_data_s user_data_1;
-#endif  //defined(BOARD_TYPE_FLEXSEA_PLAN)
-
-#if defined(BOARD_TYPE_FLEXSEA_MANAGE)
-extern struct user_data_s user_data_1;
-#endif  //defined(BOARD_TYPE_FLEXSEA_MANAGE)
 
 #endif	//INC_FLEXSEA_GLOBAL_STRUCT_H
