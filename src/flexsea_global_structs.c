@@ -39,11 +39,11 @@
 //Data structures:
 struct execute_s exec1, exec2, exec3, exec4;
 struct ricnu_s ricnu_1;
-struct manage_s manag1, manag2;
+struct battery_s batt1;
+struct manage_s manag1 = {.battPtr = &batt1}, manag2 = {.battPtr = &batt1};
 struct strain_s strain1;
 struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
-struct battery_s batt1;
 struct user_data_s user_data_1;
 
 //****************************************************************************

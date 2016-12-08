@@ -97,7 +97,6 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define CMD_STRAIN				44
 #define CMD_STRAIN_CONFIG		45
 #define CMD_VOLT				46
-#define CMD_BATT				47
 
 //Expansion/external commands:
 
@@ -107,6 +106,7 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define CMD_DIGITAL				64
 #define CMD_DIGITAL_CONFIG		65
 #define CMD_EXP_PERIPH_CONFIG	66
+#define CMD_BATT				67
 
 //Motor & Control commands:
 
@@ -140,7 +140,7 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define FLEXSEA_BATTERY			4
 #define FLEXSEA_STRAIN			5
 #define FLEXSEA_GOSSIP			6
-//ToDo: remove Goosip?
+//ToDo: remove Gossip?
 
 //Board addresses:
 #define FLEXSEA_DEFAULT			0

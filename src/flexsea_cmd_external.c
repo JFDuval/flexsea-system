@@ -56,9 +56,14 @@ struct execute_s *exPtrE = &exec1;
 //commands to flexsea_payload_catchall().
 void init_flexsea_payload_ptr_external(void)
 {
+	//Power output:
 	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_READ] = &rx_cmd_exp_pwro_rw;
 	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_WRITE] = &rx_cmd_exp_pwro_w;
 	flexsea_payload_ptr[CMD_PWRO][RX_PTYPE_REPLY] = &rx_cmd_exp_pwro_rr;
+
+	//Battery board:
+	flexsea_payload_ptr[CMD_BATT][RX_PTYPE_READ] = &rx_cmd_exp_batt_rw;
+	flexsea_payload_ptr[CMD_BATT][RX_PTYPE_REPLY] = &rx_cmd_exp_batt_rr;
 }
 
 //Transmit Power Output:
@@ -146,6 +151,73 @@ void rx_cmd_exp_pwro_rr(uint8_t *buf, uint8_t *info)
 		(void)buf;
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
+
+//Transmit Battery:
+//=================
+
+//Test code? Yes
+void tx_cmd_exp_batt_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_BATT;
+	(*cmdType) = CMD_WRITE;
+
+	//Data:
+	shBuf[index++] = batt1.rawBytes[0];
+	shBuf[index++] = batt1.rawBytes[1];
+	shBuf[index++] = batt1.rawBytes[2];
+	shBuf[index++] = batt1.rawBytes[3];
+	shBuf[index++] = batt1.rawBytes[4];
+	shBuf[index++] = batt1.rawBytes[5];
+	shBuf[index++] = batt1.rawBytes[6];
+	shBuf[index++] = batt1.rawBytes[7];
+
+	//Payload length:
+	(*len) = index;
+}
+
+//Test code? Yes
+void tx_cmd_exp_batt_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_BATT;
+	(*cmdType) = CMD_READ;
+
+	//Data:
+	(void)shBuf; //(none)
+
+	//Payload length:
+	(*len) = index;
+}
+
+//Receive Battery:
+//================
+
+void rx_cmd_exp_batt_rw(uint8_t *buf, uint8_t *info)
+{
+	tx_cmd_exp_batt_w(TX_N_DEFAULT);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+}
+
+void rx_cmd_exp_batt_rr(uint8_t *buf, uint8_t *info)
+{
+	(void)info;	//Unused for now
+	uint16_t index = P_DATA1;
+
+	batt1.rawBytes[0] = buf[index++];
+	batt1.rawBytes[1] = buf[index++];
+	batt1.rawBytes[2] = buf[index++];
+	batt1.rawBytes[3] = buf[index++];
+	batt1.rawBytes[4] = buf[index++];
+	batt1.rawBytes[5] = buf[index++];
+	batt1.rawBytes[6] = buf[index++];
+	batt1.rawBytes[7] = buf[index++];
+}
+
 
 #ifdef __cplusplus
 }

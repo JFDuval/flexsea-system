@@ -43,6 +43,7 @@
 
 void init_flexsea_payload_ptr_external(void);
 
+//Power output:
 void tx_cmd_exp_pwro_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t pwroPwm);
 void tx_cmd_exp_pwro_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -50,6 +51,14 @@ void tx_cmd_exp_pwro_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void rx_cmd_exp_pwro_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_exp_pwro_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_exp_pwro_rr(uint8_t *buf, uint8_t *info);
+
+//Battery Board:
+void tx_cmd_exp_batt_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void tx_cmd_exp_batt_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len);
+void rx_cmd_exp_batt_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_exp_batt_rr(uint8_t *buf, uint8_t *info);
 
 //Older function - disabled until further notice:
 //void rx_cmd_digital_in(uint8_t *buf);

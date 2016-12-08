@@ -210,6 +210,9 @@ struct manage_s
 	uint8_t sw1;
 	uint8_t sampling;
 
+	//Pointer to Battery structure:
+	struct battery_s *battPtr;
+
 	//Decoded values:
 	struct decoded_manage_s decoded;
 };
@@ -310,6 +313,8 @@ struct battery_s
 	uint8_t temp;
 	uint8_t pushbutton;
 	uint8_t status;
+
+	uint8_t rawBytes[8];
 
 	//Decoded values:
 	struct decoded_battery_s decoded;
