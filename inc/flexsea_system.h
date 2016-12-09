@@ -195,6 +195,8 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define CTRL_CURRENT					3		//Current controller. Use with CMD_CTRL_I_WRITE
 #define CTRL_IMPEDANCE					4		//Impedance controller. Use with CMD_MOVE_TRAP_ABSOLUTE
 #define CTRL_CUSTOM						5		//
+#define CTRL_MEASRES                    6       //send a constant current through a winding to measure resistance
+
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
 //Nickname for the controller gains:
