@@ -270,6 +270,8 @@ struct ricnu_s
 
 	//Decoded values (ext_strain only)
 	struct decoded_ricnu_s decoded;
+
+	int16_t gen_var[6];
 };
 
 //FlexSEA-Gossip:
