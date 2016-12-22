@@ -168,18 +168,19 @@ struct execute_s
 	uint16_t analog[8];
 	int16_t current;
 	int32_t enc_display; 		//useful?
-	int32_t enc_control; //useful?
-	int32_t enc_commut; //useful?
+	int32_t enc_control; 		//useful?
+	int32_t enc_commut; 		//useful?
 	int32_t enc_control_ang;
 	int32_t enc_control_vel;
 	int32_t enc_motor;
 	int32_t enc_joint;
-	uint8_t volt_batt;	//+VB
-	uint8_t volt_int;	//+VG
+	uint8_t volt_batt;			//+VB
+	uint8_t volt_int;			//+VG
 	uint8_t temp;
 	uint8_t pwro;
 	uint8_t status1;
 	uint8_t status2;
+	int16_t sine_commut_pwm;
 
 	struct ctrl_s ctrl;
 
