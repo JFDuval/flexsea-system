@@ -113,6 +113,7 @@ void flexsea_payload_catchall(uint8_t *buf, uint8_t *info)
 }
 
 //Generic TX command
+//ToDo: this function crashes if len is too long! (35 is too much...)
 uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 				uint32_t len, uint8_t receiver, uint8_t *buf)
 {

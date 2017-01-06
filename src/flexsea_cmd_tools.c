@@ -35,6 +35,7 @@ extern "C" {
 
 #include "../inc/flexsea_comm.h"
 #include "main.h"
+#include <string.h>
 #include "../inc/flexsea_system.h"
 
 //****************************************************************************
@@ -69,20 +70,28 @@ void init_flexsea_payload_ptr_tools(void)
 
 //Test code? No
 void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset, uint8_t packetIndex)
+						uint16_t *len, uint8_t offset)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
+	uint16_t i = 0;
 	(*cmd) = CMD_COMM_TEST;
 	(*cmdType) = CMD_WRITE;
 
 	//Data:
 	shBuf[index++] = offset;
-	shBuf[index++] = packetIndex;
+	shBuf[index++] = arrLen;
 
-	//We only use _w to send a reply. We send the received array:
-	memcpy(&shBuf[index], randomArrayRx, arrLen);
-	index += arrLen;
+	if(offset == 0)
+	{
+		//...
+	}
+	else
+	{
+		//We only use _w to send a reply. We send the received array:
+		memcpy(&shBuf[index], randomArrayRx, arrLen);
+		index += arrLen;
+	}
 
 	//Payload length:
 	(*len) = index;
@@ -99,6 +108,18 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Data:
 	shBuf[index++] = offset;
+	
+	if(randomArrayLen <= PAYLOAD_BYTES)
+	{
+		arrLen = randomArrayLen;
+	}
+	else
+	{
+		//Use maximum:
+		arrLen = PAYLOAD_BYTES;
+	}
+	
+	shBuf[index++] = randomArrayLen;
 
 	if(offset == 0)
 	{
@@ -107,16 +128,6 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	else
 	{
 		//Use this for the actual test:
-
-		if(randomArrayLen <= PAYLOAD_BYTES)
-		{
-			arrLen = randomArrayLen;
-		}
-		else
-		{
-			//Use maximum:
-			arrLen = PAYLOAD_BYTES;
-		}
 
 		//We save an array to a global for future comparison, and we copy it
 		//to be sent:
@@ -138,14 +149,7 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
-
-	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
-		pwro_output(buf[P_DATA1]);
-
-	#else
-		(void)buf;
-	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+	//...
 }
 */
 
@@ -154,28 +158,33 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
 
+	int i = 0;
 	uint8_t offset = buf[P_DATA1];
-	uint8_t packetIndex = buf[P_DATA1+1];
-
-	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, packetIndex);
-	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
+	arrLen = buf[P_DATA1+1];
+	
+	//Save received array:
+	memcpy(randomArrayRx, buf + (P_DATA1+2), arrLen);
+	
+	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
 //Test code? No
 void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 {
 	int cmpResult = 0;
+	uint8_t len = 0;
 
 	(void)info;
 
 	//Decode data:
 	uint8_t offset = buf[P_DATA1];
-	uint8_t packetIndex = buf[P_DATA1+1];
+	len = buf[P_DATA1+1];
 
 	//Save received array:
-	memcpy(randomArrayRx, &buf[P_DATA1+2], arrLen);
+	memcpy(randomArrayRx, &buf[P_DATA1+2], len);
 	//Compare it to what we initially sent:
-	cmpResult = memcmp(randomArrayRx, randomArrayTx, arrLen);
+	cmpResult = memcmp(randomArrayRx, randomArrayTx, len);
 	cmpResult == 0? goodPackets++ : badPackets++;
 }
 
