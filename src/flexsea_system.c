@@ -97,6 +97,9 @@ void init_flexsea_payload_ptr(void)
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
 
+	//Tools:
+	init_flexsea_payload_ptr_tools();
+
 	//User functions:
 	init_flexsea_payload_ptr_user();
 }

@@ -44,6 +44,7 @@
 #include "flexsea_cmd_sensors.h"
 #include "flexsea_cmd_external.h"
 #include "flexsea_cmd_data.h"
+#include "flexsea_cmd_tools.h"
 //Include the user files:
 #include "../flexsea-user/inc/flexsea_cmd_user.h"
 
@@ -76,6 +77,7 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 
 #define CMD_NULL				0
 #define CMD_TEST				1
+#define CMD_COMM_TEST			2
 #define CMD_PING				10
 #define CMD_STATUS				11
 #define CMD_RESET				12
