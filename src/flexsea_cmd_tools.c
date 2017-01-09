@@ -165,6 +165,19 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 	//Save received array:
 	memcpy(randomArrayRx, buf + (P_DATA1+2), arrLen);
 	
+	/*
+	//Test code: corrupt 1 byte
+	//randomArrayRx[0]++;
+	//Test 2: corrupt 5%
+	static uint8_t cnt = 0;
+	cnt++;
+	cnt %= 20;
+	if(!cnt)
+	{
+		randomArrayRx[0]++;
+	}
+	*/
+	
 	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset);
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
