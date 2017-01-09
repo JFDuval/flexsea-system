@@ -177,6 +177,16 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 		randomArrayRx[0]++;
 	}
 	*/
+	/*
+	//Test #3: skip 5% of responses:
+	static uint8_t cnt = 0;
+	cnt++;
+	cnt %= 20;
+	if(!cnt)
+	{
+		return;
+	}
+	*/
 	
 	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset);
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
