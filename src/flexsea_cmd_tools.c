@@ -47,8 +47,11 @@ uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
 
 //Comm Test:
 uint8_t randomArrayTx[COMM_STR_BUF_LEN], randomArrayRx[COMM_STR_BUF_LEN];
-uint8_t arrLen = 0;
+uint8_t randomArrayTxOff1[COMM_STR_BUF_LEN];
+uint8_t randomArrayTxOff2[COMM_STR_BUF_LEN];
+uint8_t arrLen = 0, lastTxPacketIndex = 0, lastRxPacketIndex = 0;
 int32_t sentPackets = 0, goodPackets = 0, badPackets = 0;
+int16_t packetOffset = 0;
 
 //****************************************************************************
 // Function(s)
@@ -112,6 +115,8 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	shBuf[index++] = offset;
 	shBuf[index++] = packetNum;
 
+	lastTxPacketIndex = packetNum;
+
 	if(randomArrayLen <= PAYLOAD_BYTES)
 	{
 		arrLen = randomArrayLen;
@@ -132,8 +137,11 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	{
 		//Use this for the actual test:
 
-		//We save an array to a global for future comparison, and we copy it
-		//to be sent:
+		//Save last 3 TxArrays:
+		memcpy(randomArrayTxOff2, randomArrayTxOff1, arrLen);
+		memcpy(randomArrayTxOff1, randomArrayTx, arrLen);
+
+		//Generate and send new Tx array:
 		generateRandomUint8Array(randomArrayTx, arrLen);
 		memcpy(&shBuf[index], randomArrayTx, arrLen);
 		index += arrLen;
@@ -209,11 +217,30 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	uint8_t packetNum = buf[P_DATA1+1];
 	len = buf[P_DATA1+2];
 
+	lastRxPacketIndex = packetNum;
+	packetOffset = (int16_t)lastTxPacketIndex - (int16_t)lastRxPacketIndex;
+
 	//Save received array:
 	memcpy(randomArrayRx, &buf[P_DATA1+3], len);
-	//Compare it to what we initially sent: ***ToDo*** look at packet num too!
-	cmpResult = memcmp(randomArrayRx, randomArrayTx, len);
-	cmpResult == 0? goodPackets++ : badPackets++;
+
+	//Compare it to what we initially sent:
+	switch(packetOffset)
+	{
+		case 0:
+			cmpResult = memcmp(randomArrayRx, randomArrayTx, len);
+			cmpResult == 0? goodPackets++ : badPackets++;
+			break;
+		case 1:
+			cmpResult = memcmp(randomArrayRx, randomArrayTxOff1, len);
+			cmpResult == 0? goodPackets++ : badPackets++;
+			break;
+		case 2:
+			cmpResult = memcmp(randomArrayRx, randomArrayTxOff2, len);
+			cmpResult == 0? goodPackets++ : badPackets++;
+			break;
+		default:
+			badPackets++;
+	}
 }
 
 #ifdef __cplusplus

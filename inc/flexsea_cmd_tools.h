@@ -66,5 +66,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info);
 //****************************************************************************
 
 extern int32_t sentPackets, goodPackets, badPackets;
+extern uint8_t lastTxPacketIndex, lastRxPacketIndex;
+extern int16_t packetOffset;
 
 #endif	//INC_FLEXSEA_CMD_TOOLS_H
