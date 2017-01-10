@@ -388,10 +388,11 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 		//Store value:
 		executePtrXid(&exPtr1, buf[P_XID]);
 		exPtr1->ctrl.pwm = tmp;
-		//ToDo shouldn't be exec1!
 
 	#else
+
 		(void)buf;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
@@ -540,10 +541,11 @@ void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 		exPtr1->ctrl.position.posf = tmp_posf;
 		exPtr1->ctrl.position.spdm = tmp_spdm;
 		exPtr1->ctrl.position.acc = tmp_acc;
-		//ToDo: shouldn't be exec1!
 
 	#else
+
 		(void)buf;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 

@@ -142,7 +142,6 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define FLEXSEA_BATTERY			4
 #define FLEXSEA_STRAIN			5
 #define FLEXSEA_GOSSIP			6
-//ToDo: remove Gossip?
 
 //Board addresses:
 #define FLEXSEA_DEFAULT			0
