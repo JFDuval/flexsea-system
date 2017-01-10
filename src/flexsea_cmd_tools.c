@@ -70,7 +70,7 @@ void init_flexsea_payload_ptr_tools(void)
 
 //Test code? No
 void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset)
+						uint16_t *len, uint8_t offset, uint8_t packetNum)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
@@ -80,6 +80,7 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Data:
 	shBuf[index++] = offset;
+	shBuf[index++] = packetNum;
 	shBuf[index++] = arrLen;
 
 	if(offset == 0)
@@ -99,7 +100,8 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 //Test code? No
 void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset, uint8_t randomArrayLen)
+						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \
+						uint8_t packetNum)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
@@ -108,7 +110,8 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Data:
 	shBuf[index++] = offset;
-	
+	shBuf[index++] = packetNum;
+
 	if(randomArrayLen <= PAYLOAD_BYTES)
 	{
 		arrLen = randomArrayLen;
@@ -118,7 +121,7 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		//Use maximum:
 		arrLen = PAYLOAD_BYTES;
 	}
-	
+
 	shBuf[index++] = randomArrayLen;
 
 	if(offset == 0)
@@ -160,11 +163,12 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 
 	int i = 0;
 	uint8_t offset = buf[P_DATA1];
-	arrLen = buf[P_DATA1+1];
-	
+	uint8_t packetNum = buf[P_DATA1+1];
+	arrLen = buf[P_DATA1+2];
+
 	//Save received array:
-	memcpy(randomArrayRx, buf + (P_DATA1+2), arrLen);
-	
+	memcpy(randomArrayRx, buf + (P_DATA1+3), arrLen);
+
 	/*
 	//Test code: corrupt 1 byte
 	//randomArrayRx[0]++;
@@ -187,8 +191,8 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 		return;
 	}
 	*/
-	
-	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset);
+
+	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, packetNum);
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
@@ -202,11 +206,12 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 
 	//Decode data:
 	uint8_t offset = buf[P_DATA1];
-	len = buf[P_DATA1+1];
+	uint8_t packetNum = buf[P_DATA1+1];
+	len = buf[P_DATA1+2];
 
 	//Save received array:
-	memcpy(randomArrayRx, &buf[P_DATA1+2], len);
-	//Compare it to what we initially sent:
+	memcpy(randomArrayRx, &buf[P_DATA1+3], len);
+	//Compare it to what we initially sent: ***ToDo*** look at packet num too!
 	cmpResult = memcmp(randomArrayRx, randomArrayTx, len);
 	cmpResult == 0? goodPackets++ : badPackets++;
 }

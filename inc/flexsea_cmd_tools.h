@@ -46,9 +46,10 @@ void init_flexsea_payload_ptr_tools(void);
 
 //Communication tests:
 void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset);
+						uint16_t *len, uint8_t offset, uint8_t packetNum);
 void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset, uint8_t randomArrayLen);
+						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \
+						uint8_t packetNum);
 void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info);
 
