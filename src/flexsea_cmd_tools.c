@@ -77,7 +77,6 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
-	uint16_t i = 0;
 	(*cmd) = CMD_COMM_TEST;
 	(*cmdType) = CMD_WRITE;
 
@@ -169,7 +168,6 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
 
-	int i = 0;
 	uint8_t offset = buf[P_DATA1];
 	uint8_t packetNum = buf[P_DATA1+1];
 	arrLen = buf[P_DATA1+2];
@@ -213,7 +211,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	(void)info;
 
 	//Decode data:
-	uint8_t offset = buf[P_DATA1];
+	//uint8_t offset = buf[P_DATA1];
 	uint8_t packetNum = buf[P_DATA1+1];
 	len = buf[P_DATA1+2];
 
