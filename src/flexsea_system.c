@@ -50,8 +50,9 @@ For rx_* functions, the suffix options are:
 
 #include "main.h"
 #include <string.h>
-#include "../inc/flexsea_system.h"
+#include <flexsea_system.h>
 #include "../flexsea-user/inc/flexsea_cmd_user.h"
+#include <flexsea_comm.h>
 
 //****************************************************************************
 // Variable(s)
@@ -62,6 +63,8 @@ uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
 //Similarly, we exchange command code, type and length:
 uint8_t cmdCode = 0, cmdType = 0;
 uint16_t cmdLen = 0;
+
+MsgQueue packet_queue;
 
 //****************************************************************************
 // Function(s)
@@ -93,6 +96,11 @@ void init_flexsea_payload_ptr(void)
 
 	//Data:
 	init_flexsea_payload_ptr_data();
+
+	//Memory Pool and Message Queues
+	fm_pool_init();
+	fm_queue_init(&packet_queue, 10);
+	fm_queue_init(&unpacked_packet_queue, 10);
 
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
@@ -166,17 +174,26 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 {
 	uint16_t numb = 0;
 
+	//Send to master:
+	PacketWrapper* p = fm_pool_allocate_block();
+	if (p == NULL)
+		return;
+
 	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
 
+	p->port = info[0];
 	if(ms == SEND_TO_SLAVE)
 	{
 		//Send to slave:
-		flexsea_send_serial_slave(info[0], comm_str_1, numb);
+		memcpy(p->packed, comm_str_1, numb);
+		flexsea_send_serial_slave(p);
 	}
 	else
 	{
-		//Send to master:
-		flexsea_send_serial_master(info[0], comm_str_1, numb);
+
+		memcpy(p->packed, comm_str_1, numb);
+
+		flexsea_send_serial_master(p);
 	}
 }
 
