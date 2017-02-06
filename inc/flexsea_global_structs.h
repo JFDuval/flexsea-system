@@ -167,14 +167,10 @@ struct execute_s
 	uint16_t strain;
 	uint16_t analog[8];
 	int16_t current;
-	int32_t enc_display; 		//useful?
-	int32_t enc_control; 		//useful?
-	int32_t enc_commut; 		//useful?
-	int32_t enc_control_ang;
-	int32_t enc_control_vel;
-	int32_t enc_motor;
-	int32_t enc_joint;
-	uint8_t volt_batt;			//+VB
+	int32_t* enc_ang;
+	int32_t* enc_ang_vel;
+
+    uint8_t volt_batt;			//+VB
 	uint8_t volt_int;			//+VG
 	uint8_t temp;
 	uint8_t pwro;
@@ -375,20 +371,6 @@ struct angsense_s
 //AS504x Magnetic encoders:
 struct as504x_s
 {
-	/*
-	int32_t angle_raws[10]; 			//last 10 raw readings
-	int32_t angle_conts[10]; 			// last 10 continuous angle readings
-	int32_t angle_vel_denoms[8]; 		//the number of 1 MHz counts between the last two angle readings
-	int32_t num_rot;        			//number of rotations
-	int32_t angle_vel[2];				//sensor reading - last sensor reading
-	int32_t angle_vel_filt[2];			//sensor reading - last sensor reading
-	int32_t angle_vel_RPMS_raw[2];		//sensor reading - last sensor reading
-	int32_t angle_vel_RPMS_filt[2];
-	int32_t angle_vel_RPM;
-	uint16_t angle_comp;	//Sensor reading, 2/ Compensation enabled
-	uint16_t angle_ctrl;	//Modified version (gain, zero). Used by controllers.
-	*/
-
 	int32_t last_angtimer_read;
 	int32_t counts_since_last_ang_read;
 	int32_t last_ang_read_period;
@@ -397,6 +379,9 @@ struct as504x_s
 	struct angsense_s raw;
 	struct angsense_s filt;
 
+	int32_t signed_ang;
+	int32_t signed_ang_vel;
+	
 	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
 	int32_t ang_comp_clks;	//compensated absolute angle in clicks
 	int32_t num_rot; 		//number of full encoder rotations
