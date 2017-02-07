@@ -37,6 +37,7 @@
 //****************************************************************************
 
 #include <stdint.h>
+#include <flexsea_board.h>
 
 //****************************************************************************
 // Prototype(s):
@@ -402,5 +403,7 @@ extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
 extern struct user_data_s user_data_1;
+
+void initializeGlobalStructs();
 
 #endif	//INC_FLEXSEA_GLOBAL_STRUCT_H
