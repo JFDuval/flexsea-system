@@ -122,6 +122,7 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define CMD_CTRL_P				87
 #define SHORTED_LEADS			88
 #define CMD_IN_CONTROL			90
+#define CMD_CALIBRATION_MODE	91
 
 //User commands (100-127):
 
@@ -197,6 +198,10 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define CTRL_IMPEDANCE					4		//Impedance controller. Use with CMD_MOVE_TRAP_ABSOLUTE
 #define CTRL_CUSTOM						5		//
 #define CTRL_MEASRES                    6       //send a constant current through a winding to measure resistance
+
+//List of calibration procedures
+#define CALIBRATION_FIND_POLES 				0x01
+#define CALIBRATION_FIND_CURRENT_ZEROES 	0x02
 
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
