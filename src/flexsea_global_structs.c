@@ -31,6 +31,7 @@
 
 #include "main.h"
 #include "../inc/flexsea_global_structs.h"
+#include "ext_input.h"
 
 //****************************************************************************
 // Variable(s)
