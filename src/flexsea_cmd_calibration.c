@@ -4,7 +4,10 @@
 
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 	#include "calibration_tools.h"
+	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
+
+uint8_t handleCalibrationMessage(uint8_t *buf);
 
 void init_flexsea_payload_ptr_calibration(void)
 {
@@ -49,40 +52,41 @@ void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info)
 }
 
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info)
-{
-	uint8_t index = P_DATA1;
-	uint8_t procedureRequested = buf[index];
-	
-	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-	
-		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedureRequested))
-		{
-			calibrationFlags |= procedureRequested;
-		}
-
-		tx_cmd_calibration_mode_rw(TX_N_DEFAULT, calibrationFlags);
-		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
-
-	#endif //BOARD_TYPE_FLEXSEA_EXECUTE
+{	
+	uint8_t response = handleCalibrationMessage(buf);
+	tx_cmd_calibration_mode_rw(TX_N_DEFAULT, response);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info)
 {
+	handleCalibrationMessage(buf);
+	
+	#ifndef BOARD_TYPE_FLEXSEA_EXECUTE
+		(void)buf;
+	#endif //BOARD_TYPE_FLEXSEA_EXECUTE
+	
+	(void)info;
+}
+
+
+uint8_t handleCalibrationMessage(uint8_t *buf) 
+{
 	uint16_t index = P_DATA1;
 	uint8_t procedure = buf[index];
+	
+	uint8_t calibrationFlagToRunOrIsRunning = 0;
 	
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 		{
 			calibrationFlags |= procedure;
+			control_strategy(buf[P_DATA1]);
 		}
-
-	#else
-
-		(void)buf;
+		calibrationFlagToRunOrIsRunning = calibrationFlags;
 		
-	#endif //BOARD_TYPE_FLEXSEA_EXECUTE
-	
-	(void)info;
+	#endif
+
+	return calibrationFlagToRunOrIsRunning;
 }
