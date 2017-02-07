@@ -224,7 +224,7 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				exec_s_ptr->strain = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[0] = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[1] = (int16_t) REBUILD_UINT16(buf, &index);
-				exec_s_ptr->enc_display = (int32_t) REBUILD_UINT32(buf, &index);
+                *(exec_s_ptr->enc_ang) = (int32_t) REBUILD_UINT32(buf, &index);
 				exec_s_ptr->current = (int16_t) REBUILD_UINT16(buf, &index);
 
 				exec_s_ptr->volt_batt = buf[index++];
