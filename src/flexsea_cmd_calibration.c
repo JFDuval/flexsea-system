@@ -2,6 +2,10 @@
 #include "flexsea_system.h"
 #include "flexsea_board.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 	#include "calibration_tools.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
@@ -86,3 +90,8 @@ void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info)
 	
 	(void)info;
 }
+
+
+#ifdef __cplusplus
+}
+#endif

@@ -32,6 +32,10 @@
 #ifndef INC_FLEXSEA_SYSTEM_H
 #define INC_FLEXSEA_SYSTEM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
@@ -245,5 +249,9 @@ extern uint16_t cmdLen;
 
 //Structures and shared variables are now in:
 #include "flexsea_global_structs.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//INC_FLEXSEA_SYSTEM_H

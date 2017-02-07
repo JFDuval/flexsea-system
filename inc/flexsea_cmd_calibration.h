@@ -28,8 +28,12 @@
 	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_CMD_CONTROL_H
-#define INC_FLEXSEA_CMD_CONTROL_H
+#ifndef INC_FLEXSEA_CMD_CALIBRATION_H
+#define INC_FLEXSEA_CMD_CALIBRATION_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //****************************************************************************
 // Include(s)
@@ -45,12 +49,17 @@ void init_flexsea_payload_ptr_calibration(void);
 //Calibration mode:
 void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t calibrationMode);
-void tx_cmd_calibration_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t calibrationMode);
 
 void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info);
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info);
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif	//INC_FLEXSEA_CMD_CONTROL_H
+#endif	//INC_FLEXSEA_CMD_CALIBRATION_H
+
+
