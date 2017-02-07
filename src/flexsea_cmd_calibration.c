@@ -2,6 +2,10 @@
 #include "flexsea_system.h"
 #include "flexsea_board.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 	#include "calibration_tools.h"
 	#include "control.h"
@@ -90,3 +94,8 @@ uint8_t handleCalibrationMessage(uint8_t *buf)
 
 	return calibrationFlagToRunOrIsRunning;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
