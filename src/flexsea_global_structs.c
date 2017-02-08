@@ -31,7 +31,11 @@
 
 #include "main.h"
 #include "../inc/flexsea_global_structs.h"
+
+
+#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 #include "ext_input.h"
+#endif
 
 //****************************************************************************
 // Variable(s)
