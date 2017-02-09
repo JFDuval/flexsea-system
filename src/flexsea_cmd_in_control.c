@@ -41,6 +41,9 @@ extern "C" {
 #include <stdlib.h>
 #include "../inc/flexsea_system.h"
 
+#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+#include "control.h"
+#endif
 
 //****************************************************************************
 // Function(s)
@@ -173,7 +176,6 @@ void rx_cmd_in_control_rr(uint8_t *buf, uint8_t *info)
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
-	//ToDo: change in_control to be part of execPtr
 		//Store value:
 
 		in_control_1.setp = (int32_t) REBUILD_UINT32(buf, &index);
