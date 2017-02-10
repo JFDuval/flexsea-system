@@ -120,7 +120,7 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16(read_analog(0), shBuf, &index);
 	SPLIT_16(read_analog(1), shBuf, &index);
 
-	SPLIT_32((uint32_t)refresh_enc_display(), shBuf, &index);
+	SPLIT_32((uint32_t)(*exec1.enc_ang), shBuf, &index);
 	SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
 
 	shBuf[index++] = safety_cop.v_vb;
@@ -224,7 +224,7 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				exec_s_ptr->strain = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[0] = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[1] = (int16_t) REBUILD_UINT16(buf, &index);
-				exec_s_ptr->enc_display = (int32_t) REBUILD_UINT32(buf, &index);
+                *(exec_s_ptr->enc_ang) = (int32_t) REBUILD_UINT32(buf, &index);
 				exec_s_ptr->current = (int16_t) REBUILD_UINT16(buf, &index);
 
 				exec_s_ptr->volt_batt = buf[index++];

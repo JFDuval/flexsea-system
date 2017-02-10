@@ -32,6 +32,10 @@
 #ifndef INC_FLEXSEA_SYSTEM_H
 #define INC_FLEXSEA_SYSTEM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
@@ -124,6 +128,7 @@ void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 #define CMD_CTRL_P				87
 #define SHORTED_LEADS			88
 #define CMD_IN_CONTROL			90
+#define CMD_CALIBRATION_MODE	91
 
 //User commands (100-127):
 
@@ -200,6 +205,10 @@ void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 #define CTRL_CUSTOM						5		//
 #define CTRL_MEASRES                    6       //send a constant current through a winding to measure resistance
 
+//List of calibration procedures
+#define CALIBRATION_FIND_POLES 				0x01
+#define CALIBRATION_FIND_CURRENT_ZEROES 	0x02
+
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
 //Nickname for the controller gains:
@@ -243,5 +252,9 @@ extern MsgQueue packet_queue;
 
 //Structures and shared variables are now in:
 #include "flexsea_global_structs.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//INC_FLEXSEA_SYSTEM_H
