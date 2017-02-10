@@ -184,15 +184,12 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 	p->port = info[0];
 	if(ms == SEND_TO_SLAVE)
 	{
-		//Send to slave:
 		memcpy(p->packed, comm_str_1, numb);
 		flexsea_send_serial_slave(p);
 	}
 	else
 	{
-
 		memcpy(p->packed, comm_str_1, numb);
-
 		flexsea_send_serial_master(p);
 	}
 }
