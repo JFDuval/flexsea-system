@@ -142,6 +142,15 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	shBuf[index++] = manag1.sw1;
 
+	SPLIT_16((uint16_t)adc_results[0], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[1], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[2], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[3], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[4], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[5], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[6], shBuf, &index);
+	SPLIT_16((uint16_t)adc_results[7], shBuf, &index);
+
 	//...
 
 	#endif  //BOARD_TYPE_FLEXSEA_MANAGE
@@ -224,7 +233,7 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				exec_s_ptr->strain = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[0] = (int16_t) REBUILD_UINT16(buf, &index);
 				exec_s_ptr->analog[1] = (int16_t) REBUILD_UINT16(buf, &index);
-                *(exec_s_ptr->enc_ang) = (int32_t) REBUILD_UINT32(buf, &index);
+				*(exec_s_ptr->enc_ang) = (int32_t) REBUILD_UINT32(buf, &index);
 				exec_s_ptr->current = (int16_t) REBUILD_UINT16(buf, &index);
 
 				exec_s_ptr->volt_batt = buf[index++];
@@ -244,6 +253,15 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				mn_s_ptr->accel.z = (int16_t) REBUILD_UINT16(buf, &index);
 
 				mn_s_ptr->sw1 = buf[index++];
+
+				mn_s_ptr->analog[0] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[1] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[2] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[3] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[4] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[5] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[6] = REBUILD_UINT16(buf, &index);
+				mn_s_ptr->analog[7] = REBUILD_UINT16(buf, &index);
 
 				//...
 				break;
