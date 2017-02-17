@@ -34,7 +34,7 @@
 typedef unsigned int size_t;
 
 #define FM_BLOCK_SIZE 256
-#define FM_NUM_BLOCKS 10
+#define FM_NUM_BLOCKS 20
 
 
 /**
@@ -134,6 +134,10 @@ typedef struct {
 	size_t bytes_written;
 	char data[];
 } BlockWrapper;
+
+
+#define ATOMIC_BEGIN()
+#define ATOMIC_END()
 
 #endif
 

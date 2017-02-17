@@ -33,14 +33,27 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+#include <stm32f427xx.h>
+#include <core_cm4.h>
+#include <stdio.h>
 struct Block {
+	char data[FM_BLOCK_SIZE];
 	struct Block * next;
 	struct Block * prev;
 	size_t index;
-	char data[FM_BLOCK_SIZE];
+
 };
 
+extern MsgQueue slave_queue;
+
+void fail(void) {
+	printf("failed\n");
+}
+
+inline bool isInterrupt()
+{
+    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0 ;
+}
 
 typedef struct Block Block;
 
@@ -49,6 +62,9 @@ Block memory_pool[FM_NUM_BLOCKS];
 #define offsetof(st, m) ((size_t)(&((st *)0)->m))
 
 static Block* get_block(void * raw_block) {
+	uint32_t p =  ((uint32_t) raw_block);
+	if (p & 0x3 != 0)
+		fail();
 	size_t offset = offsetof(Block, data);
 	Block* b = raw_block - offset;
 	return b;
@@ -84,11 +100,17 @@ void fm_pool_init()
  */
 void* fm_pool_allocate_block(void)
 {
+	ATOMIC_BEGIN();
 	Block* new_block = first;
+	if (isInterrupt())
+	{
+		fail();
+	}
+
 
 	if (first != NULL)
 		first = first->next;
-
+	ATOMIC_END();
 	if (new_block)
 	{
 		new_block->next = NULL;
@@ -102,9 +124,14 @@ void* fm_pool_allocate_block(void)
 int fm_pool_free_block(void* raw_data) {
 	if (raw_data != NULL)
 	{
+		if (isInterrupt()) {
+			fail();
+		}
 		Block* block =  get_block(raw_data);
+		ATOMIC_BEGIN();
 		block->next = first;
 		first = block;
+		ATOMIC_END();
 		block->prev = NULL;
 		return 0;
 	}
@@ -131,16 +158,29 @@ int fm_queue_init(MsgQueue* q, size_t max_size)
 int fm_queue_put(MsgQueue* q, void* item) {
 	if (q == NULL || item == NULL)
 		return -1;
+	if (isInterrupt())
+	{
+		fail();
+	}
 
+
+	ATOMIC_BEGIN();
 	if (q->size >= q->max_size)
+	{
+		ATOMIC_END();
 		return -1;
+	}
 
 	Block** head = (Block**)&q->head;
 	Block** tail = (Block**)&q->tail;
 
 	Block* block =  get_block(item);
 	block->next = *head;
-	if (*head != NULL) {
+	if (block  == 0x2609343 ) {
+		fail();
+	}
+	if (*head != NULL)
+	{
 		(*head)->prev = block;
 	}
 	*head = block;
@@ -148,20 +188,34 @@ int fm_queue_put(MsgQueue* q, void* item) {
 
 	if (q->size == 1)
 		*tail = block;
+	ATOMIC_END();
 	return 0;
 }
 
 int fm_queue_put_tail(MsgQueue* q, void * item) {
 	if (q == NULL || item == NULL)
 		return -1;
+	if (isInterrupt())
+	{
+		fail();
+	}
 
+	ATOMIC_BEGIN();
 	if (q->size >= q->max_size)
+	{
+		ATOMIC_END();
 		return -1;
+	}
+
 
 	Block** head = (Block**)&q->head;
 	Block** tail = (Block**)&q->tail;
 
 	Block* block =  get_block(item);
+
+	if ((*tail) == 0x2609343 )
+		fail();
+
 	block->prev = *tail;
 	block->next = NULL;
 
@@ -173,23 +227,41 @@ int fm_queue_put_tail(MsgQueue* q, void * item) {
 
 	if (q->size == 1)
 		*head = block;
+	ATOMIC_END();
 	return 0;
 }
 
 void* fm_queue_get(MsgQueue* q ) {
 	if (q == NULL)
 		return NULL;
+	if (isInterrupt())
+	{
+		fail();
+	}
 
+	ATOMIC_BEGIN();
 	if (q->size == 0)
+	{
+		ATOMIC_END();
 		return NULL;
+	}
 
-	q->size--;
 
 	Block** head = (Block**)&q->head;
 	Block** tail = (Block**)&q->tail;
 
 	Block* item = *tail;
 
+	if ((*tail) == 0x2609343 )
+		fail();
+
+	if ((*tail)->prev == 0x2609343) {
+		fm_queue_init(&slave_queue, 10);
+		fail();
+		return NULL;
+	}
+
+	q->size--;
 	// *tail shouldn't be NULL
 	// since the size was > 0
 	*tail = (*tail)->prev;
@@ -197,6 +269,7 @@ void* fm_queue_get(MsgQueue* q ) {
 	if (q->size == 0)
 		*head = NULL;
 
+	ATOMIC_END();
 	item->prev = NULL;
 	item->next = NULL;
 
