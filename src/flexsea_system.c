@@ -48,6 +48,7 @@ For rx_* functions, the suffix options are:
 // Include(s)
 //****************************************************************************
 
+#include <fm_block_allocator.h>
 #include "main.h"
 #include <string.h>
 #include <flexsea_system.h>

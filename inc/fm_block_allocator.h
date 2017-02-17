@@ -30,7 +30,8 @@
 
 #ifndef FM_BLOCK_ALLOCATOR_H
 #define FM_BLOCK_ALLOCATOR_H
-#include <stdlib.h>
+
+typedef unsigned int size_t;
 
 #define FM_BLOCK_SIZE 256
 #define FM_NUM_BLOCKS 10
@@ -56,7 +57,6 @@ void fm_pool_init();
  * if no space is left.
  */
 void* fm_pool_allocate_block(void);
-
 
 /**
  * Free a block, returning it to the pool.
@@ -129,7 +129,6 @@ int fm_queue_put_tail(MsgQueue* q, void * item);
  *
  *
  */
-
 
 typedef struct {
 	size_t bytes_written;
