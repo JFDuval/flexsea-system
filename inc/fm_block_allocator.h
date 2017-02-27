@@ -139,8 +139,8 @@ typedef struct {
 	char data[];
 } BlockWrapper;
 
-//#define ATOMIC_BEGIN()
-//#define ATOMIC_END()
+#define ATOMIC_BEGIN()
+#define ATOMIC_END()
 
 #ifdef __cplusplus
 }

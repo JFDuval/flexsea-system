@@ -39,9 +39,10 @@ extern "C" {
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stm32f427xx.h>
-#include <core_cm4.h>
+//#include <stm32f427xx.h>	//ToDo remove or isolate with #ifdef
+//#include <core_cm4.h>		//ToDo remove or isolate with #ifdef
 #include <stdio.h>
+
 struct Block {
 	char data[FM_BLOCK_SIZE];
 	struct Block * next;
@@ -58,7 +59,8 @@ void fail(void) {
 
 inline bool isInterrupt()
 {
-    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0 ;
+	//return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0 ;	//ToDo remove or isolate with #ifdef
+	return 0;
 }
 
 typedef struct Block Block;
@@ -78,7 +80,7 @@ static Block* get_block(void * raw_block) {
 
 static Block* first;
 
-void fm_pool_init() 
+void fm_pool_init()
 {
 	// all prev pointers are set to NULL because we
 	// dont need them for allocations
