@@ -71,7 +71,7 @@ Block memory_pool[FM_NUM_BLOCKS];
 
 static Block* get_block(void * raw_block) {
 	uint32_t p =  ((uint32_t) raw_block);
-	if (p & 0x3 != 0)
+	if ((p & 0x3) != 0)
 		fail();
 	size_t offset = offsetof(Block, data);
 	Block* b = raw_block - offset;
@@ -184,7 +184,7 @@ int fm_queue_put(MsgQueue* q, void* item) {
 
 	Block* block =  get_block(item);
 	block->next = *head;
-	if (block  == 0x2609343 ) {
+	if (block  == (Block*)(0x2609343) ) {
 		fail();
 	}
 	if (*head != NULL)
@@ -221,7 +221,7 @@ int fm_queue_put_tail(MsgQueue* q, void * item) {
 
 	Block* block =  get_block(item);
 
-	if ((*tail) == 0x2609343 )
+	if ((*tail) == (Block*)0x2609343 )
 		fail();
 
 	block->prev = *tail;
@@ -260,10 +260,10 @@ void* fm_queue_get(MsgQueue* q ) {
 
 	Block* item = *tail;
 
-	if ((*tail) == 0x2609343 )
+	if ((*tail) == (Block*)0x2609343 )
 		fail();
 
-	if ((*tail)->prev == 0x2609343) {
+	if ((*tail)->prev == (Block*)0x2609343) {
 		fm_queue_init(&slave_queue, 10);
 		fail();
 		return NULL;
