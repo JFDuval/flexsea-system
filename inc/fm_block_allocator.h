@@ -31,6 +31,10 @@
 #ifndef FM_BLOCK_ALLOCATOR_H
 #define FM_BLOCK_ALLOCATOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef unsigned int size_t;
 
 #define FM_BLOCK_SIZE 256
@@ -135,9 +139,12 @@ typedef struct {
 	char data[];
 } BlockWrapper;
 
+//#define ATOMIC_BEGIN()
+//#define ATOMIC_END()
 
-#define ATOMIC_BEGIN()
-#define ATOMIC_END()
-
+#ifdef __cplusplus
+}
 #endif
+
+#endif //FM_BLOCK_ALLOCATOR_H
 

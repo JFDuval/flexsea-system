@@ -27,6 +27,12 @@
 	* 2017-01-20 | igutekunst | Initial implementation
 	*
 *****************************************************************************/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "../inc/fm_block_allocator.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -275,4 +281,8 @@ void* fm_queue_get(MsgQueue* q ) {
 
 	return item->data;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
