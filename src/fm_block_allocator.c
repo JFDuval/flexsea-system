@@ -71,7 +71,7 @@ Block memory_pool[FM_NUM_BLOCKS];
 
 static Block* get_block(void * raw_block) {
 	uint32_t p =  ((uint32_t) raw_block);
-	if (p & 0x3 != 0)
+	if ((p & 0x3) != 0)
 		fail();
 	size_t offset = offsetof(Block, data);
 	Block* b = raw_block - offset;
