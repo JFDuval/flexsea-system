@@ -179,23 +179,31 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 {
 	uint16_t numb = 0;
 
-	//Send to master:
-	PacketWrapper* p = fm_pool_allocate_block();
-	if (p == NULL)
-		return;
-
 	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
 
-	p->port = info[0];
 	if(ms == SEND_TO_SLAVE)
 	{
+		PacketWrapper* p = fm_pool_allocate_block();
+		if (p == NULL)
+			return;
+
+		p->port = info[0];
+
 		memcpy(p->packed, comm_str_1, numb);
 		flexsea_send_serial_slave(p);
 	}
 	else
 	{
-		memcpy(p->packed, comm_str_1, numb);
-		flexsea_send_serial_master(p);
+		/*
+		PacketWrapper* p = fm_pool_allocate_block();
+		if (p == NULL)
+			return;
+		*/
+		PacketWrapper p;
+		p.port = info[0];	//ToDo might be wrong... enum??
+
+		memcpy(p.packed, comm_str_1, numb);
+		flexsea_send_serial_master(&p);
 	}
 }
 
