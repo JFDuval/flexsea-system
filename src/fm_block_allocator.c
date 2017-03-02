@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 
-#include "fm_block_allocator.h"
+#include "../inc/fm_block_allocator.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
