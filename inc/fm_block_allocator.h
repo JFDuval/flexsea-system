@@ -40,7 +40,6 @@ typedef unsigned int size_t;
 #define FM_BLOCK_SIZE 256
 #define FM_NUM_BLOCKS 20
 
-
 /**
  * Initialize the memory pool. Must be called before
  * calling fm_pool_allocate_block or fm_pool_free_block.
@@ -89,7 +88,7 @@ typedef struct {
  * Initialize a MsgQueue object, able to hold up
  * to max_size items
  *
- * This queue only support bushing blocks allocated
+ * This queue only support pushing blocks allocated
  * from fm_pool_allocate_block
  *
  * @param q pointer to MsgQueue object to initialize
