@@ -67,7 +67,7 @@ uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
 uint8_t cmdCode = 0, cmdType = 0;
 uint16_t cmdLen = 0;
 
-MsgQueue packet_queue;
+//MsgQueue packet_queue;
 PacketWrapper pwPackAndSend;
 
 //****************************************************************************
