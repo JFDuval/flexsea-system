@@ -186,23 +186,31 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 
 	if(ms == SEND_TO_SLAVE)
 	{
-		//ToDo ******************
-		pwPackAndSend.port = info[0];
-		memcpy(pwPackAndSend.packed, comm_str_1, numb);
-		flexsea_send_serial_slave(&pwPackAndSend);
+		switch(info[0])
+		{
+			case PORT_RS485_1:
+				p = &slaveOutbound[SCP_RS485_1];
+				break;
+			case PORT_RS485_2:
+				p = &slaveOutbound[SCP_RS485_2];
+				break;
+		}
+
+		memcpy(p->packed, comm_str_1, numb);
+		flexsea_send_serial_slave(p);
 	}
 	else
 	{
 		switch(info[0])
 		{
 			case PORT_USB:
-				p = &masterOutbound[0];
+				p = &masterOutbound[MCP_USB];
 				break;
 			case PORT_SPI:
-				p = &masterOutbound[1];
+				p = &masterOutbound[MCP_SPI];
 				break;
 			case PORT_WIRELESS:
-				p = &masterOutbound[2];
+				p = &masterOutbound[MCP_WIRELESS];
 				break;
 		}
 
