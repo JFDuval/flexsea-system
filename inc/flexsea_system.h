@@ -49,7 +49,6 @@ extern "C" {
 #include "flexsea_cmd_external.h"
 #include "flexsea_cmd_data.h"
 #include "flexsea_cmd_tools.h"
-#include <fm_block_allocator.h>
 //Include the user files:
 #include "../flexsea-user/inc/flexsea_cmd_user.h"
 
@@ -69,7 +68,6 @@ void managePtrXid(struct manage_s **myPtr, uint8_t p_xid);
 void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
-//__attribute__((weak)) void init_flexsea_payload_ptr_user(void);
 
 //****************************************************************************
 // Definition(s):
@@ -248,7 +246,6 @@ extern uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
 //Similarly, we exchange command code, type and length:
 extern uint8_t cmdCode, cmdType;
 extern uint16_t cmdLen;
-extern MsgQueue packet_queue;
 
 //Structures and shared variables are now in:
 #include "flexsea_global_structs.h"

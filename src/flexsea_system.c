@@ -67,9 +67,6 @@ uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
 uint8_t cmdCode = 0, cmdType = 0;
 uint16_t cmdLen = 0;
 
-//MsgQueue packet_queue;
-PacketWrapper pwPackAndSend;
-
 //****************************************************************************
 // Function(s)
 //****************************************************************************
@@ -101,19 +98,13 @@ void init_flexsea_payload_ptr(void)
 	//Data:
 	init_flexsea_payload_ptr_data();
 
-	/*
-	//Memory Pool and Message Queues
-	fm_pool_init();
-	fm_queue_init(&packet_queue, 10);
-	fm_queue_init(&unpacked_packet_queue, 10);
-	*/
-
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
 
 	//Tools:
 	init_flexsea_payload_ptr_tools();
 
+	//Calibration:
 	init_flexsea_payload_ptr_calibration();
 
 	//User functions:
@@ -177,6 +168,7 @@ void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 
 //Call pack(), and send result to master/slave.
 //Use that after your tx_N() function.
+//ToDo: not elegant, and way too Manage-centric. Fix! ********************
 void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 				 uint8_t rid, uint8_t *info, uint8_t ms)
 {
@@ -295,6 +287,3 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid)
 			break;
 	}
 }
-
-//Weak function, redefine in your own flexsea-user if needed.
-//__attribute__((weak)) void init_flexsea_payload_ptr_user(void){}
