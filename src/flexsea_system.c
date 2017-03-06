@@ -176,39 +176,19 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 	PacketWrapper *p = NULL;
 	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
 
+	//Assign packet
+	p = &packet[info[0]][OUTBOUND];
+	//Fill in some of the data
+	memcpy(p->packed, comm_str_1, numb);
+	p->cmd = (cmdType == CMD_READ) ? CMD_R(cmd) : CMD_W(cmd);
+
+	//Send it where it needs to go:
 	if(ms == SEND_TO_SLAVE)
 	{
-		switch(info[0])
-		{
-			case PORT_RS485_1:
-				p = &packet[PORT_RS485_1][OUTBOUND];
-				break;
-			case PORT_RS485_2:
-				p = &packet[PORT_RS485_2][OUTBOUND];
-				break;
-		}
-
-		memcpy(p->packed, comm_str_1, numb);
-		p->cmd = (cmdType == CMD_READ) ? CMD_R(cmd) : CMD_W(cmd);
 		flexsea_send_serial_slave(p);
 	}
 	else
 	{
-		switch(info[0])
-		{
-			case PORT_USB:
-				p = &packet[PORT_USB][OUTBOUND];
-				break;
-			case PORT_SPI:
-				p = &packet[PORT_SPI][OUTBOUND];
-				break;
-			case PORT_WIRELESS:
-				p = &packet[PORT_WIRELESS][OUTBOUND];
-				break;
-		}
-
-		memcpy(p->packed, comm_str_1, numb);
-		p->cmd = (cmdType == CMD_READ) ? CMD_R(cmd) : CMD_W(cmd);
 		flexsea_send_serial_master(p);
 	}
 }
