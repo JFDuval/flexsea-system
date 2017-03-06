@@ -181,10 +181,10 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 		switch(info[0])
 		{
 			case PORT_RS485_1:
-				p = &slaveOutbound[SCP_RS485_1];
+				p = &packet[PORT_RS485_1][OUTBOUND];
 				break;
 			case PORT_RS485_2:
-				p = &slaveOutbound[SCP_RS485_2];
+				p = &packet[PORT_RS485_2][OUTBOUND];
 				break;
 		}
 
@@ -197,13 +197,13 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 		switch(info[0])
 		{
 			case PORT_USB:
-				p = &masterOutbound[MCP_USB];
+				p = &packet[PORT_USB][OUTBOUND];
 				break;
 			case PORT_SPI:
-				p = &masterOutbound[MCP_SPI];
+				p = &packet[PORT_SPI][OUTBOUND];
 				break;
 			case PORT_WIRELESS:
-				p = &masterOutbound[MCP_WIRELESS];
+				p = &packet[PORT_WIRELESS][OUTBOUND];
 				break;
 		}
 
