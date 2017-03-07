@@ -126,7 +126,7 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		arrLen = PAYLOAD_BYTES;
 	}
 
-	shBuf[index++] = randomArrayLen;
+	shBuf[index++] = arrLen;
 
 	if(offset == 0)
 	{
