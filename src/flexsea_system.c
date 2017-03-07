@@ -162,17 +162,10 @@ void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 {
 	uint8_t finalPayload[PAYLOAD_BUF_LEN];
 	uint16_t numb = 0;
-	volatile uint16_t debugVar1 = 0, debugVar2 = 0;
 
 	(void)info;	//Unused for now
 
-	debugVar1 = len;
 	numb = tx_cmd(shBuf, cmd, cmdType, len, rid, finalPayload);
-	debugVar2 = numb;
-	if(debugVar1 > 50 || debugVar2 > 50)
-	{
-		//while(1);
-	}
 	numb = comm_gen_str(finalPayload, commStr, numb);
 	numb = COMM_STR_BUF_LEN;	//Fixed length
 	(*numBytes) = numb;
