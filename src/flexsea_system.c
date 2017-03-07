@@ -127,6 +127,10 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 {
 	uint16_t bytes = 0;
 	uint16_t index = 0;
+	uint32_t length = 0;
+	
+	//Protection against long len:
+	length = (len > PAYLOAD_BYTES) ? PAYLOAD_BYTES : len;
 
 	prepare_empty_payload(board_id, receiver, buf, sizeof(buf));
 	buf[P_CMDS] = 1;	//Fixed, 1 command
@@ -146,8 +150,8 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 	}
 
 	index = P_DATA1;
-	memcpy(&buf[index], payloadData, len);
-	bytes = index+len;
+	memcpy(&buf[index], payloadData, length);
+	bytes = index+length;
 
 	return bytes;
 }
@@ -158,10 +162,17 @@ void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 {
 	uint8_t finalPayload[PAYLOAD_BUF_LEN];
 	uint16_t numb = 0;
+	volatile uint16_t debugVar1 = 0, debugVar2 = 0;
 
 	(void)info;	//Unused for now
 
+	debugVar1 = len;
 	numb = tx_cmd(shBuf, cmd, cmdType, len, rid, finalPayload);
+	debugVar2 = numb;
+	if(debugVar1 > 50 || debugVar2 > 50)
+	{
+		//while(1);
+	}
 	numb = comm_gen_str(finalPayload, commStr, numb);
 	numb = COMM_STR_BUF_LEN;	//Fixed length
 	(*numBytes) = numb;
