@@ -63,6 +63,7 @@ For rx_* functions, the suffix options are:
 
 //We use this buffer to exchange information between tx_N() and tx_cmd():
 uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
+uint8_t tmp_comm_str[COMM_STR_BUF_LEN];
 //Similarly, we exchange command code, type and length:
 uint8_t cmdCode = 0, cmdType = 0;
 uint16_t cmdLen = 0;
@@ -174,12 +175,12 @@ void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 {
 	uint16_t numb = 0;
 	PacketWrapper *p = NULL;
-	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
+	pack(shBuf, cmd, cmdType, len, rid, info, &numb, tmp_comm_str);
 
 	//Assign packet
 	p = &packet[info[0]][OUTBOUND];
 	//Fill in some of the data
-	memcpy(p->packed, comm_str_1, numb);
+	memcpy(p->packed, tmp_comm_str, numb);
 	p->cmd = (cmdType == CMD_READ) ? CMD_R(cmd) : CMD_W(cmd);
 
 	//Send it where it needs to go:
