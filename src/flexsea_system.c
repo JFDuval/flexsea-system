@@ -48,12 +48,12 @@ For rx_* functions, the suffix options are:
 // Include(s)
 //****************************************************************************
 
-#include <fm_block_allocator.h>
 #include "main.h"
 #include <string.h>
 #include <flexsea_system.h>
 #include "../flexsea-user/inc/flexsea_cmd_user.h"
 #include <flexsea_comm.h>
+#include <flexsea_payload.h>
 #include "../inc/flexsea_cmd_calibration.h"
 
 //****************************************************************************
@@ -62,11 +62,10 @@ For rx_* functions, the suffix options are:
 
 //We use this buffer to exchange information between tx_N() and tx_cmd():
 uint8_t tmpPayload[PAYLOAD_BUF_LEN];	//tx_N() => tx_cmd()
+uint8_t tmp_comm_str[COMM_STR_BUF_LEN];
 //Similarly, we exchange command code, type and length:
 uint8_t cmdCode = 0, cmdType = 0;
 uint16_t cmdLen = 0;
-
-MsgQueue packet_queue;
 
 //****************************************************************************
 // Function(s)
@@ -99,17 +98,13 @@ void init_flexsea_payload_ptr(void)
 	//Data:
 	init_flexsea_payload_ptr_data();
 
-	//Memory Pool and Message Queues
-	fm_pool_init();
-	fm_queue_init(&packet_queue, 10);
-	fm_queue_init(&unpacked_packet_queue, 10);
-
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
 
 	//Tools:
 	init_flexsea_payload_ptr_tools();
 
+	//Calibration:
 	init_flexsea_payload_ptr_calibration();
 
 	//User functions:
@@ -131,6 +126,10 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 {
 	uint16_t bytes = 0;
 	uint16_t index = 0;
+	uint32_t length = 0;
+
+	//Protection against long len:
+	length = (len > PAYLOAD_BYTES) ? PAYLOAD_BYTES : len;
 
 	prepare_empty_payload(board_id, receiver, buf, sizeof(buf));
 	buf[P_CMDS] = 1;	//Fixed, 1 command
@@ -150,8 +149,8 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 	}
 
 	index = P_DATA1;
-	memcpy(&buf[index], payloadData, len);
-	bytes = index+len;
+	memcpy(&buf[index], payloadData, length);
+	bytes = index+length;
 
 	return bytes;
 }
@@ -173,27 +172,27 @@ void pack(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 
 //Call pack(), and send result to master/slave.
 //Use that after your tx_N() function.
+//ToDo: not elegant, and way too Manage-centric. Fix! ********************
 void packAndSend(uint8_t *shBuf, uint8_t cmd, uint8_t cmdType, uint16_t len, \
 				 uint8_t rid, uint8_t *info, uint8_t ms)
 {
 	uint16_t numb = 0;
+	PacketWrapper *p = NULL;
+	pack(shBuf, cmd, cmdType, len, rid, info, &numb, tmp_comm_str);
 
-	//Send to master:
-	PacketWrapper* p = fm_pool_allocate_block();
-	if (p == NULL)
-		return;
+	//Assign packet
+	p = &packet[info[0]][OUTBOUND];
+	//Fill in some of the data
+	memcpy(p->packed, tmp_comm_str, numb);
+	p->cmd = (cmdType == CMD_READ) ? CMD_R(cmd) : CMD_W(cmd);
 
-	pack(shBuf, cmd, cmdType, len, rid, info, &numb, comm_str_1);
-
-	p->port = info[0];
+	//Send it where it needs to go:
 	if(ms == SEND_TO_SLAVE)
 	{
-		memcpy(p->packed, comm_str_1, numb);
 		flexsea_send_serial_slave(p);
 	}
 	else
 	{
-		memcpy(p->packed, comm_str_1, numb);
 		flexsea_send_serial_master(p);
 	}
 }
@@ -272,6 +271,3 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid)
 			break;
 	}
 }
-
-//Weak function, redefine in your own flexsea-user if needed.
-//__attribute__((weak)) void init_flexsea_payload_ptr_user(void){}

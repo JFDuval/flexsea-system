@@ -116,16 +116,7 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	lastTxPacketIndex = packetNum;
 
-	if(randomArrayLen <= PAYLOAD_BYTES)
-	{
-		arrLen = randomArrayLen;
-	}
-	else
-	{
-		//Use maximum:
-		arrLen = PAYLOAD_BYTES;
-	}
-
+	arrLen = (randomArrayLen <= PAYLOAD_BYTES) ? randomArrayLen : PAYLOAD_BYTES;
 	shBuf[index++] = arrLen;
 
 	if(offset == 0)
@@ -173,6 +164,7 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 	arrLen = buf[P_DATA1+2];
 
 	//Save received array:
+	arrLen = (arrLen <= 48) ? arrLen : 48;
 	memcpy(randomArrayRx, buf + (P_DATA1+3), arrLen);
 
 	/*
