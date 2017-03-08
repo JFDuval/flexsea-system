@@ -51,7 +51,7 @@ struct Block {
 
 };
 
-extern MsgQueue slave_queue;
+MsgQueue slave_queue;
 
 void fail(void) {
 	printf("failed\n");

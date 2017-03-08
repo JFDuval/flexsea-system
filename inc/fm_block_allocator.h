@@ -83,6 +83,7 @@ typedef struct {
 	int size;
 } MsgQueue ;
 
+extern MsgQueue slave_queue;
 
 /**
  * Initialize a MsgQueue object, able to hold up
