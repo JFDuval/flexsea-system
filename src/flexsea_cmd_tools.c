@@ -51,7 +51,7 @@ uint8_t randomArrayTxOff1[COMM_STR_BUF_LEN];
 uint8_t randomArrayTxOff2[COMM_STR_BUF_LEN];
 uint8_t arrLen = 0, lastTxPacketIndex = 0, lastRxPacketIndex = 0;
 int32_t sentPackets = 0, goodPackets = 0, badPackets = 0;
-int16_t packetOffset = 0;
+uint8_t packetOffset = 0;
 
 //****************************************************************************
 // Function(s)
@@ -116,17 +116,8 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	lastTxPacketIndex = packetNum;
 
-	if(randomArrayLen <= PAYLOAD_BYTES)
-	{
-		arrLen = randomArrayLen;
-	}
-	else
-	{
-		//Use maximum:
-		arrLen = PAYLOAD_BYTES;
-	}
-
-	shBuf[index++] = randomArrayLen;
+	arrLen = (randomArrayLen <= PAYLOAD_BYTES) ? randomArrayLen : PAYLOAD_BYTES;
+	shBuf[index++] = arrLen;
 
 	if(offset == 0)
 	{
@@ -173,6 +164,7 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 	arrLen = buf[P_DATA1+2];
 
 	//Save received array:
+	arrLen = (arrLen <= 48) ? arrLen : 48;
 	memcpy(randomArrayRx, buf + (P_DATA1+3), arrLen);
 
 	/*
@@ -216,7 +208,8 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	len = buf[P_DATA1+2];
 
 	lastRxPacketIndex = packetNum;
-	packetOffset = (int16_t)lastTxPacketIndex - (int16_t)lastRxPacketIndex;
+	packetOffset = (uint8_t)lastTxPacketIndex - (uint8_t)lastRxPacketIndex;
+
 
 	//Save received array:
 	memcpy(randomArrayRx, &buf[P_DATA1+3], len);

@@ -226,7 +226,11 @@ void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		qei_write(tmpEnc);
+		#ifdef USE_QEI
+			
+			qei_write(tmpEnc);
+			
+		#endif
 
 	#else
 
@@ -238,10 +242,17 @@ void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info)
 void rx_cmd_sensors_encoder_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
+	int32_t encVal = 0;
+	
+	#ifdef USE_QEI
+		
+		encVal = qei_read();
+		
+	#endif
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_sensors_encoder_w(TX_N_DEFAULT, qei_read());
+		tx_cmd_sensors_encoder_w(TX_N_DEFAULT, encVal);
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else

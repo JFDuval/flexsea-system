@@ -67,7 +67,7 @@ void executePtrXid(struct execute_s **myPtr, uint8_t p_xid);
 void managePtrXid(struct manage_s **myPtr, uint8_t p_xid);
 void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
-//__attribute__((weak)) void init_flexsea_payload_ptr_user(void);
+void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 
 //****************************************************************************
 // Definition(s):
@@ -167,10 +167,8 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 #define FLEXSEA_GOSSIP_BASE		80						//Gossip: from 80 to 89
 #define FLEXSEA_GOSSIP_1		(FLEXSEA_GOSSIP_BASE + 0)
 #define FLEXSEA_GOSSIP_2		(FLEXSEA_GOSSIP_BASE + 1)
-#define FLEXSEA_VIRTUAL_BASE	100						//Virtual boards from 100 to N
-#define FLEXSEA_VIRTUAL_1		(FLEXSEA_VIRTUAL_BASE + 0)
-#define FLEXSEA_VIRTUAL_2		(FLEXSEA_VIRTUAL_BASE + 1)
-//ToDo: The "Virtual" board idea was ill-conceived. Is it used? Can we get rid of it?
+//Dummy addresses for virtual project.
+#define FLEXSEA_VIRTUAL_PROJECT	255
 
 //Software error (SE) codes. Values will be ORed
 #define SE_DEFAULT						0
