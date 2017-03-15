@@ -127,6 +127,7 @@ void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 #define SHORTED_LEADS			88
 #define CMD_IN_CONTROL			90
 #define CMD_CALIBRATION_MODE	91
+#define CMD_STREAM				92
 
 //User commands (100-127):
 

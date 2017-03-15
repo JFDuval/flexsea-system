@@ -39,13 +39,17 @@ extern "C" {
 void init_flexsea_payload_ptr_stream(void);
 
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t select_w);
+						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop);
 void tx_cmd_stream_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 
 void rx_cmd_stream_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_stream_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info);
+
+extern uint8_t isStreaming;
+extern int streamCmd;
+extern uint16_t streamPeriod; //in ms
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,10 @@
 extern "C" {
 #endif
 
+uint8_t isStreaming = 0;
+int streamCmd = -1;
+uint16_t streamPeriod = 1;
+
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop)
 {
@@ -54,7 +58,20 @@ void tx_cmd_stream_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmd) = CMD_STREAM;
 	(*cmdType) = CMD_READ;
 
+	(void)shBuf;
+	
 	*len = index;
+}
+
+uint8_t isLegalStreamCmd(uint8_t cmd)
+{
+	//We have a couple system commands that are streamable
+	//and we allow streaming for all user cmds?
+	//These are basically all the commands available in slavecomm in Plan GUI
+	
+	return 
+		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT ||
+		(cmd > 99 && cmd < 128);
 }
 
 void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
@@ -68,10 +85,21 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		if(startStop) ;
-			//turn streaming on
-		else ;
-			//turn streaming off
+		//case: turn streaming on
+		if(startStop && isLegalStreamCmd(cmdToStream))
+		{
+			streamCmd = cmdToStream;
+			isStreaming = 1;
+			streamPeriod = periodInMS;
+		}
+		//case: turn streaming off
+		else 
+		{ 
+			streamCmd = -1;
+			isStreaming = 0;
+			streamPeriod = 12345;
+		}
+			
 	#else
 
 		(void)buf;
