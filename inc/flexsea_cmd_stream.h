@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#include "flexsea_system.h"
+#include <stdint.h>
 
 void init_flexsea_payload_ptr_stream(void);
 
@@ -50,6 +50,7 @@ void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info);
 extern uint8_t isStreaming;
 extern int streamCmd;
 extern uint16_t streamPeriod; //in ms
+extern uint8_t streamReceiver;
 
 #ifdef __cplusplus
 }
