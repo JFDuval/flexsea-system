@@ -44,6 +44,7 @@ extern "C" {
 #include "../flexsea-comm/inc/flexsea.h"
 //Include the core flexsea-system files:
 #include "flexsea_global_structs.h"
+#include "flexsea_cmd_stream.h"
 #include "flexsea_cmd_control.h"
 #include "flexsea_cmd_sensors.h"
 #include "flexsea_cmd_external.h"

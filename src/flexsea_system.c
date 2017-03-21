@@ -50,13 +50,13 @@ For rx_* functions, the suffix options are:
 
 #include "main.h"
 #include <string.h>
+#include <flexsea_cmd_stream.h>
 #include <flexsea_system.h>
 #include "../flexsea-user/inc/flexsea_cmd_user.h"
 #include <flexsea_comm.h>
 #include <flexsea_payload.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
-#include "../inc/flexsea_cmd_stream.h"
 
 //****************************************************************************
 // Variable(s)
@@ -94,13 +94,13 @@ void init_flexsea_payload_ptr(void)
 	init_flexsea_payload_ptr_external();
 
 	//Control:
-    init_flexsea_payload_ptr_control_1();
-    init_flexsea_payload_ptr_control_2();
-    init_flexsea_payload_ptr_in_control();
+	init_flexsea_payload_ptr_control_1();
+	init_flexsea_payload_ptr_control_2();
+	init_flexsea_payload_ptr_in_control();
 
 	//Stream:
 	init_flexsea_payload_ptr_stream();
-	
+
 	//Data:
 	init_flexsea_payload_ptr_data();
 
