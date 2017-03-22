@@ -40,7 +40,9 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../inc/flexsea_system.h"
+#include <flexsea_system.h>
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
+#include <flexsea_board.h>
 
 //Plan boards only:
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
@@ -227,9 +229,9 @@ void rx_cmd_sensors_encoder_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		#ifdef USE_QEI
-			
+
 			qei_write(tmpEnc);
-			
+
 		#endif
 
 	#else
@@ -243,11 +245,11 @@ void rx_cmd_sensors_encoder_rw(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
 	int32_t encVal = 0;
-	
+
 	#ifdef USE_QEI
-		
+
 		encVal = qei_read();
-		
+
 	#endif
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE

@@ -32,16 +32,21 @@
 #ifndef INC_FLEXSEA_GLOBAL_STRUCT_H
 #define INC_FLEXSEA_GLOBAL_STRUCT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
 
 #include <stdint.h>
-#include <flexsea_board.h>
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
+
+void initializeGlobalStructs();
 
 //****************************************************************************
 // Definition(s):
@@ -171,7 +176,7 @@ struct execute_s
 	int32_t* enc_ang;
 	int32_t* enc_ang_vel;
 
-    uint8_t volt_batt;			//+VB
+	uint8_t volt_batt;			//+VB
 	uint8_t volt_int;			//+VG
 	uint8_t temp;
 	uint8_t pwro;
@@ -262,8 +267,8 @@ struct ricnu_s
 	//Execute:
 	struct execute_s ex;
 
-    int32_t enc_motor;
-    int32_t enc_joint;
+	int32_t enc_motor;
+	int32_t enc_joint;
 
 	//Extra sensors (Strain):
 	//uint16_t ext_strain[6];
@@ -385,7 +390,7 @@ struct as504x_s
 
 	int32_t signed_ang;
 	int32_t signed_ang_vel;
-	
+
 	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
 	int32_t ang_comp_clks;	//compensated absolute angle in clicks
 	int32_t num_rot; 		//number of full encoder rotations
@@ -404,6 +409,8 @@ extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
 extern struct user_data_s user_data_1;
 
-void initializeGlobalStructs();
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//INC_FLEXSEA_GLOBAL_STRUCT_H

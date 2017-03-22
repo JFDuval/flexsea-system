@@ -2,6 +2,8 @@
 extern "C" {
 #endif
 
+#include <flexsea_comm.h>
+#include <flexsea_system.h>
 #include "flexsea-system_test-all.h"
 
 //Definitions and variables used by some/all tests:
@@ -29,9 +31,9 @@ void test_tx_cmd(void)
 void test_flexsea_system(void)
 {
 	UNITY_BEGIN();
-	
+
 	RUN_TEST(test_tx_cmd);
-	
+
 	UNITY_END();
 }
 

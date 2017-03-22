@@ -2,9 +2,9 @@
 extern "C" {
 #endif
 
-#include "main.h"
 #include "unity.h"
 #include "flexsea-system_test-all.h"
+#include <string.h>
 
 //****************************************************************************
 // Variables used for these sets of tests:

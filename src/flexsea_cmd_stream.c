@@ -24,11 +24,13 @@
 	[This file] flexsea_cmd_stream: commands allowing plan to put execute into a streaming mode
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-03-13 | dudds4 | Initial GPL-3.0 release 
+	* 2017-03-13 | dudds4 | Initial GPL-3.0 release
 ****************************************************************************/
 
 #include "flexsea_cmd_stream.h"
+#include <flexsea.h>
 #include "flexsea_system.h"
+#include <flexsea_board.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,7 +63,7 @@ void tx_cmd_stream_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = CMD_READ;
 
 	(void)shBuf;
-	
+
 	*len = index;
 }
 
@@ -70,8 +72,8 @@ uint8_t isLegalStreamCmd(uint8_t cmd)
 	//We have a couple system commands that are streamable
 	//and we allow streaming for all user cmds?
 	//These are basically all the commands available in slavecomm in Plan GUI
-	
-	return 
+
+	return
 		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT ||
 		(cmd > 99 && cmd < 128);
 }
@@ -96,13 +98,13 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 			streamReceiver = buf[P_XID];
 		}
 		//case: turn streaming off
-		else 
-		{ 
+		else
+		{
 			streamCmd = -1;
 			isStreaming = 0;
 			streamPeriod = 12345;
 		}
-			
+
 	#else
 
 		(void)buf;

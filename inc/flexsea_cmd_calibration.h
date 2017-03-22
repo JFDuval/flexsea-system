@@ -38,13 +38,14 @@ extern "C" {
 //****************************************************************************
 // Include(s)
 //****************************************************************************
+
 #include <stdint.h>
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
 
-/* Initializes part of the array of function pointers which determines which 
+/* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
 */
 void init_flexsea_payload_ptr_calibration(void);
@@ -52,7 +53,7 @@ void init_flexsea_payload_ptr_calibration(void);
 //Calibration mode:
 
 
-/* Called by master to send a message to the slave, attempting to inititiate a calibration procedure specified by 
+/* Called by master to send a message to the slave, attempting to inititiate a calibration procedure specified by
 	'calibrationMode'. Slave will respond with the calibration procedure it is running or about to run.
 */
 void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -70,13 +71,13 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info);
 
 /* Slave calls this function automatically after receiving a read from master.
-	It determines what to do with the information passed to it, 	
+	It determines what to do with the information passed to it,
 	And it replies indicating the resulting decision
 */
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info);
 
 /* Slave calls this function automatically after receiving a read from master.
-	It determines what to do with the information passed to it, 	
+	It determines what to do with the information passed to it,
 	And it does not reply.
 */
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info);

@@ -48,13 +48,12 @@ For rx_* functions, the suffix options are:
 // Include(s)
 //****************************************************************************
 
-#include "main.h"
+//#include "main.h"
 #include <string.h>
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
+#include "../../flexsea-comm/inc/flexsea_payload.h"	//dependency: flexsea-comm
 #include <flexsea_cmd_stream.h>
 #include <flexsea_system.h>
-#include "../flexsea-user/inc/flexsea_cmd_user.h"
-#include <flexsea_comm.h>
-#include <flexsea_payload.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
 
@@ -137,7 +136,7 @@ uint16_t tx_cmd(uint8_t *payloadData, uint8_t cmdCode, uint8_t cmd_type, \
 	//Protection against long len:
 	length = (len > PAYLOAD_BYTES) ? PAYLOAD_BYTES : len;
 
-	prepare_empty_payload(board_id, receiver, buf, sizeof(buf));
+	prepare_empty_payload(getBoardID(), receiver, buf, sizeof(buf));
 	buf[P_CMDS] = 1;	//Fixed, 1 command
 
 	if(cmd_type == CMD_READ)

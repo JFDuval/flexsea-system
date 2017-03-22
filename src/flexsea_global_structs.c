@@ -29,9 +29,9 @@
 // Include(s)
 //****************************************************************************
 
-#include "main.h"
-#include "../inc/flexsea_global_structs.h"
-
+#include <stdint.h>
+#include <flexsea_board.h>
+#include <flexsea_global_structs.h>
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 #include "ext_input.h"
@@ -45,11 +45,14 @@
 struct execute_s exec1, exec2, exec3, exec4;
 struct ricnu_s ricnu_1;
 struct battery_s batt1;
-struct manage_s manag1 = {.battPtr = &batt1}, manag2 = {.battPtr = &batt1};
+struct manage_s manag1 = {.battPtr = &batt1};
+struct manage_s manag2 = {.battPtr = &batt1};
 struct strain_s strain1;
 struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
 struct user_data_s user_data_1;
+
+#include <flexsea_board.h>
 
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
 int32_t exec1Ang, exec2Ang, exec3Ang, exec4Ang;
@@ -62,18 +65,18 @@ int32_t exec1AngVel, exec2AngVel, exec3AngVel, exec4AngVel;
 
 void initializeGlobalStructs()
 {
-#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
-    exec1.enc_ang = &exec1Ang;
-    exec2.enc_ang = &exec2Ang;
-    exec3.enc_ang = &exec3Ang;
-    exec4.enc_ang = &exec4Ang;
+	#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		exec1.enc_ang = &exec1Ang;
+		exec2.enc_ang = &exec2Ang;
+		exec3.enc_ang = &exec3Ang;
+		exec4.enc_ang = &exec4Ang;
 
-    exec1.enc_ang_vel = &exec1AngVel;
-    exec2.enc_ang_vel = &exec2AngVel;
-    exec3.enc_ang_vel = &exec3AngVel;
-    exec4.enc_ang_vel = &exec4AngVel;
-#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
-    exec1.enc_ang = &(as5047.signed_ang);
-    exec1.enc_ang_vel = &(as5047.signed_ang_vel);
-#endif
+		exec1.enc_ang_vel = &exec1AngVel;
+		exec2.enc_ang_vel = &exec2AngVel;
+		exec3.enc_ang_vel = &exec3AngVel;
+		exec4.enc_ang_vel = &exec4AngVel;
+	#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+		exec1.enc_ang = &(as5047.signed_ang);
+		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
+	#endif
 }

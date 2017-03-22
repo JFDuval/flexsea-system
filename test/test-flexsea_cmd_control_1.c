@@ -2,6 +2,7 @@
 extern "C" {
 #endif
 
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
 #include "flexsea-system_test-all.h"
 
 //****************************************************************************
