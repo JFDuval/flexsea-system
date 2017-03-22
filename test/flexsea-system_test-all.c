@@ -35,6 +35,8 @@ void prepTxCmdTest(void)
 //Call this function to test the 'flexsea-system' stack:
 void flexsea_system_test(void)
 {
+	UNITY_BEGIN();
+
 	//One call per file here:
 	test_flexsea_system();
 	test_flexsea_cmd_control_1();
@@ -42,6 +44,8 @@ void flexsea_system_test(void)
 	test_flexsea_cmd_data();
 	test_flexsea_cmd_external();
 	test_flexsea_cmd_sensors();
+
+	UNITY_END();
 }
 
 #ifdef __cplusplus

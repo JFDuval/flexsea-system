@@ -49,14 +49,12 @@ void test_tx_cmd_exp_batt_w(void)
 
 void test_flexsea_cmd_external(void)
 {
-	UNITY_BEGIN();
-
 	//Add all your unit tests to this list:
 	RUN_TEST(test_tx_cmd_exp_batt_r);
 	RUN_TEST(test_tx_cmd_exp_batt_w);
 	//...
 
-	UNITY_END();
+	fflush(stdout);
 }
 
 #ifdef __cplusplus

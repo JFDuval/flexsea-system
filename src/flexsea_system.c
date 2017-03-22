@@ -48,12 +48,12 @@ For rx_* functions, the suffix options are:
 // Include(s)
 //****************************************************************************
 
-//#include "main.h"
 #include <string.h>
 #include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
 #include "../../flexsea-comm/inc/flexsea_payload.h"	//dependency: flexsea-comm
 #include <flexsea_cmd_stream.h>
 #include <flexsea_system.h>
+#include <flexsea_board.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
 

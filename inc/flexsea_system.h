@@ -70,15 +70,6 @@ void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 
-//Weak function definition - real one will come from flexsea-user:
-uint8_t getBoardID(void) __attribute__((weak));
-uint8_t getBoardUpID(void) __attribute__((weak));
-uint8_t getBoardSubID(uint8_t sub, uint8_t idx) __attribute__((weak));
-uint8_t getSlaveCnt(uint8_t sub) __attribute__((weak));
-
-//Weak function definition - real one will come from flexsea-user:
-//void init_flexsea_payload_ptr_user(void)  __attribute__((weak));
-
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
