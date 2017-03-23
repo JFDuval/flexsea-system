@@ -35,14 +35,14 @@
 // Include(s)
 //****************************************************************************
 
-#include "flexsea_system.h"
+#include <stdint.h>
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
 
 void init_flexsea_payload_ptr_sensors(void);
-	
+
 //Switch:
 void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 								uint16_t *len);

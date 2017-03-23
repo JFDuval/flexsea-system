@@ -1,7 +1,7 @@
 #ifndef TEST_ALL_FX_SYSTEM_H
 #define TEST_ALL_FX_SYSTEM_H
 
-#include "main.h"
+//#include "main.h"
 #include "unity.h"
 #include "../inc/flexsea_system.h"
 

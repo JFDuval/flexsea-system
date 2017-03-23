@@ -25,7 +25,7 @@
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
 	* 2016-09-09 | jfduval | Initial GPL-3.0 release
-	* 2017-02-09 | dudds4 | Extracted in control commands to separate file 
+	* 2017-02-09 | dudds4 | Extracted in control commands to separate file
 ****************************************************************************/
 
 #ifndef INC_FLEXSEA_CMD_IN_CONTROL_TOLSH
@@ -38,7 +38,7 @@ extern "C" {
 // Include(s)
 //****************************************************************************
 
-#include "flexsea_system.h"
+#include <stdint.h>
 
 //****************************************************************************
 // Prototype(s):

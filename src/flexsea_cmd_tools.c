@@ -33,10 +33,10 @@ extern "C" {
 // Include(s)
 //****************************************************************************
 
-#include "../inc/flexsea_comm.h"
-#include "main.h"
 #include <string.h>
-#include "../inc/flexsea_system.h"
+#include <flexsea.h>
+#include <flexsea_system.h>
+#include <flexsea_board.h>
 
 //****************************************************************************
 // Variable(s)

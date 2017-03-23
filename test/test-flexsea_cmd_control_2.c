@@ -2,6 +2,7 @@
 extern "C" {
 #endif
 
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
 #include "flexsea-system_test-all.h"
 
 //****************************************************************************
@@ -170,8 +171,6 @@ void test_tx_cmd_ctrl_z_g_r(void)
 
 void test_flexsea_cmd_control_2(void)
 {
-	UNITY_BEGIN();
-
 	//Add all your unit tests to this list:
 
 	RUN_TEST(test_tx_cmd_ctrl_i_g_w);
@@ -194,7 +193,7 @@ void test_flexsea_cmd_control_2(void)
 
 	//...
 
-	UNITY_END();
+	fflush(stdout);
 }
 
 #ifdef __cplusplus

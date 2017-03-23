@@ -39,9 +39,10 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../inc/flexsea.h"
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
 #include "../inc/flexsea_system.h"
 #include "../inc/flexsea_cmd_data.h"
+#include <flexsea_board.h>
 
 //Manage boards only:
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE

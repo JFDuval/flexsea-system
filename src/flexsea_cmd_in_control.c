@@ -26,7 +26,7 @@
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
 	* 2016-09-09 | jfduval | Initial GPL-3.0 release
 	* 2016-11-07 | jfduval | Renamed *_1, updated to new convention
-	* 2017-02-09 | dudds4  | Extracted in control commands to separate file 
+	* 2017-02-09 | dudds4  | Extracted in control commands to separate file
 ****************************************************************************/
 
 #ifdef __cplusplus
@@ -39,7 +39,9 @@ extern "C" {
 #include "../inc/flexsea_cmd_in_control.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "../inc/flexsea_system.h"
+#include <flexsea_system.h>
+#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
+#include <flexsea_board.h>
 
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 #include "control.h"

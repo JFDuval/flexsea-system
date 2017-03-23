@@ -29,8 +29,9 @@
 ****************************************************************************/
 
 #include "flexsea_cmd_calibration.h"
+#include <flexsea.h>
 #include "flexsea_system.h"
-#include "flexsea_board.h"
+#include <flexsea_board.h>
 
 #ifdef __cplusplus
 extern "C" {
