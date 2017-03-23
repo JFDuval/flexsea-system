@@ -38,6 +38,7 @@ uint8_t isStreaming = 0;
 int streamCmd = -1;
 uint16_t streamPeriod = 1;
 uint8_t streamReceiver = 0;
+uint8_t streamPortInfo = PORT_USB;
 
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop)
@@ -94,6 +95,8 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 			isStreaming = 1;
 			streamPeriod = periodInMS;
 			streamReceiver = buf[P_XID];
+			streamPortInfo = *info;
+
 		}
 		//case: turn streaming off
 		else 
@@ -101,6 +104,7 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 			streamCmd = -1;
 			isStreaming = 0;
 			streamPeriod = 12345;
+			streamPortInfo = 0;
 		}
 			
 	#else

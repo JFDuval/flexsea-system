@@ -51,6 +51,7 @@ extern uint8_t isStreaming;
 extern int streamCmd;
 extern uint16_t streamPeriod; //in ms
 extern uint8_t streamReceiver;
+extern uint8_t streamPortInfo;
 
 #ifdef __cplusplus
 }
