@@ -55,7 +55,6 @@ extern "C" {
 #include "motor.h"
 #include "trapez.h"
 #include "control.h"
-#include "main_fsm.h"
 #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
 //****************************************************************************
