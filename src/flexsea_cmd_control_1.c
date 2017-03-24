@@ -52,6 +52,10 @@ extern "C" {
 //Execute boards only:
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 #include "main.h"
+#include "motor.h"
+#include "trapez.h"
+#include "control.h"
+#include "main_fsm.h"
 #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
 //****************************************************************************

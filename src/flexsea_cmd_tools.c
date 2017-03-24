@@ -132,7 +132,7 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		memcpy(randomArrayTxOff1, randomArrayTx, arrLen);
 
 		//Generate and send new Tx array:
-		generateRandomUint8Array(randomArrayTx, arrLen);
+		generateRandomUint8_tArray(randomArrayTx, arrLen);
 		memcpy(&shBuf[index], randomArrayTx, arrLen);
 		index += arrLen;
 		sentPackets++;

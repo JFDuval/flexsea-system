@@ -40,6 +40,12 @@ extern "C" {
 #include <flexsea_system.h>
 #include <flexsea_board.h>
 
+//Execute boards only:
+#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+#include "main.h"
+#include "ext_output.h"
+#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
+
 //****************************************************************************
 // Variable(s)
 //****************************************************************************

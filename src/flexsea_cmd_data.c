@@ -53,6 +53,11 @@ extern "C" {
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
 	|| defined BOARD_TYPE_FLEXSEA_STRAIN_AMP)
 #include "main.h"
+#include "imu.h"
+#include "strain.h"
+#include "safety.h"
+#include "analog.h"
+#include "control.h"
 #endif
 
 //****************************************************************************
@@ -341,7 +346,8 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		SPLIT_32((uint32_t)user_data_1.w[select_w], shBuf, &index);
 
 	#else
-
+		(void)select_w;
+		
 		//All other boards can only reply
 		SPLIT_32((uint32_t)user_data_1.r[0], shBuf, &index);
 		SPLIT_32((uint32_t)user_data_1.r[1], shBuf, &index);
