@@ -43,12 +43,10 @@ extern "C" {
 //****************************************************************************
 
 //Comm Test:
-#ifdef BOARD_TYPE_FLEXSEA_PLAN
 #define MAX_PACKETS_BEHIND 10
 uint8_t randomArray[MAX_PACKETS_BEHIND][COMM_STR_BUF_LEN];
 uint8_t indexOfLastWritten = 255;
 uint8_t randomArrayRx[COMM_STR_BUF_LEN];
-#endif
 
 uint8_t arrLen = 0, lastTxPacketIndex = 0, lastRxPacketIndex = 0;
 int32_t sentPackets = 0, goodPackets = 0, badPackets = 0;
@@ -92,9 +90,11 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	}
 	else
 	{
+		#ifdef BOARD_TYPE_FLEXSEA_PLAN
 		//We only use _w to send a reply. We send the received array:
 		memcpy(&shBuf[index], randomArrayRx, arrLen);
 		index += arrLen;
+		#endif
 	}
 
 	//Payload length:
@@ -128,11 +128,13 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	{
 		//Use this for the actual test:
 		int indexToWriteTo = (indexOfLastWritten + 1) % MAX_PACKETS_BEHIND;
-#ifdef BOARD_TYPE_FLEXSEA_PLAN
+		
+		#ifdef BOARD_TYPE_FLEXSEA_PLAN
 		uint8_t* writeTo = &randomArray[indexToWriteTo][0];
 		generateRandomUint8_tArray(writeTo, arrLen);
 		memcpy(&shBuf[index], writeTo, arrLen);
-#endif
+		#endif
+		
 		indexOfLastWritten = indexToWriteTo;
 		//Generate and send new Tx array:
 		index += arrLen;
