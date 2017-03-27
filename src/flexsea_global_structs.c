@@ -34,7 +34,7 @@
 #include <flexsea_global_structs.h>
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
-#include "ext_input.h"
+	#include "mag_encoders.h"
 #endif
 
 //****************************************************************************
