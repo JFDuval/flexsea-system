@@ -45,8 +45,7 @@
 struct execute_s exec1, exec2, exec3, exec4;
 struct ricnu_s ricnu_1;
 struct battery_s batt1;
-struct manage_s manag1 = {.battPtr = &batt1};
-struct manage_s manag2 = {.battPtr = &batt1};
+struct manage_s manag1 = {.battPtr = &batt1}, manag2 = {.battPtr = &batt1};
 struct strain_s strain1;
 struct in_control_s in_control_1;
 struct gossip_s gossip1, gossip2;
@@ -79,4 +78,35 @@ void initializeGlobalStructs()
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
 	#endif
+}
+
+void init_diffarr(struct diffarr_s * das)
+{
+   static int jj;
+   for (jj=0;jj<50;jj++)
+    {
+        das->vals[jj] = 0;
+    }
+    das->indx = 0;
+    das->curval = 0;
+    das->curdif = 0;
+}
+
+void update_diffarr(struct diffarr_s * das, int32_t cvl, int32_t difflen)
+{
+    das->curval = cvl;
+    das->vals[(das->indx+1)%50] = das->curval;
+    das->indx = (das->indx+1)%50;
+    das->curdif = das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50]; 
+}
+
+int32_t get_diffarr(struct diffarr_s * das, int32_t difflen)
+{
+    
+    return das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50]; 
+}
+
+int32_t get_diffarr_elmnt(struct diffarr_s * das, int32_t indx)
+{
+    return das->vals[(das->indx-indx+50)%50]; 
 }

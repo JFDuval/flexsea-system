@@ -43,12 +43,6 @@ extern "C" {
 #include <stdint.h>
 
 //****************************************************************************
-// Prototype(s):
-//****************************************************************************
-
-void initializeGlobalStructs();
-
-//****************************************************************************
 // Definition(s):
 //****************************************************************************
 
@@ -377,6 +371,16 @@ struct angsense_s
 	int32_t vel_rpm; //rotations per minute
 };
 
+struct diffarr_s
+{
+	int32_t vals[50];
+	int32_t curval;
+	int32_t indx;
+    int32_t curdif;
+};
+
+
+/*
 //AS504x Magnetic encoders:
 struct as504x_s
 {
@@ -390,10 +394,33 @@ struct as504x_s
 
 	int32_t signed_ang;
 	int32_t signed_ang_vel;
-
+	
 	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
 	int32_t ang_comp_clks;	//compensated absolute angle in clicks
 	int32_t num_rot; 		//number of full encoder rotations
+};
+*/
+//AS504x Magnetic encoders:
+struct as504x_s
+{
+	struct diffarr_s raw_angs_clks;
+    struct diffarr_s raw_vels_cpms;
+    int32_t filt_vel_cpms;        
+
+	int32_t signed_ang;
+	int32_t signed_ang_vel;
+	
+	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
+	int32_t ang_comp_clks;	//compensated absolute angle in clicks
+    int32_t ang_comp_clks_for_cur;	//compensated absolute angle in clicks
+	int32_t num_rot; 		//number of full encoder rotations
+    
+    struct angsense_s raw;
+	struct angsense_s filt; 
+    int32_t last_angtimer_read;
+	int32_t counts_since_last_ang_read;
+	int32_t last_ang_read_period;
+	int32_t samplefreq; 	//sampling frequency of the sensor
 };
 
 //****************************************************************************
@@ -408,6 +435,16 @@ extern struct in_control_s in_control_1;
 extern struct gossip_s gossip1, gossip2;
 extern struct battery_s batt1;
 extern struct user_data_s user_data_1;
+
+//****************************************************************************
+// Prototype(s):
+//****************************************************************************
+
+void initializeGlobalStructs();
+void init_diffarr(struct diffarr_s *);
+void update_diffarr(struct diffarr_s *, int32_t, int32_t);
+int32_t get_diffarr(struct diffarr_s *, int32_t);
+int32_t get_diffarr_elmnt(struct diffarr_s *, int32_t);
 
 #ifdef __cplusplus
 }
