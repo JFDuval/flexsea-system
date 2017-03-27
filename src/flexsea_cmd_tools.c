@@ -42,13 +42,14 @@ extern "C" {
 // Variable(s)
 //****************************************************************************
 
-//Will change this, but for now the payloads will be stored in:
-uint8_t tmp_payload_xmit[PAYLOAD_BUF_LEN];
-
 //Comm Test:
-uint8_t randomArrayTx[COMM_STR_BUF_LEN], randomArrayRx[COMM_STR_BUF_LEN];
-uint8_t randomArrayTxOff1[COMM_STR_BUF_LEN];
-uint8_t randomArrayTxOff2[COMM_STR_BUF_LEN];
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+#define MAX_PACKETS_BEHIND 10
+uint8_t randomArray[MAX_PACKETS_BEHIND][COMM_STR_BUF_LEN];
+uint8_t indexOfLastWritten = 255;
+uint8_t randomArrayRx[COMM_STR_BUF_LEN];
+#endif
+
 uint8_t arrLen = 0, lastTxPacketIndex = 0, lastRxPacketIndex = 0;
 int32_t sentPackets = 0, goodPackets = 0, badPackets = 0;
 uint8_t packetOffset = 0;
@@ -126,14 +127,14 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	else
 	{
 		//Use this for the actual test:
-
-		//Save last 3 TxArrays:
-		memcpy(randomArrayTxOff2, randomArrayTxOff1, arrLen);
-		memcpy(randomArrayTxOff1, randomArrayTx, arrLen);
-
+		int indexToWriteTo = (indexOfLastWritten + 1) % MAX_PACKETS_BEHIND;
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+		uint8_t* writeTo = &randomArray[indexToWriteTo][0];
+		generateRandomUint8_tArray(writeTo, arrLen);
+		memcpy(&shBuf[index], writeTo, arrLen);
+#endif
+		indexOfLastWritten = indexToWriteTo;
 		//Generate and send new Tx array:
-		generateRandomUint8_tArray(randomArrayTx, arrLen);
-		memcpy(&shBuf[index], randomArrayTx, arrLen);
 		index += arrLen;
 		sentPackets++;
 	}
@@ -210,28 +211,24 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	lastRxPacketIndex = packetNum;
 	packetOffset = (uint8_t)lastTxPacketIndex - (uint8_t)lastRxPacketIndex;
 
-
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
 	//Save received array:
 	memcpy(randomArrayRx, &buf[P_DATA1+3], len);
 
-	//Compare it to what we initially sent:
-	switch(packetOffset)
+	if(packetOffset >= MAX_PACKETS_BEHIND)
 	{
-		case 0:
-			cmpResult = memcmp(randomArrayRx, randomArrayTx, len);
-			cmpResult == 0? goodPackets++ : badPackets++;
-			break;
-		case 1:
-			cmpResult = memcmp(randomArrayRx, randomArrayTxOff1, len);
-			cmpResult == 0? goodPackets++ : badPackets++;
-			break;
-		case 2:
-			cmpResult = memcmp(randomArrayRx, randomArrayTxOff2, len);
-			cmpResult == 0? goodPackets++ : badPackets++;
-			break;
-		default:
-			badPackets++;
+		badPackets++;
+		return;
 	}
+
+	int indexToRead = indexOfLastWritten >= packetOffset
+			? (indexOfLastWritten - packetOffset)
+			: (MAX_PACKETS_BEHIND + indexOfLastWritten - packetOffset);
+
+	uint8_t* arrayToCompare = &randomArray[indexToRead][0];
+	cmpResult = memcmp(randomArrayRx, arrayToCompare, len);
+	cmpResult == 0 ? goodPackets++ : badPackets++;
+#endif
 }
 
 #ifdef __cplusplus
