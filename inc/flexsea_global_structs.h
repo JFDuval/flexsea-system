@@ -110,7 +110,7 @@ struct pos_ctrl_s
 struct ctrl_s
 {
 	uint8_t active_ctrl;
-	int16_t pwm;
+	int32_t pwm;
 	struct gen_ctrl_s generic;
 	struct gen_ctrl_s current;
 	struct pos_ctrl_s position;
@@ -166,7 +166,7 @@ struct execute_s
 
 	uint16_t strain;
 	uint16_t analog[8];
-	int16_t current;
+	int32_t current;
 	int32_t* enc_ang;
 	int32_t* enc_ang_vel;
 
@@ -176,7 +176,7 @@ struct execute_s
 	uint8_t pwro;
 	uint8_t status1;
 	uint8_t status2;
-	int16_t sine_commut_pwm;
+	int32_t sine_commut_pwm;
 
 	struct ctrl_s ctrl;
 
@@ -376,7 +376,7 @@ struct diffarr_s
 	int32_t vals[50];
 	int32_t curval;
 	int32_t indx;
-    int32_t curdif;
+	int32_t curdif;
 };
 
 
@@ -394,7 +394,7 @@ struct as504x_s
 
 	int32_t signed_ang;
 	int32_t signed_ang_vel;
-	
+
 	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
 	int32_t ang_comp_clks;	//compensated absolute angle in clicks
 	int32_t num_rot; 		//number of full encoder rotations
@@ -404,20 +404,20 @@ struct as504x_s
 struct as504x_s
 {
 	struct diffarr_s raw_angs_clks;
-    struct diffarr_s raw_vels_cpms;
-    int32_t filt_vel_cpms;        
+	struct diffarr_s raw_vels_cpms;
+	int32_t filt_vel_cpms;
 
 	int32_t signed_ang;
 	int32_t signed_ang_vel;
-	
+
 	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
 	int32_t ang_comp_clks;	//compensated absolute angle in clicks
-    int32_t ang_comp_clks_for_cur;	//compensated absolute angle in clicks
+	int32_t ang_comp_clks_for_cur;	//compensated absolute angle in clicks
 	int32_t num_rot; 		//number of full encoder rotations
-    
-    struct angsense_s raw;
-	struct angsense_s filt; 
-    int32_t last_angtimer_read;
+
+	struct angsense_s raw;
+	struct angsense_s filt;
+	int32_t last_angtimer_read;
 	int32_t counts_since_last_ang_read;
 	int32_t last_ang_read_period;
 	int32_t samplefreq; 	//sampling frequency of the sensor

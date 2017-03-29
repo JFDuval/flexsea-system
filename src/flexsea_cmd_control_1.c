@@ -187,7 +187,7 @@ void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info)
 
 //Test code? Yes
 void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, int16_t currentSetpoint)
+						uint16_t *len, int32_t currentSetpoint)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
@@ -198,12 +198,12 @@ void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		//Execute: reply only
 		(void)currentSetpoint;
-		SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
-		SPLIT_16((uint16_t)ctrl.current.setpoint_val, shBuf, &index);
+		SPLIT_32((uint32_t)ctrl.current.actual_val, shBuf, &index);
+		SPLIT_32((uint32_t)ctrl.current.setpoint_val, shBuf, &index);
 	#else
 		//Other boards can write a new setpoint
-		SPLIT_16((uint16_t)0, shBuf, &index);
-		SPLIT_16((uint16_t)currentSetpoint, shBuf, &index);
+		SPLIT_32((uint32_t)0, shBuf, &index);
+		SPLIT_32((uint32_t)currentSetpoint, shBuf, &index);
 	#endif
 
 	//Payload length:
@@ -233,10 +233,10 @@ void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
-	int16_t tmp_wanted_current = 0, tmp_measured_current = 0;
+	int32_t tmp_wanted_current = 0, tmp_measured_current = 0;
 
-	tmp_measured_current = (int16_t) REBUILD_UINT16(buf, &index);
-	tmp_wanted_current = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp_measured_current = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_wanted_current = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
 
@@ -274,10 +274,10 @@ void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
-	int16_t tmp_wanted_current = 0, tmp_measured_current = 0;
+	int32_t tmp_wanted_current = 0, tmp_measured_current = 0;
 
-	tmp_measured_current = (int16_t) REBUILD_UINT16(buf, &index);
-	tmp_wanted_current = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp_measured_current = (int32_t) REBUILD_UINT32(buf, &index);
+	tmp_wanted_current = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
 
@@ -297,7 +297,7 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 
 //Test code? Yes
 void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, int16_t setpoint)
+						uint16_t *len, int32_t setpoint)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
@@ -308,11 +308,11 @@ void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		//Execute: reply only
 		(void)setpoint;
-		SPLIT_16((uint16_t)exec1.ctrl.pwm, shBuf, &index);
+		SPLIT_32((uint32_t)exec1.ctrl.pwm, shBuf, &index);
 		//ToDo: not sure that this field is updated
 	#else
 		//Other boards can write a new setpoint
-		SPLIT_16((uint16_t)setpoint, shBuf, &index);
+		SPLIT_32((uint32_t)setpoint, shBuf, &index);
 	#endif
 
 	//Payload length:
@@ -342,9 +342,9 @@ void tx_cmd_ctrl_o_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
-	int16_t tmp = 0;
+	int32_t tmp = 0;
 
-	tmp = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
 
@@ -370,7 +370,7 @@ void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_o_w(TX_N_DEFAULT, exec1.ctrl.pwm);
+		tx_cmd_ctrl_o_w(TX_N_DEFAULT, exec1.ctrl.pwm);	//ToDo: is that the right variable?
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
@@ -382,9 +382,9 @@ void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info)
 void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
-	int16_t tmp = 0;
+	int32_t tmp = 0;
 
-	tmp = (int16_t) REBUILD_UINT16(buf, &index);
+	tmp = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
 
