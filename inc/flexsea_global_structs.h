@@ -61,6 +61,15 @@ struct gains_s
 	 uint16_t g0, g1, g2, g3, g4, g5;
 };
 
+struct diffarr_s
+{
+	int32_t vals[50];
+	int32_t curval;
+	int32_t indx;
+	int32_t curdif;
+    int32_t avg;
+};
+
 //Generic controller
 struct gen_ctrl_s
 {
@@ -71,6 +80,7 @@ struct gen_ctrl_s
 	int32_t actual_val;
 	int32_t setpoint_val;
 	int32_t actual_vel;
+    struct diffarr_s actual_vals;
 
 	//Errors:
 	int32_t error;						//Current error
@@ -371,14 +381,6 @@ struct angsense_s
 	int32_t vel_rpm; //rotations per minute
 };
 
-struct diffarr_s
-{
-	int32_t vals[50];
-	int32_t curval;
-	int32_t indx;
-	int32_t curdif;
-};
-
 
 /*
 //AS504x Magnetic encoders:
@@ -445,6 +447,7 @@ void init_diffarr(struct diffarr_s *);
 void update_diffarr(struct diffarr_s *, int32_t, int32_t);
 int32_t get_diffarr(struct diffarr_s *, int32_t);
 int32_t get_diffarr_elmnt(struct diffarr_s *, int32_t);
+void update_diffarr_avg(struct diffarr_s *, int32_t);
 
 #ifdef __cplusplus
 }
