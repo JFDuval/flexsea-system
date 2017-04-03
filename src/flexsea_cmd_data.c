@@ -48,6 +48,8 @@ extern "C" {
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 #include "user-mn.h"
 #include "main.h"
+#include "fm_imu.h"
+#include "fm_adc.h"
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
@@ -347,7 +349,7 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#else
 		(void)select_w;
-		
+
 		//All other boards can only reply
 		SPLIT_32((uint32_t)user_data_1.r[0], shBuf, &index);
 		SPLIT_32((uint32_t)user_data_1.r[1], shBuf, &index);
