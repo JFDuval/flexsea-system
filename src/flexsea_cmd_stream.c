@@ -41,7 +41,7 @@ uint8_t isStreaming = 0;
 int streamCmds[MAX_STREAMS] = {-1 , -1 };
 uint16_t streamPeriods[MAX_STREAMS] = {1, 1};
 uint16_t streamReceivers[MAX_STREAMS] = {0, 0};
-uint8_t streamPortInfos[MAX_STREAMS] = {PORT_USB, PORT_USB};
+uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE, PORT_NONE};
 /*
 int streamCmd = -1;
 uint16_t streamPeriod = 1;
@@ -97,22 +97,43 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 		uint8_t startStop = buf[index++];
 
 		//case: turn streaming on
-		if(startStop && isLegalStreamCmd(cmdToStream))
+		if(startStop && isLegalStreamCmd(cmdToStream) && isStreaming < MAX_STREAMS)
 		{
-			streamCmd = cmdToStream;
-			isStreaming = 1;
-			streamPeriod = periodInMS;
-			streamReceiver = buf[P_XID];
-			streamPortInfo = *info;
+			streamCmds[isStreaming] = cmdToStream;
+			streamPeriods[isStreaming] = periodInMS;
+			streamReceivers[isStreaming] = buf[P_XID];
+			streamPortInfos[isStreaming] = *info;
+			isStreaming++;
 
 		}
 		//case: turn streaming off
 		else
 		{
-			streamCmd = -1;
-			isStreaming = 0;
-			streamPeriod = 12345;
-			streamPortInfo = 0;
+			int i;
+			//get rid of the appropriate stream (find the index of the appropriate stream)
+			for(i=0;i<isStreaming;i++)
+			{
+				if(streamCmds[i] == cmdToStream)
+				{
+					isStreaming--;
+					break;
+				}
+			}
+			//shift other streams down (stream to delete gets overwritten)
+			for(i=i; i < MAX_STREAMS-1; i++)
+			{
+				streamCmds[i] = streamCmds[i+1];
+				streamPeriods[i] = streamPeriods[i+1];
+				streamReceivers[i] = streamReceivers[i+1];
+				streamPortInfos[i] = streamPortInfos[i+1];				
+			}
+			
+			//set last 'stream' to null values
+			streamCmds[i] = -1;
+			streamPeriods[i] = 12345;
+			streamReceivers[i] = 0;
+			streamPortInfos[i] = PORT_NONE;
+			
 		}
 
 	#else

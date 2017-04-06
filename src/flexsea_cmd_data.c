@@ -55,6 +55,7 @@ extern "C" {
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
 	|| defined BOARD_TYPE_FLEXSEA_STRAIN_AMP)
 #include "main.h"
+#include "user-ex.h"
 #ifdef USE_IMU
 	#include "imu.h"
 #endif
