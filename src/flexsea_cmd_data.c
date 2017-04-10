@@ -173,6 +173,14 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16((uint16_t)imu.magneto.y, shBuf, &index);
 	SPLIT_16((uint16_t)imu.magneto.z, shBuf, &index);
 
+	shBuf[index++] = 0;
+	shBuf[index++] = 0;
+
+	SPLIT_16((uint16_t)capSense[0], shBuf, &index);
+	SPLIT_16((uint16_t)capSense[1], shBuf, &index);
+	SPLIT_16((uint16_t)capSense[2], shBuf, &index);
+	SPLIT_16((uint16_t)capSense[3], shBuf, &index);
+
 	#endif  //BOARD_TYPE_FLEXSEA_GOSSIP
 
 	#ifdef BOARD_TYPE_FLEXSEA_STRAIN_AMP
@@ -283,6 +291,15 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				go_s_ptr->magneto.x = (int16_t) REBUILD_UINT16(buf, &index);
 				go_s_ptr->magneto.y = (int16_t) REBUILD_UINT16(buf, &index);
 				go_s_ptr->magneto.z = (int16_t) REBUILD_UINT16(buf, &index);
+
+				go_s_ptr->io[0] = buf[index++];
+				go_s_ptr->io[1] = buf[index++];
+
+				go_s_ptr->capsense[0] = REBUILD_UINT16(buf, &index);
+				go_s_ptr->capsense[1] = REBUILD_UINT16(buf, &index);
+				go_s_ptr->capsense[2] = REBUILD_UINT16(buf, &index);
+				go_s_ptr->capsense[3] = REBUILD_UINT16(buf, &index);
+
 				break;
 
 			case FLEXSEA_STRAIN_BASE:
@@ -347,7 +364,7 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#else
 		(void)select_w;
-		
+
 		//All other boards can only reply
 		SPLIT_32((uint32_t)user_data_1.r[0], shBuf, &index);
 		SPLIT_32((uint32_t)user_data_1.r[1], shBuf, &index);
