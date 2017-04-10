@@ -37,11 +37,17 @@ extern "C" {
 #endif
 
 uint8_t isStreaming = 0;
+
+int streamCmds[MAX_STREAMS] = {-1 , -1 };
+uint16_t streamPeriods[MAX_STREAMS] = {1, 1};
+uint16_t streamReceivers[MAX_STREAMS] = {0, 0};
+uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE, PORT_NONE};
+/*
 int streamCmd = -1;
 uint16_t streamPeriod = 1;
 uint8_t streamReceiver = 0;
 uint8_t streamPortInfo = PORT_USB;
-
+*/
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop)
 {
@@ -76,37 +82,74 @@ uint8_t isLegalStreamCmd(uint8_t cmd)
 
 	return
 		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT ||
-		(cmd > 99 && cmd < 128);
+		(cmd > 99 && cmd < 127);
 }
 
 void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 {
-	uint16_t index = P_DATA1;
 	(void) info;
 
-	uint8_t cmdToStream = buf[index++];
-	uint8_t periodInMS = buf[index++];
-	uint8_t startStop = buf[index++];
-
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		uint16_t index = P_DATA1;
+
+		uint8_t cmdToStream = buf[index++];
+		uint8_t periodInMS = buf[index++];
+		uint8_t startStop = buf[index++];
 
 		//case: turn streaming on
-		if(startStop && isLegalStreamCmd(cmdToStream))
+		if(startStop && isLegalStreamCmd(cmdToStream) && isStreaming < MAX_STREAMS)
 		{
-			streamCmd = cmdToStream;
-			isStreaming = 1;
-			streamPeriod = periodInMS;
-			streamReceiver = buf[P_XID];
-			streamPortInfo = *info;
+			streamCmds[isStreaming] = cmdToStream;
+			streamPeriods[isStreaming] = periodInMS;
+			streamReceivers[isStreaming] = buf[P_XID];
+			streamPortInfos[isStreaming] = *info;
+			isStreaming++;
 
 		}
 		//case: turn streaming off
 		else
 		{
-			streamCmd = -1;
-			isStreaming = 0;
-			streamPeriod = 12345;
-			streamPortInfo = 0;
+			int i;
+			//get rid of the appropriate stream (find the index of the appropriate stream)
+			for(i=0;i<isStreaming;i++)
+			{
+				if(streamCmds[i] == cmdToStream)
+				{
+					isStreaming--;
+					break;
+				}
+			}
+			
+			//fail safe conditions
+			//these conditions will be met if using an older version of plan
+			if(i == isStreaming || cmdToStream == ((uint8_t)-1))
+			{
+				for(i=0;i<MAX_STREAMS;i++)
+				{
+					streamCmds[i] = -1;
+					streamPeriods[i] = 12345;
+					streamReceivers[i] = 0;
+					streamPortInfos[i] = PORT_NONE;	
+				}
+				isStreaming = 0;
+			}
+			else
+			{
+				//shift other streams down (stream to delete gets overwritten)
+				for(i=i; i < MAX_STREAMS-1; i++)
+				{
+					streamCmds[i] = streamCmds[i+1];
+					streamPeriods[i] = streamPeriods[i+1];
+					streamReceivers[i] = streamReceivers[i+1];
+					streamPortInfos[i] = streamPortInfos[i+1];				
+				}
+				
+				//set last 'stream' to null values
+				streamCmds[i] = -1;
+				streamPeriods[i] = 12345;
+				streamReceivers[i] = 0;
+				streamPortInfos[i] = PORT_NONE;		
+			}
 		}
 
 	#else
@@ -129,12 +172,13 @@ void rx_cmd_stream_r(uint8_t *buf, uint8_t *info)
 
 void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info)
 {
-	uint16_t index = P_DATA1;
+	(void) buf;
 	(void) info;
 
-	uint8_t cmdToStream = buf[index++];
-	uint8_t periodInMS = buf[index++];
-	uint8_t startStop = buf[index++];
+//	uint16_t index = P_DATA1;
+//	uint8_t cmdToStream = buf[index++];
+//	uint8_t periodInMS = buf[index++];
+//	uint8_t startStop = buf[index++];
 
 	// do stuff ?
 }

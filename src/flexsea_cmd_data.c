@@ -48,12 +48,17 @@ extern "C" {
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 #include "user-mn.h"
 #include "main.h"
+#include "fm_imu.h"
+#include "fm_adc.h"
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
 	|| defined BOARD_TYPE_FLEXSEA_STRAIN_AMP)
 #include "main.h"
-#include "imu.h"
+#include "user-ex.h"
+#ifdef USE_IMU
+	#include "imu.h"
+#endif
 #include "strain.h"
 #include "safety.h"
 #include "analog.h"
@@ -115,12 +120,21 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	//Data:
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-	SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
-	SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
-	SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
-	SPLIT_16((uint16_t)imu.accel.x, shBuf, &index);
-	SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
-	SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
+	#ifdef USE_IMU
+		SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
+		SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
+		SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
+		SPLIT_16((uint16_t)imu.accel.x, shBuf, &index);
+		SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
+		SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
+	#else
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
+	#endif
 
 	SPLIT_16(strain_read(), shBuf, &index);
 	SPLIT_16(read_analog(0), shBuf, &index);

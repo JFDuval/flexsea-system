@@ -110,3 +110,16 @@ int32_t get_diffarr_elmnt(struct diffarr_s * das, int32_t indx)
 {
     return das->vals[(das->indx-indx+50)%50]; 
 }
+
+void update_diffarr_avg(struct diffarr_s * das, int32_t num)
+{
+    static uint8_t jj;
+    static int32_t sum;
+    static int32_t avg;
+    sum = 0;
+    for (jj=0;jj<num;jj++)
+    {
+        sum+= das->vals[(das->indx-jj+50)%50];
+    }
+    das->avg = sum/num;
+}

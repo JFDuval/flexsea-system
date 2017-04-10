@@ -48,10 +48,20 @@ void rx_cmd_stream_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info);
 
 extern uint8_t isStreaming;
+
+#define MAX_STREAMS 2
+
+extern int streamCmds[MAX_STREAMS];
+extern uint16_t streamPeriods[MAX_STREAMS];
+extern uint16_t streamReceivers[MAX_STREAMS];
+extern uint8_t streamPortInfos[MAX_STREAMS];
+
+/*
 extern int streamCmd;
 extern uint16_t streamPeriod; //in ms
 extern uint8_t streamReceiver;
 extern uint8_t streamPortInfo;
+*/
 
 #ifdef __cplusplus
 }

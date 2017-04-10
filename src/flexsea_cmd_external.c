@@ -43,7 +43,9 @@ extern "C" {
 //Execute boards only:
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 #include "main.h"
-#include "ext_output.h"
+#ifdef USE_PWRO	
+	#include "ext_output.h"
+#endif
 #endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
 //****************************************************************************
@@ -118,7 +120,9 @@ void rx_cmd_exp_pwro_w(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		pwro_output(buf[P_DATA1]);
+		#ifdef USE_PWRO
+			pwro_output(buf[P_DATA1]);
+		#endif
 
 	#else
 		(void)buf;
@@ -128,11 +132,19 @@ void rx_cmd_exp_pwro_w(uint8_t *buf, uint8_t *info)
 //Test code? No
 void rx_cmd_exp_pwro_rw(uint8_t *buf, uint8_t *info)
 {
+	uint8_t tmp = 0;
+	
 	(void)info;
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_exp_pwro_w(TX_N_DEFAULT, read_pwro());
+		#ifdef USE_PWRO
+			tmp = read_pwro();
+		#else
+			tmp = 0;
+		#endif
+			
+		tx_cmd_exp_pwro_w(TX_N_DEFAULT, tmp);
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
 
 	#else
