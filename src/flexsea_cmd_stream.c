@@ -92,7 +92,7 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		uint16_t index = P_DATA1;
 
-		uint8_t cmdToStream = buf[index++];
+		volatile uint8_t cmdToStream = buf[index++];
 		uint8_t periodInMS = buf[index++];
 		uint8_t startStop = buf[index++];
 
@@ -115,7 +115,6 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 			{
 				if(streamCmds[i] == cmdToStream)
 				{
-					isStreaming--;
 					break;
 				}
 			}
@@ -148,7 +147,8 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 				streamCmds[i] = -1;
 				streamPeriods[i] = 12345;
 				streamReceivers[i] = 0;
-				streamPortInfos[i] = PORT_NONE;		
+				streamPortInfos[i] = PORT_NONE;	
+				isStreaming--;
 			}
 		}
 
