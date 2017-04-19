@@ -59,6 +59,10 @@ extern "C" {
 #ifdef USE_IMU
 	#include "imu.h"
 #endif
+#ifdef USE_AS5048B
+	#include "flexsea_global_structs.h"
+	#include "mag_encoders.h"
+#endif
 #include "strain.h"
 #include "safety.h"
 #include "analog.h"
