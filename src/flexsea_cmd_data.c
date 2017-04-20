@@ -48,8 +48,8 @@ extern "C" {
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
 #include "user-mn.h"
 #include "main.h"
-#include "fm_imu.h"
-#include "fm_adc.h"
+#include <imu.h>
+#include <adc.h>
 #endif	//BOARD_TYPE_FLEXSEA_MANAGE
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
