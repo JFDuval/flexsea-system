@@ -54,19 +54,23 @@ extern "C" {
 
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
 	|| defined BOARD_TYPE_FLEXSEA_STRAIN_AMP)
-#include "main.h"
-#include "user-ex.h"
-#ifdef USE_IMU
-	#include "imu.h"
-#endif
-#ifdef USE_AS5048B
-	#include "flexsea_global_structs.h"
-	#include "mag_encoders.h"
-#endif
-#include "strain.h"
-#include "safety.h"
-#include "analog.h"
-#include "control.h"
+	#include "main.h"
+	#ifndef BOARD_SUBTYPE_RIGID
+		#include "user-ex.h"
+	#else
+		#include "user-ex-rigid.h"
+	#endif
+	#ifdef USE_IMU
+		#include "imu.h"
+	#endif
+	#ifdef USE_AS5048B
+		#include "flexsea_global_structs.h"
+		#include "mag_encoders.h"
+	#endif
+	#include "strain.h"
+	#include "safety.h"
+	#include "analog.h"
+	#include "control.h"
 #endif
 
 //****************************************************************************
