@@ -115,7 +115,6 @@ void update_diffarr_avg(struct diffarr_s * das, int32_t num)
 {
     static uint8_t jj;
     static int32_t sum;
-    static int32_t avg;
     sum = 0;
     for (jj=0;jj<num;jj++)
     {
