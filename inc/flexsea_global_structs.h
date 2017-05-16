@@ -67,7 +67,7 @@ struct diffarr_s
 	int32_t curval;
 	int32_t indx;
 	int32_t curdif;
-    int32_t avg;
+	int32_t avg;
 };
 
 //Generic controller
@@ -80,7 +80,7 @@ struct gen_ctrl_s
 	int32_t actual_val;
 	int32_t setpoint_val;
 	int32_t actual_vel;
-    struct diffarr_s actual_vals;
+	struct diffarr_s actual_vals;
 
 	//Errors:
 	int32_t error;						//Current error
@@ -269,14 +269,14 @@ struct decoded_ricnu_s
 struct ricnu_s
 {
 	//Execute:
-	struct execute_s ex;
+	struct execute_s *ex;
 
 	int32_t enc_motor;
 	int32_t enc_joint;
 
 	//Extra sensors (Strain):
 	//uint16_t ext_strain[6];
-	struct strain_s st;
+	struct strain_s *st;
 
 	//Decoded values (ext_strain only)
 	struct decoded_ricnu_s decoded;

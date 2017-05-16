@@ -54,7 +54,7 @@ struct user_data_s user_data_1;
 #include <flexsea_board.h>
 
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
-int32_t exec1Ang, exec2Ang, exec3Ang, exec4Ang;
+int32_t exec1Ang, exec2Ang, exec3Ang, exec4Ang, execXAng;
 int32_t exec1AngVel, exec2AngVel, exec3AngVel, exec4AngVel;
 #endif
 
@@ -84,42 +84,42 @@ void init_diffarr(struct diffarr_s * das)
 {
    static int jj;
    for (jj=0;jj<50;jj++)
-    {
-        das->vals[jj] = 0;
-    }
-    das->indx = 0;
-    das->curval = 0;
-    das->curdif = 0;
+	{
+		das->vals[jj] = 0;
+	}
+	das->indx = 0;
+	das->curval = 0;
+	das->curdif = 0;
 }
 
 void update_diffarr(struct diffarr_s * das, int32_t cvl, int32_t difflen)
 {
-    das->curval = cvl;
-    das->vals[(das->indx+1)%50] = das->curval;
-    das->indx = (das->indx+1)%50;
-    das->curdif = das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50]; 
+	das->curval = cvl;
+	das->vals[(das->indx+1)%50] = das->curval;
+	das->indx = (das->indx+1)%50;
+	das->curdif = das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50];
 }
 
 int32_t get_diffarr(struct diffarr_s * das, int32_t difflen)
 {
-    
-    return das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50]; 
+
+	return das->vals[das->indx]-das->vals[(das->indx-difflen+50)%50];
 }
 
 int32_t get_diffarr_elmnt(struct diffarr_s * das, int32_t indx)
 {
-    return das->vals[(das->indx-indx+50)%50]; 
+	return das->vals[(das->indx-indx+50)%50];
 }
 
 void update_diffarr_avg(struct diffarr_s * das, int32_t num)
 {
-    static uint8_t jj;
-    static int32_t sum;
-    static int32_t avg;
-    sum = 0;
-    for (jj=0;jj<num;jj++)
-    {
-        sum+= das->vals[(das->indx-jj+50)%50];
-    }
-    das->avg = sum/num;
+	static uint8_t jj;
+	static int32_t sum;
+	static int32_t avg;
+	sum = 0;
+	for (jj=0;jj<num;jj++)
+	{
+		sum+= das->vals[(das->indx-jj+50)%50];
+	}
+	das->avg = sum/num;
 }
