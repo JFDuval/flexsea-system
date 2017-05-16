@@ -469,10 +469,14 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 
 		if(ctrl.active_ctrl == CTRL_POSITION)
 		{
+			#ifdef USE_TRAPEZ
 			ctrl.position.posi = ctrl.position.setp;
 			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
 										ctrl.position.spdm, \
 										ctrl.position.acc = tmp_acc);
+			#else
+			ctrl.position.setp = tmp_posf;
+			#endif
 		}
 		else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
 		{
