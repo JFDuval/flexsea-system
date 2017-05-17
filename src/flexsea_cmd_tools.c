@@ -43,7 +43,6 @@ extern "C" {
 //****************************************************************************
 
 //Comm Test:
-#define MAX_PACKETS_BEHIND 10
 uint8_t randomArray[MAX_PACKETS_BEHIND][COMM_STR_BUF_LEN];
 uint8_t indexOfLastWritten = 255;
 uint8_t randomArrayRx[COMM_STR_BUF_LEN];
@@ -90,11 +89,9 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	}
 	else
 	{
-		#ifdef BOARD_TYPE_FLEXSEA_PLAN
 		//We only use _w to send a reply. We send the received array:
 		memcpy(&shBuf[index], randomArrayRx, arrLen);
 		index += arrLen;
-		#endif
 	}
 
 	//Payload length:
@@ -213,7 +210,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	lastRxPacketIndex = packetNum;
 	packetOffset = (uint8_t)lastTxPacketIndex - (uint8_t)lastRxPacketIndex;
 
-#ifdef BOARD_TYPE_FLEXSEA_PLAN
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 	//Save received array:
 	memcpy(randomArrayRx, &buf[P_DATA1+3], len);
 
@@ -230,7 +227,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	uint8_t* arrayToCompare = &randomArray[indexToRead][0];
 	cmpResult = memcmp(randomArrayRx, arrayToCompare, len);
 	cmpResult == 0 ? goodPackets++ : badPackets++;
-#endif
+	#endif
 }
 
 #ifdef __cplusplus
