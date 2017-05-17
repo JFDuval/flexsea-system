@@ -381,27 +381,6 @@ struct angsense_s
 	int32_t vel_rpm; //rotations per minute
 };
 
-
-/*
-//AS504x Magnetic encoders:
-struct as504x_s
-{
-	int32_t last_angtimer_read;
-	int32_t counts_since_last_ang_read;
-	int32_t last_ang_read_period;
-	int32_t samplefreq; 	//sampling frequency of the sensor
-
-	struct angsense_s raw;
-	struct angsense_s filt;
-
-	int32_t signed_ang;
-	int32_t signed_ang_vel;
-
-	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
-	int32_t ang_comp_clks;	//compensated absolute angle in clicks
-	int32_t num_rot; 		//number of full encoder rotations
-};
-*/
 //AS504x Magnetic encoders:
 struct as504x_s
 {
@@ -412,17 +391,17 @@ struct as504x_s
 	int32_t signed_ang;
 	int32_t signed_ang_vel;
 
-	int32_t ang_abs_clks; 	//absolute (0-16383) angle in clicks
-	int32_t ang_comp_clks;	//compensated absolute angle in clicks
+	int32_t ang_abs_clks; 			//absolute (0-16383) angle in clicks
+	int32_t ang_comp_clks;			//compensated absolute angle in clicks
 	int32_t ang_comp_clks_for_cur;	//compensated absolute angle in clicks
-	int32_t num_rot; 		//number of full encoder rotations
+	int32_t num_rot; 				//number of full encoder rotations
 
 	struct angsense_s raw;
 	struct angsense_s filt;
 	int32_t last_angtimer_read;
 	int32_t counts_since_last_ang_read;
 	int32_t last_ang_read_period;
-	int32_t samplefreq; 	//sampling frequency of the sensor
+	int32_t samplefreq; 			//sampling frequency of the sensor
 };
 
 //****************************************************************************
