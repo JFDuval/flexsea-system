@@ -259,6 +259,30 @@ struct strain_s
 	struct decoded_strain_s decoded;
 };
 
+//FlexSEA-Battery:
+
+struct decoded_battery_s
+{
+	int32_t voltage;	//mV
+	int32_t current;	//mA
+	int32_t power;		//mW
+	int32_t temp;		//C*10
+};
+
+struct battery_s
+{
+	uint16_t voltage;
+	int16_t current;
+	uint8_t temp;
+	uint8_t pushbutton;
+	uint8_t status;
+
+	uint8_t rawBytes[8];
+
+	//Decoded values:
+	struct decoded_battery_s decoded;
+};
+
 //Special structure for the RIC/NU Knee. 'execute_s' + extra sensors.
 
 struct decoded_ricnu_s
@@ -271,12 +295,15 @@ struct ricnu_s
 	//Execute:
 	struct execute_s *ex;
 
+	//Two encoders:
 	int32_t enc_motor;
 	int32_t enc_joint;
 
 	//Extra sensors (Strain):
-	//uint16_t ext_strain[6];
 	struct strain_s *st;
+
+	//Battery board:
+	struct battery_s *batt;
 
 	//Decoded values (ext_strain only)
 	struct decoded_ricnu_s decoded;
@@ -306,30 +333,6 @@ struct gossip_s
 
 	//Decoded values:
 	struct decoded_gossip_s decoded;
-};
-
-//FlexSEA-Battery:
-
-struct decoded_battery_s
-{
-	int32_t voltage;    //mV
-	int32_t current;    //mA
-	int32_t power;      //mW
-	int32_t temp;       //C*10
-};
-
-struct battery_s
-{
-	uint16_t voltage;
-	int16_t current;
-	uint8_t temp;
-	uint8_t pushbutton;
-	uint8_t status;
-
-	uint8_t rawBytes[8];
-
-	//Decoded values:
-	struct decoded_battery_s decoded;
 };
 
 //Commands, tools, specialty, etc.:
