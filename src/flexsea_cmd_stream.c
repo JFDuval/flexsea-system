@@ -42,12 +42,7 @@ int streamCmds[MAX_STREAMS] = {-1 , -1 };
 uint16_t streamPeriods[MAX_STREAMS] = {1, 1};
 uint16_t streamReceivers[MAX_STREAMS] = {0, 0};
 uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE, PORT_NONE};
-/*
-int streamCmd = -1;
-uint16_t streamPeriod = 1;
-uint8_t streamReceiver = 0;
-uint8_t streamPortInfo = PORT_USB;
-*/
+
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop)
 {
@@ -89,83 +84,71 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 {
 	(void) info;
 
-	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-		uint16_t index = P_DATA1;
+	uint16_t index = P_DATA1;
 
-		volatile uint8_t cmdToStream = buf[index++];
-		uint8_t periodInMS = buf[index++];
-		uint8_t startStop = buf[index++];
+	volatile uint8_t cmdToStream = buf[index++];
+	uint8_t periodInMS = buf[index++];
+	uint8_t startStop = buf[index++];
 
-		//case: turn streaming on
-		if(startStop && isLegalStreamCmd(cmdToStream) && isStreaming < MAX_STREAMS)
+	//case: turn streaming on
+	if(startStop && isLegalStreamCmd(cmdToStream) && isStreaming < MAX_STREAMS)
+	{
+		streamCmds[isStreaming] = cmdToStream;
+		streamPeriods[isStreaming] = periodInMS;
+		streamReceivers[isStreaming] = buf[P_XID];
+		streamPortInfos[isStreaming] = *info;
+		isStreaming++;
+
+	}
+	//case: turn streaming off
+	else
+	{
+		int i;
+		//get rid of the appropriate stream (find the index of the appropriate stream)
+		for(i=0;i<isStreaming;i++)
 		{
-			streamCmds[isStreaming] = cmdToStream;
-			streamPeriods[isStreaming] = periodInMS;
-			streamReceivers[isStreaming] = buf[P_XID];
-			streamPortInfos[isStreaming] = *info;
-			isStreaming++;
-
+			if(streamCmds[i] == cmdToStream)
+			{
+				break;
+			}
 		}
-		//case: turn streaming off
-		else
+
+		//fail safe conditions
+		//these conditions will be met if using an older version of plan
+		if(i == isStreaming || cmdToStream == ((uint8_t)-1))
 		{
-			int i;
-			//get rid of the appropriate stream (find the index of the appropriate stream)
-			for(i=0;i<isStreaming;i++)
+			for(i=0;i<MAX_STREAMS;i++)
 			{
-				if(streamCmds[i] == cmdToStream)
-				{
-					break;
-				}
-			}
-			
-			//fail safe conditions
-			//these conditions will be met if using an older version of plan
-			if(i == isStreaming || cmdToStream == ((uint8_t)-1))
-			{
-				for(i=0;i<MAX_STREAMS;i++)
-				{
-					streamCmds[i] = -1;
-					streamPeriods[i] = 12345;
-					streamReceivers[i] = 0;
-					streamPortInfos[i] = PORT_NONE;	
-				}
-				isStreaming = 0;
-			}
-			else
-			{
-				//shift other streams down (stream to delete gets overwritten)
-				for(i=i; i < MAX_STREAMS-1; i++)
-				{
-					streamCmds[i] = streamCmds[i+1];
-					streamPeriods[i] = streamPeriods[i+1];
-					streamReceivers[i] = streamReceivers[i+1];
-					streamPortInfos[i] = streamPortInfos[i+1];				
-				}
-				
-				//set last 'stream' to null values
 				streamCmds[i] = -1;
 				streamPeriods[i] = 12345;
 				streamReceivers[i] = 0;
 				streamPortInfos[i] = PORT_NONE;	
-				isStreaming--;
 			}
+			isStreaming = 0;
 		}
+		else
+		{
+			//shift other streams down (stream to delete gets overwritten)
+			for(; i < MAX_STREAMS-1; i++)	//Note: init was i=i, compiler complained.
+			{
+				streamCmds[i] = streamCmds[i+1];
+				streamPeriods[i] = streamPeriods[i+1];
+				streamReceivers[i] = streamReceivers[i+1];
+				streamPortInfos[i] = streamPortInfos[i+1];
+			}
 
-	#else
-
-		(void)buf;
-
-	#endif	//BOARD_TY
+			//set last 'stream' to null values
+			streamCmds[i] = -1;
+			streamPeriods[i] = 12345;
+			streamReceivers[i] = 0;
+			streamPortInfos[i] = PORT_NONE;
+			isStreaming--;
+		}
+	}
 }
 
 void rx_cmd_stream_r(uint8_t *buf, uint8_t *info)
 {
-	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-//	tx_cmd_stream_w(TX_N_DEFAULT, current stream mode, whether currently streaming)
-// 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
-	#endif
-
 	(void) buf;
 	(void) info;
 }
@@ -174,13 +157,6 @@ void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info)
 {
 	(void) buf;
 	(void) info;
-
-//	uint16_t index = P_DATA1;
-//	uint8_t cmdToStream = buf[index++];
-//	uint8_t periodInMS = buf[index++];
-//	uint8_t startStop = buf[index++];
-
-	// do stuff ?
 }
 
 void init_flexsea_payload_ptr_stream(void)
@@ -189,7 +165,6 @@ void init_flexsea_payload_ptr_stream(void)
 	flexsea_payload_ptr[CMD_STREAM][RX_PTYPE_WRITE] = &rx_cmd_stream_w;
 	flexsea_payload_ptr[CMD_STREAM][RX_PTYPE_REPLY] = &rx_cmd_stream_rr;
 }
-
 
 #ifdef __cplusplus
 }
