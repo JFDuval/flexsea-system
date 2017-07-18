@@ -56,13 +56,8 @@ extern int streamCmds[MAX_STREAMS];
 extern uint16_t streamPeriods[MAX_STREAMS];
 extern uint16_t streamReceivers[MAX_STREAMS];
 extern uint8_t streamPortInfos[MAX_STREAMS];
-
-/*
-extern int streamCmd;
-extern uint16_t streamPeriod; //in ms
-extern uint8_t streamReceiver;
-extern uint8_t streamPortInfo;
-*/
+extern uint16_t streamIndex[MAX_STREAMS][2];
+extern uint8_t streamCurrentOffset[MAX_STREAMS];
 
 #ifdef __cplusplus
 }
