@@ -24,7 +24,7 @@
 	[This file] flexsea_cmd_stream: commands allowing plan to put execute into a streaming mode
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-03-13 | dudds4 | Initial GPL-3.0 release 
+	* 2017-03-13 | dudds4 | Initial GPL-3.0 release
 ****************************************************************************/
 
 #ifndef INC_FLEXSEA_CMD_STREAM_H
@@ -39,7 +39,8 @@ extern "C" {
 void init_flexsea_payload_ptr_stream(void);
 
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop);
+						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, \
+						uint8_t startStop, uint8_t firstIndex, uint8_t lastIndex);
 void tx_cmd_stream_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 
