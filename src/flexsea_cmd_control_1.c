@@ -490,11 +490,15 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 			ctrl.impedance.gain.Z_B = 0;
 			ctrl.impedance.gain.Z_I = 0;
 
+			#ifdef USE_TRAPEZ
 			//New trajectory
 			ctrl.position.posi = ctrl.impedance.setpoint_val;
 			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
 										ctrl.position.spdm, \
 										ctrl.position.acc = tmp_acc);
+			#else
+			ctrl.impedance.setpoint_val = tmp_posf;
+			#endif //USE_TRAPEZ
 
 			//Restore gains
 			ctrl.impedance.gain.Z_K = tmp_z_k;
