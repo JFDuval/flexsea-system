@@ -37,6 +37,9 @@ extern "C" {
 #include <flexsea.h>
 #include <flexsea_system.h>
 #include <flexsea_board.h>
+#ifdef TEST_PC
+#include <stdio.h>
+#endif	//TEST_PC
 
 //****************************************************************************
 // Variable(s)
@@ -62,7 +65,7 @@ void init_flexsea_payload_ptr_tools(void)
 {
 	//Comm. Test:
 	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_READ] = &rx_cmd_tools_comm_test_rw;
-	//flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_WRITE] = &rx_cmd_tools_comm_test_w;
+	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_WRITE] = &rx_cmd_tools_comm_test_w;
 	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_REPLY] = &rx_cmd_tools_comm_test_rr;
 }
 
@@ -70,8 +73,11 @@ void init_flexsea_payload_ptr_tools(void)
 //====================
 
 //Test code? No
+//Legacy use (reply only): randomArrayLen = 0, reply = 1.
+//To write random packets (not replies), reply = 0.
 void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t offset, uint8_t packetNum)
+						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \
+						uint8_t packetNum, uint8_t reply)
 {
 	//Variable(s) & command:
 	uint16_t index = 0;
@@ -81,7 +87,6 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	//Data:
 	shBuf[index++] = offset;
 	shBuf[index++] = packetNum;
-	shBuf[index++] = arrLen;
 
 	if(offset == 0)
 	{
@@ -89,9 +94,32 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	}
 	else
 	{
-		//We only use _w to send a reply. We send the received array:
-		memcpy(&shBuf[index], randomArrayRx, arrLen);
-		index += arrLen;
+		if(reply)
+		{
+			//We only use _w to send a reply. We send the received array:
+			shBuf[index++] = arrLen;
+			memcpy(&shBuf[index], randomArrayRx, arrLen);
+			index += arrLen;
+		}
+		else
+		{
+			arrLen = (randomArrayLen <= PAYLOAD_BYTES) ? randomArrayLen : PAYLOAD_BYTES;
+			shBuf[index++] = arrLen;
+
+			//Use this for the actual test:
+			int indexToWriteTo = (indexOfLastWritten + 1) % MAX_PACKETS_BEHIND;
+
+			#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined TEST_PC)
+			uint8_t* writeTo = &randomArray[indexToWriteTo][0];
+			generateRandomUint8_tArray(writeTo, arrLen);
+			memcpy(&shBuf[index], writeTo, arrLen);
+			#endif	//(defined BOARD_TYPE_FLEXSEA_PLAN || defined TEST_PC)
+
+			indexOfLastWritten = indexToWriteTo;
+			//Generate and send new Tx array:
+			index += arrLen;
+			sentPackets++;
+		}
 	}
 
 	//Payload length:
@@ -145,14 +173,24 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive Comm. Test:
 //===================
 
-/*
 //Test code? No
+//This function is only used for TEST_PC
 void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info)
 {
 	(void)info;
-	//...
+
+	uint8_t offset = buf[P_DATA1];
+	uint8_t packetNum = buf[P_DATA1+1];
+	arrLen = buf[P_DATA1+2];
+
+	goodPackets++;
+
+	#ifdef TEST_PC
+
+	printf("\nrx_cmd_tools_comm_test_w: %i, %i, %i.\n", offset, packetNum, arrLen);
+
+	#endif
 }
-*/
 
 //Test code? No
 void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
@@ -190,7 +228,7 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 	}
 	*/
 
-	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, packetNum);
+	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, 0, packetNum, 1);
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 }
 
