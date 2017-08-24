@@ -42,9 +42,12 @@ int streamCmds[MAX_STREAMS] = {-1 , -1 };
 uint16_t streamPeriods[MAX_STREAMS] = {1, 1};
 uint16_t streamReceivers[MAX_STREAMS] = {0, 0};
 uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE, PORT_NONE};
+uint16_t streamIndex[MAX_STREAMS][2];
+uint8_t streamCurrentOffset[MAX_STREAMS] = {0,0};
 
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, uint8_t startStop)
+						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, \
+						uint8_t startStop, uint8_t firstIndex, uint8_t lastIndex)
 {
 	uint16_t index = 0;
 	(*cmd) = CMD_STREAM;
@@ -53,6 +56,8 @@ void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	shBuf[index++] = cmdToStream;
 	shBuf[index++] = periodInMS;
 	shBuf[index++] = startStop;
+	shBuf[index++] = firstIndex;
+	shBuf[index++] = lastIndex;
 
 	*len = index;
 }
@@ -89,16 +94,19 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 	volatile uint8_t cmdToStream = buf[index++];
 	uint8_t periodInMS = buf[index++];
 	uint8_t startStop = buf[index++];
+	uint8_t firstIndex = buf[index++];
+	uint8_t lastIndex = buf[index++];
 
 	//case: turn streaming on
-	if(startStop && isLegalStreamCmd(cmdToStream) && isStreaming < MAX_STREAMS)
+	if(startStop && isLegalStreamCmd(cmdToStream) && (isStreaming < MAX_STREAMS))
 	{
 		streamCmds[isStreaming] = cmdToStream;
 		streamPeriods[isStreaming] = periodInMS;
 		streamReceivers[isStreaming] = buf[P_XID];
 		streamPortInfos[isStreaming] = *info;
+		streamIndex[isStreaming][0] = firstIndex;
+		streamIndex[isStreaming][1] = lastIndex;
 		isStreaming++;
-
 	}
 	//case: turn streaming off
 	else
@@ -122,7 +130,9 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 				streamCmds[i] = -1;
 				streamPeriods[i] = 12345;
 				streamReceivers[i] = 0;
-				streamPortInfos[i] = PORT_NONE;	
+				streamPortInfos[i] = PORT_NONE;
+				streamIndex[i][0] = 0;
+				streamIndex[i][1] = 0;
 			}
 			isStreaming = 0;
 		}
@@ -135,6 +145,8 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 				streamPeriods[i] = streamPeriods[i+1];
 				streamReceivers[i] = streamReceivers[i+1];
 				streamPortInfos[i] = streamPortInfos[i+1];
+				streamIndex[i][0] = streamIndex[i+1][0];
+				streamIndex[i][1] = streamIndex[i+1][1];
 			}
 
 			//set last 'stream' to null values
@@ -142,6 +154,8 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 			streamPeriods[i] = 12345;
 			streamReceivers[i] = 0;
 			streamPortInfos[i] = PORT_NONE;
+			streamIndex[i][0] = 0;
+			streamIndex[i][1] = 0;
 			isStreaming--;
 		}
 	}
