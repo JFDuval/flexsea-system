@@ -353,7 +353,7 @@ void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info)
 		//Only change the setpoint if we are in open control mode:
 		if(ctrl.active_ctrl == CTRL_OPEN)
 		{
-			motor_open_speed_1(tmp);
+			setMotorVoltage(tmp);
 		}
 
 	#else
