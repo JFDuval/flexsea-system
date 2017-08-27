@@ -35,6 +35,11 @@
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 	#include "mag_encoders.h"
+	#include "user-ex.h"
+	
+	#ifdef USE_QEI
+		#include "ext_input.h"
+	#endif	//USE_QEI
 #endif
 
 //****************************************************************************
@@ -77,6 +82,10 @@ void initializeGlobalStructs()
 	#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
+		
+		#ifdef USE_QEI
+			exec1.enc_ang = &encoder.count;
+		#endif	//USE_QEI
 	#endif
 }
 
