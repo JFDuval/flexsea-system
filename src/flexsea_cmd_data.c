@@ -151,11 +151,19 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_32((uint32_t)(*exec1.enc_ang), shBuf, &index);
 	SPLIT_32((uint32_t)ctrl.current.actual_val, shBuf, &index);
 
-	shBuf[index++] = safety_cop.v_vb;
-	shBuf[index++] = safety_cop.v_vg;
-	shBuf[index++] = safety_cop.temperature;
-	shBuf[index++] = safety_cop.status1;
-	shBuf[index++] = safety_cop.status2;
+	#ifndef BOARD_SUBTYPE_RIGID
+		shBuf[index++] = safety_cop.v_vb;
+		shBuf[index++] = safety_cop.v_vg;
+		shBuf[index++] = safety_cop.temperature;
+		shBuf[index++] = safety_cop.status1;
+		shBuf[index++] = safety_cop.status2;
+	#else
+		shBuf[index++] = 0;
+		shBuf[index++] = 0;
+		shBuf[index++] = 0;
+		shBuf[index++] = 0;
+		shBuf[index++] = 0;
+	#endif //BOARD_SUBTYPE_RIGID
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 
