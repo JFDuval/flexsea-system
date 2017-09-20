@@ -68,9 +68,11 @@ extern "C" {
 		#include "mag_encoders.h"
 	#endif
 	#include "strain.h"
-	#include "safety.h"
-	#include "analog.h"
-	#include "control.h"
+	#ifndef BOARD_TYPE_FLEXSEA_STRAIN_AMP
+		#include "safety.h"
+		#include "analog.h"
+		#include "control.h"
+	#endif
 #endif
 
 //****************************************************************************
