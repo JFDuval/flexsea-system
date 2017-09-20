@@ -49,6 +49,8 @@ void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t ctrlMode);
+void ptx_cmd_ctrl_mode_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							 uint8_t ctrlMode);
 void rx_cmd_ctrl_mode_rr(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info);
@@ -67,6 +69,8 @@ void tx_cmd_ctrl_o_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, int32_t setpoint);
+void ptx_cmd_ctrl_o_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t setpoint);
 void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info);

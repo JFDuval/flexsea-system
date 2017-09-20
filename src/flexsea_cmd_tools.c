@@ -126,6 +126,15 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+void ptx_cmd_tools_comm_test_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+								uint8_t offset, uint8_t randomArrayLen, \
+								uint8_t packetNum, uint8_t reply)
+{
+	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, randomArrayLen, \
+								packetNum, reply);
+	pack(P_AND_S_DEFAULT,slaveId, NULL, numb, commStr);
+}
+
 //Test code? No
 void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \

@@ -115,6 +115,13 @@ void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+void ptx_cmd_ctrl_mode_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							 uint8_t ctrlMode)
+{
+	tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrlMode);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
+}
+
 //Test code? Yes
 void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
@@ -317,6 +324,13 @@ void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+void ptx_cmd_ctrl_o_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t setpoint)
+{
+	tx_cmd_ctrl_o_w(TX_N_DEFAULT, setpoint);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Test code? Yes
