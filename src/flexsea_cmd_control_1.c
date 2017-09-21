@@ -115,6 +115,14 @@ void tx_cmd_ctrl_mode_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+//Pack tx_cmd_ctrl_mode_w()
+void ptx_cmd_ctrl_mode_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							uint8_t ctrlMode)
+{
+	tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrlMode);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
+}
+
 //Test code? Yes
 void tx_cmd_ctrl_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
@@ -210,6 +218,14 @@ void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+//Pack tx_cmd_ctrl_i_w()
+void ptx_cmd_ctrl_i_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t currentSetpoint)
+{
+	tx_cmd_ctrl_i_w(TX_N_DEFAULT, currentSetpoint);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
+}
+
 //Test code? Yes
 void tx_cmd_ctrl_i_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
@@ -251,6 +267,8 @@ void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_measured_current;
+		(void)tmp_wanted_current;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -266,7 +284,9 @@ void rx_cmd_ctrl_i_rw(uint8_t *buf, uint8_t *info)
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
+
 		(void)buf;
+
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
@@ -280,6 +300,7 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 	tmp_wanted_current = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
+	(void)tmp_wanted_current;
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
@@ -288,7 +309,10 @@ void rx_cmd_ctrl_i_rr(uint8_t *buf, uint8_t *info)
 	exPtr1->current = tmp_measured_current;
 
 	#else
+
 		(void)buf;
+		(void)tmp_measured_current;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
@@ -317,6 +341,14 @@ void tx_cmd_ctrl_o_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+//Pack tx_cmd_ctrl_o()
+void ptx_cmd_ctrl_o_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t setpoint)
+{
+	tx_cmd_ctrl_o_w(TX_N_DEFAULT, setpoint);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Test code? Yes
@@ -359,6 +391,7 @@ void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -374,7 +407,9 @@ void rx_cmd_ctrl_o_rw(uint8_t *buf, uint8_t *info)
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
+
 		(void)buf;
+
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 
@@ -397,6 +432,7 @@ void rx_cmd_ctrl_o_rr(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp;
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
@@ -423,6 +459,15 @@ void tx_cmd_ctrl_p_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+//Pack tx_cmd_ctrl_p_w()
+void ptx_cmd_ctrl_p_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t pos, int32_t posi, int32_t posf,\
+						int32_t spdm, int32_t acc)
+{
+	tx_cmd_ctrl_p_w(TX_N_DEFAULT, pos, posi, posf, spdm, acc);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Test code? Yes
@@ -509,6 +554,11 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_pos;
+		(void)tmp_posi;
+		(void)tmp_posf;
+		(void)tmp_spdm;
+		(void)tmp_acc;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -558,6 +608,11 @@ void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_pos;
+		(void)tmp_posi;
+		(void)tmp_posf;
+		(void)tmp_spdm;
+		(void)tmp_acc;
 
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }

@@ -148,7 +148,10 @@ void rx_cmd_exp_pwro_rw(uint8_t *buf, uint8_t *info)
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, 0);
 
 	#else
+
 		(void)buf;
+		(void)tmp;
+
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
 

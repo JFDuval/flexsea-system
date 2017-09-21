@@ -55,6 +55,11 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info);
 
+//Simplified functions:
+void ptx_cmd_tools_comm_test_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+								uint8_t offset, uint8_t randomArrayLen, \
+								uint8_t packetNum, uint8_t reply);
+
 //****************************************************************************
 // Definition(s):
 //****************************************************************************

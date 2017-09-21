@@ -113,6 +113,26 @@ void rx_cmd_ctrl_z_g_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_ctrl_z_g_rr(uint8_t *buf, uint8_t *info);
 
 //****************************************************************************
+// Prototype(s) - simplified functions (DLL):
+//****************************************************************************
+
+void ptx_cmd_ctrl_mode_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							uint8_t ctrlMode);
+void ptx_cmd_ctrl_o_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t setpoint);
+void ptx_cmd_ctrl_i_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t currentSetpoint);
+void ptx_cmd_ctrl_p_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int32_t pos, int32_t posi, int32_t posf,\
+						int32_t spdm, int32_t acc);
+void ptx_cmd_ctrl_i_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							int16_t kp, int16_t ki, int16_t kd);
+void ptx_cmd_ctrl_p_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int16_t kp, int16_t ki, int16_t kd);
+void ptx_cmd_ctrl_z_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int16_t zk, int16_t zb, int16_t zi);
+
+//****************************************************************************
 // Definition(s):
 //****************************************************************************
 

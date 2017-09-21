@@ -144,6 +144,8 @@ void rx_cmd_in_control_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)w_val;
+		(void)w_select;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -167,19 +169,12 @@ void rx_cmd_in_control_rw(uint8_t *buf, uint8_t *info)
 void rx_cmd_in_control_rr(uint8_t *buf, uint8_t *info)
 {
 	uint16_t index = P_DATA1;
-	int32_t w_val = 0;
-	uint8_t w_select = 0;
-
-	//Decode data:
-	w_select =  buf[index++];
-	w_val = (int32_t) REBUILD_UINT32(buf, &index);
 
 	(void)info;
 
 	#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 
 		//Store value:
-
 		in_control_1.setp = (int32_t) REBUILD_UINT32(buf, &index);
 		in_control_1.actual_val = (int32_t) REBUILD_UINT32(buf, &index);
 
@@ -197,7 +192,9 @@ void rx_cmd_in_control_rr(uint8_t *buf, uint8_t *info)
 		in_control_1.pwm = IN_CONTROL_PWM(in_control_1.combined);
 
 	#else
+
 		(void)buf;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
