@@ -232,6 +232,12 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+	(void)shBuf;
+
+	#endif	//BOARD_TYPE_FLEXSEA_PLAN
+
 	//Payload length:
 	(*len) = index;
 }
