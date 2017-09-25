@@ -241,6 +241,7 @@ struct strain_1ch_s
 
 	//Raw ADC values:
 	uint16_t strain_raw[4];
+	uint16_t strain_mem[5];
 	uint16_t vo1;
 	uint16_t vo2;
 
