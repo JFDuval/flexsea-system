@@ -220,6 +220,7 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	//Arguments:
 
 	//Compressed Strain:
+	prepStrainDataForComm();
 	shBuf[index++] = strain1.compressedBytes[0];
 	shBuf[index++] = strain1.compressedBytes[1];
 	shBuf[index++] = strain1.compressedBytes[2];
