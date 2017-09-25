@@ -255,6 +255,7 @@ struct strain_s
 	//One structure per channel:
 	struct strain_1ch_s ch[6];
 	uint8_t compressedBytes[9];
+	uint8_t preDecoded;
 
 	//Decoded values:
 	struct decoded_strain_s decoded;
@@ -383,7 +384,7 @@ struct angsense_s
 	int32_t vel_cpms; //clicks per ms
 	int32_t vel_ctrl_cpms;
 	int32_t vel_rpm; //rotations per minute
-	
+
 	//16-bits version for the joint encoder:
 	int16_t ang_clks_16b;
 	int16_t vel_cpms_16b;

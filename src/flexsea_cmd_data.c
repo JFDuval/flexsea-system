@@ -232,6 +232,12 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#endif 	//BOARD_TYPE_FLEXSEA_STRAIN_AMP
 
+	#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+	(void)shBuf;
+
+	#endif	//BOARD_TYPE_FLEXSEA_PLAN
+
 	//Payload length:
 	(*len) = index;
 }
@@ -345,6 +351,7 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 				st_s_ptr->compressedBytes[6] = buf[index++];
 				st_s_ptr->compressedBytes[7] = buf[index++];
 				st_s_ptr->compressedBytes[8] = buf[index++];
+				st_s_ptr->preDecoded = 0;
 				break;
 		}
 

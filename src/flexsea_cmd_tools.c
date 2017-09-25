@@ -126,6 +126,15 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+void ptx_cmd_tools_comm_test_w(	uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+								uint8_t offset, uint8_t randomArrayLen, \
+								uint8_t packetNum, uint8_t reply)
+{
+	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, randomArrayLen, \
+								packetNum, reply);
+	pack(P_AND_S_DEFAULT,slaveId, NULL, numb, commStr);
+}
+
 //Test code? No
 void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \
@@ -187,7 +196,12 @@ void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info)
 
 	#ifdef TEST_PC
 
-	printf("\nrx_cmd_tools_comm_test_w: %i, %i, %i.\n", offset, packetNum, arrLen);
+		printf("\nrx_cmd_tools_comm_test_w: %i, %i, %i.\n", offset, packetNum, arrLen);
+
+	#else
+
+		(void)offset;
+		(void)packetNum;
 
 	#endif
 }
@@ -249,22 +263,28 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	packetOffset = (uint8_t)lastTxPacketIndex - (uint8_t)lastRxPacketIndex;
 
 	#ifdef BOARD_TYPE_FLEXSEA_PLAN
-	//Save received array:
-	memcpy(randomArrayRx, &buf[P_DATA1+3], len);
 
-	if(packetOffset >= MAX_PACKETS_BEHIND)
-	{
-		badPackets++;
-		return;
-	}
+		//Save received array:
+		memcpy(randomArrayRx, &buf[P_DATA1+3], len);
 
-	int indexToRead = indexOfLastWritten >= packetOffset
-			? (indexOfLastWritten - packetOffset)
-			: (MAX_PACKETS_BEHIND + indexOfLastWritten - packetOffset);
+		if(packetOffset >= MAX_PACKETS_BEHIND)
+		{
+			badPackets++;
+			return;
+		}
 
-	uint8_t* arrayToCompare = &randomArray[indexToRead][0];
-	cmpResult = memcmp(randomArrayRx, arrayToCompare, len);
-	cmpResult == 0 ? goodPackets++ : badPackets++;
+		int indexToRead = indexOfLastWritten >= packetOffset
+				? (indexOfLastWritten - packetOffset)
+				: (MAX_PACKETS_BEHIND + indexOfLastWritten - packetOffset);
+
+		uint8_t* arrayToCompare = &randomArray[indexToRead][0];
+		cmpResult = memcmp(randomArrayRx, arrayToCompare, len);
+		cmpResult == 0 ? goodPackets++ : badPackets++;
+
+	#else
+
+		(void)cmpResult;
+
 	#endif
 }
 

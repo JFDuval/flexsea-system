@@ -104,6 +104,14 @@ void tx_cmd_ctrl_i_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+//Pack tx_cmd_ctrl_i_g_w()
+void ptx_cmd_ctrl_i_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							int16_t kp, int16_t ki, int16_t kd)
+{
+	tx_cmd_ctrl_i_g_w(TX_N_DEFAULT, kp, ki, kd);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
+}
+
 //Test code? Yes
 void tx_cmd_ctrl_i_g_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len)
@@ -147,6 +155,9 @@ void rx_cmd_ctrl_i_g_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_kp;
+		(void)tmp_ki;
+		(void)tmp_kd;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -190,7 +201,12 @@ void rx_cmd_ctrl_i_g_rr(uint8_t *buf, uint8_t *info)
 		exPtr2->ctrl.current.gain.I_KD = tmp_kd;
 
 	#else
+
 		(void)buf;
+		(void)tmp_kp;
+		(void)tmp_ki;
+		(void)tmp_kd;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
@@ -213,6 +229,14 @@ void tx_cmd_ctrl_p_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+//Pack tx_cmd_ctrl_mode_w()
+void ptx_cmd_ctrl_p_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int16_t kp, int16_t ki, int16_t kd)
+{
+	tx_cmd_ctrl_p_g_w(TX_N_DEFAULT, kp, ki, kd);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Test code? Yes
@@ -258,6 +282,9 @@ void rx_cmd_ctrl_p_g_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_kp;
+		(void)tmp_ki;
+		(void)tmp_kd;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -302,7 +329,12 @@ void rx_cmd_ctrl_p_g_rr(uint8_t *buf, uint8_t *info)
 		//ToDo: can't be exec1!
 
 	#else
+
 		(void)buf;
+		(void)tmp_kp;
+		(void)tmp_ki;
+		(void)tmp_kd;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
@@ -325,6 +357,14 @@ void tx_cmd_ctrl_z_g_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+//Pack tx_cmd_ctrl_mode_w()
+void ptx_cmd_ctrl_z_g_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+						int16_t zk, int16_t zb, int16_t zi)
+{
+	tx_cmd_ctrl_z_g_w(TX_N_DEFAULT, zk, zb, zi);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Test code? Yes
@@ -370,6 +410,9 @@ void rx_cmd_ctrl_z_g_w(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)buf;
+		(void)tmp_zk;
+		(void)tmp_zb;
+		(void)tmp_zi;
 
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
 }
@@ -413,7 +456,12 @@ void rx_cmd_ctrl_z_g_rr(uint8_t *buf, uint8_t *info)
 		exPtr2->ctrl.impedance.gain.Z_I = tmp_zi;
 
 	#else
+
 		(void)buf;
+		(void)tmp_zk;
+		(void)tmp_zb;
+		(void)tmp_zi;
+
 	#endif	//((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 }
 
