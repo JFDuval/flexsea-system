@@ -37,6 +37,10 @@
 	#include "mag_encoders.h"
 	#include "user-ex.h"
 	
+	#ifdef BOARD_SUBTYPE_RIGID
+		#include "user-ex-rigid.h"
+	#endif	//BOARD_SUBTYPE_RIGID
+	
 	#ifdef USE_QEI
 		#include "ext_input.h"
 	#endif	//USE_QEI
