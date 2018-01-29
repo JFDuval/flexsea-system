@@ -163,6 +163,7 @@ float get_circbuf_float_val(struct circbuf_float_s * das, int16_t indx)
 void init_filt_float(struct filt_float_s * ffs, int16_t co)
 {
 	ffs->curval = 0;
+	ffs->curdiff = 0;
 	ffs->cutoff = co;
 	ffs->cntr = 0;
 	ffs->newvalsum = 0;
@@ -255,6 +256,16 @@ void update_filt_float(struct filt_float_s * ffs, float cvl)
 	   ffs->newvalsum = 0;
 	}
    ffs->curval = ffs->y.curval;
+
+   ffs->curdiff = get_circbuf_float_val(&(ffs->y),0)-get_circbuf_float_val(&(ffs->y),1);
+   if (ffs->cutoff<10)
+   {
+	   ffs->curdiff = ffs->curdiff/100.0;
+   }
+   else
+   {
+	   ffs->curdiff = ffs->curdiff/1000.0;
+   }
 }
 
 //newco is the cutoff frequency in Hz, it can range from 1-100

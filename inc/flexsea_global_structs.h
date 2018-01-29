@@ -442,6 +442,7 @@ struct filt_float_s
 	int16_t cntr;
 	float newvalsum;
 	float curval;
+	float curdiff;
 };
 
 //****************************************************************************
