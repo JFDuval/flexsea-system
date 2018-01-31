@@ -257,14 +257,14 @@ void update_filt_float(struct filt_float_s * ffs, float cvl)
 	}
    ffs->curval = ffs->y.curval;
 
-   ffs->curdiff = get_circbuf_float_val(&(ffs->y),0)-get_circbuf_float_val(&(ffs->y),1);
+   ffs->curdiff = get_circbuf_float_val(&(ffs->y),0)-get_circbuf_float_val(&(ffs->y),5);
    if (ffs->cutoff<10)
    {
-	   ffs->curdiff = ffs->curdiff/100.0;
+	   ffs->curdiff = ffs->curdiff*20.0;
    }
    else
    {
-	   ffs->curdiff = ffs->curdiff/1000.0;
+	   ffs->curdiff = ffs->curdiff*200.0;
    }
 }
 
