@@ -35,7 +35,12 @@
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 	#include "mag_encoders.h"
-	#include "user-ex.h"
+	
+		#ifndef BOARD_SUBTYPE_RIGID
+			#include "user-ex.h"
+		#else
+			#include "user-ex-rigid.h"
+		#endif
 	
 	#ifdef USE_QEI
 		#include "ext_input.h"
