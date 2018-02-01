@@ -55,6 +55,16 @@ version has multiple data types, and is used by the different boards.
 It includes a sub-structure named decoded_X that contains decoded values
 (physical units, not ticks). The decoded values are always int32*/
 
+//Output the length of an array:
+#define ARRLEN(x)					((int32_t)sizeof(x)/(int32_t)sizeof((x)[0]))
+//Limit x to be an index for the array y
+#define LIMINDX(x,y)				(x = (x<0)?0:((x>=ARRLEN(y)?ARRLEN(y)-1:x)))
+//Limit x to be between a and b:
+#define LIMIT(x,a,b)				(x = (x)<=(a)?(a):((x)>=(b)?(b):(x)))
+#define LININTERP(x1,y1,x2,y2,x)	((y1)+(((x)-(x1))*((y2)-(y1)))/((x2)-(x1)))
+#define MINVAL(a,b)					((a<b)?a:b)
+#define MAXVAL(a,b)					((a>b)?a:b)
+
 //Gains
 struct gains_s
 {
@@ -413,6 +423,28 @@ struct as504x_s
 	int32_t samplefreq; 			//sampling frequency of the sensor
 };
 
+//circular buffer
+#define CIRCBUFFLOATLEN 10
+struct circbuf_float_s
+{
+	float x[CIRCBUFFLOATLEN];
+	int16_t i;
+	float curval;
+};
+
+//filter
+struct filt_float_s
+{
+	struct circbuf_float_s x;
+	struct circbuf_float_s y;
+	int16_t cutoff;
+	int16_t cutoff_indx;
+	int16_t cntr;
+	float newvalsum;
+	float curval;
+	float curdiff;
+};
+
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
@@ -436,6 +468,13 @@ void update_diffarr(struct diffarr_s *, int32_t, int32_t);
 int32_t get_diffarr(struct diffarr_s *, int32_t);
 int32_t get_diffarr_elmnt(struct diffarr_s *, int32_t);
 void update_diffarr_avg(struct diffarr_s *, int32_t);
+
+void init_circbuf_float(struct circbuf_float_s *);
+void update_circbuf_float(struct circbuf_float_s *, float);
+float get_circbuf_float_val(struct circbuf_float_s *, int16_t);
+void init_filt_float(struct filt_float_s *, int16_t);
+void update_filt_float(struct filt_float_s *, float);
+void update_filt_float_cutoff(struct filt_float_s *, int16_t);
 
 #ifdef __cplusplus
 }
