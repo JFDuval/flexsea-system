@@ -53,6 +53,7 @@ extern "C" {
 #include "flexsea_cmd_in_control.h"
 //Include the user files:
 #include "flexsea_cmd_user.h"
+#include "flexsea_user_structs.h"
 
 //****************************************************************************
 // Prototype(s):
@@ -69,6 +70,7 @@ void executePtrXid(struct execute_s **myPtr, uint8_t p_xid);
 void managePtrXid(struct manage_s **myPtr, uint8_t p_xid);
 void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
+void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid);
 void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
 
 //****************************************************************************
