@@ -85,8 +85,13 @@ void initializeGlobalStructs()
 		exec3.enc_ang_vel = &exec3AngVel;
 		exec4.enc_ang_vel = &exec4AngVel;
 	#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+		
+		#ifdef BOARD_SUBTYPE_POCKET
+		exec1.enc_ang = &encoder.count;
+		#else
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
+		#endif
 		
 		//#ifdef USE_QEI
 		//	exec1.enc_ang = &encoder.count;
