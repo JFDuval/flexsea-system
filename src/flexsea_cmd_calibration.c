@@ -128,7 +128,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf)
 		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 		{
 			calibrationFlags |= procedure;
-			control_strategy(buf[P_DATA1]);
+			control_strategy(buf[P_DATA1], 0);
 		}
 		calibrationFlagToRunOrIsRunning = calibrationFlags;
 
