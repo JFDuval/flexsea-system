@@ -149,7 +149,7 @@ void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		control_strategy(buf[P_DATA1]);
+		control_strategy(buf[P_DATA1], 0);
 
 	#else
 		(void)buf;
@@ -163,7 +163,7 @@ void rx_cmd_ctrl_mode_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrl.active_ctrl);
+		tx_cmd_ctrl_mode_w(TX_N_DEFAULT, ctrl[0].active_ctrl);
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
@@ -206,8 +206,8 @@ void tx_cmd_ctrl_i_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		//Execute: reply only
 		(void)currentSetpoint;
-		SPLIT_32((uint32_t)ctrl.current.actual_val, shBuf, &index);
-		SPLIT_32((uint32_t)ctrl.current.setpoint_val, shBuf, &index);
+		SPLIT_32((uint32_t)ctrl[0].current.actual_val, shBuf, &index);
+		SPLIT_32((uint32_t)ctrl[0].current.setpoint_val, shBuf, &index);
 	#else
 		//Other boards can write a new setpoint
 		SPLIT_32((uint32_t)0, shBuf, &index);
@@ -259,9 +259,9 @@ void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Only change the setpoint if we are in current control mode:
-		if(ctrl.active_ctrl == CTRL_CURRENT)
+		if(ctrl[0].active_ctrl == CTRL_CURRENT)
 		{
-			ctrl.current.setpoint_val = tmp_wanted_current;
+			ctrl[0].current.setpoint_val = tmp_wanted_current;
 		}
 
 	#else
@@ -383,9 +383,9 @@ void rx_cmd_ctrl_o_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Only change the setpoint if we are in open control mode:
-		if(ctrl.active_ctrl == CTRL_OPEN)
+		if(ctrl[0].active_ctrl == CTRL_OPEN)
 		{
-			setMotorVoltage(tmp);
+			setMotorVoltage(tmp, 0);
 		}
 
 	#else
@@ -508,47 +508,47 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 
 		int16_t tmp_z_k = 0, tmp_z_b = 0, tmp_z_i = 0;
 
-		ctrl.position.posf = tmp_posf;
-		ctrl.position.spdm = tmp_spdm;
-		ctrl.position.acc = tmp_acc;
+		ctrl[0].position.posf = tmp_posf;
+		ctrl[0].position.spdm = tmp_spdm;
+		ctrl[0].position.acc = tmp_acc;
 
-		if(ctrl.active_ctrl == CTRL_POSITION)
+		if(ctrl[0].active_ctrl == CTRL_POSITION)
 		{
 			#ifdef USE_TRAPEZ
-			ctrl.position.posi = ctrl.position.setp;
-			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
-										ctrl.position.spdm, \
-										ctrl.position.acc = tmp_acc);
+			ctrl[0].position.posi = ctrl[0].position.setp;
+			steps = trapez_gen_motion_1(ctrl[0].position.posi, ctrl[0].position.posf,\
+										ctrl[0].position.spdm, \
+										ctrl[0].position.acc = tmp_acc);
 			#else
-			ctrl.position.setp = tmp_posf;
+			ctrl[0].position.setp = tmp_posf;
 			#endif
 		}
-		else if(ctrl.active_ctrl == CTRL_IMPEDANCE)
+		else if(ctrl[0].active_ctrl == CTRL_IMPEDANCE)
 		{
 			//Backup gains
-			tmp_z_k = ctrl.impedance.gain.Z_K;
-			tmp_z_b = ctrl.impedance.gain.Z_B;
-			tmp_z_i = ctrl.impedance.gain.Z_I;
+			tmp_z_k = ctrl[0].impedance.gain.Z_K;
+			tmp_z_b = ctrl[0].impedance.gain.Z_B;
+			tmp_z_i = ctrl[0].impedance.gain.Z_I;
 
 			//Zero them
-			ctrl.impedance.gain.Z_K = 0;
-			ctrl.impedance.gain.Z_B = 0;
-			ctrl.impedance.gain.Z_I = 0;
+			ctrl[0].impedance.gain.Z_K = 0;
+			ctrl[0].impedance.gain.Z_B = 0;
+			ctrl[0].impedance.gain.Z_I = 0;
 
 			#ifdef USE_TRAPEZ
 			//New trajectory
-			ctrl.position.posi = ctrl.impedance.setpoint_val;
-			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
-										ctrl.position.spdm, \
-										ctrl.position.acc = tmp_acc);
+			ctrl[0].position.posi = ctrl[0].impedance.setpoint_val;
+			steps = trapez_gen_motion_1(ctrl[0].position.posi, ctrl[0].position.posf,\
+										ctrl[0].position.spdm, \
+										ctrl[0].position.acc = tmp_acc);
 			#else
-			ctrl.impedance.setpoint_val = tmp_posf;
+			ctrl[0].impedance.setpoint_val = tmp_posf;
 			#endif //USE_TRAPEZ
 
 			//Restore gains
-			ctrl.impedance.gain.Z_K = tmp_z_k;
-			ctrl.impedance.gain.Z_B = tmp_z_b;
-			ctrl.impedance.gain.Z_I = tmp_z_i;
+			ctrl[0].impedance.gain.Z_K = tmp_z_k;
+			ctrl[0].impedance.gain.Z_B = tmp_z_b;
+			ctrl[0].impedance.gain.Z_I = tmp_z_i;
 		}
 
 	#else
@@ -570,9 +570,9 @@ void rx_cmd_ctrl_p_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_p_w(TX_N_DEFAULT, ctrl.position.pos, ctrl.position.posi, \
-						ctrl.position.posf, ctrl.position.spdm, \
-						ctrl.position.acc);
+		tx_cmd_ctrl_p_w(TX_N_DEFAULT, ctrl[0].position.pos, ctrl[0].position.posi, \
+						ctrl[0].position.posf, ctrl[0].position.spdm, \
+						ctrl[0].position.acc);
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
 	#else
@@ -599,11 +599,11 @@ void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 
 		//Store value:
 		executePtrXid(&exPtr1, buf[P_XID]);
-		exPtr1->ctrl.position.pos = tmp_pos;
-		exPtr1->ctrl.position.posi = tmp_posi;
-		exPtr1->ctrl.position.posf = tmp_posf;
-		exPtr1->ctrl.position.spdm = tmp_spdm;
-		exPtr1->ctrl.position.acc = tmp_acc;
+		exPtr1->ctrl[0].position.pos = tmp_pos;
+		exPtr1->ctrl[0].position.posi = tmp_posi;
+		exPtr1->ctrl[0].position.posf = tmp_posf;
+		exPtr1->ctrl[0].position.spdm = tmp_spdm;
+		exPtr1->ctrl[0].position.acc = tmp_acc;
 
 	#else
 

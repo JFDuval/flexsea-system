@@ -87,7 +87,7 @@ void tx_cmd_in_control_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		in_control_combine();
 		SPLIT_16((uint16_t)in_control.combined, shBuf, &index);
 
-		SPLIT_16((uint16_t)ctrl.current.actual_val, shBuf, &index);
+		SPLIT_16((uint16_t)ctrl[0].current.actual_val, shBuf, &index);
 
 		//User fields:
 		SPLIT_32((uint32_t)in_control.r[0], shBuf, &index);
