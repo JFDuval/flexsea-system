@@ -196,9 +196,9 @@ void rx_cmd_ctrl_i_g_rr(uint8_t *buf, uint8_t *info)
 
 		//Store value:
 		executePtrXid(&exPtr2, buf[P_XID]);
-		exPtr2->ctrl[0].current.gain.I_KP = tmp_kp;
-		exPtr2->ctrl[0].current.gain.I_KI = tmp_ki;
-		exPtr2->ctrl[0].current.gain.I_KD = tmp_kd;
+		exPtr2->ctrl.current.gain.I_KP = tmp_kp;
+		exPtr2->ctrl.current.gain.I_KI = tmp_ki;
+		exPtr2->ctrl.current.gain.I_KD = tmp_kd;
 
 	#else
 
@@ -323,9 +323,9 @@ void rx_cmd_ctrl_p_g_rr(uint8_t *buf, uint8_t *info)
 
 		//Store value:
 		executePtrXid(&exPtr2, buf[P_XID]);
-		exPtr2->ctrl[0].position.gain.P_KP = tmp_kp;
-		exPtr2->ctrl[0].position.gain.P_KI = tmp_ki;
-		exPtr2->ctrl[0].position.gain.P_KD = tmp_kd;
+		exPtr2->ctrl.position.gain.P_KP = tmp_kp;
+		exPtr2->ctrl.position.gain.P_KI = tmp_ki;
+		exPtr2->ctrl.position.gain.P_KD = tmp_kd;
 		//ToDo: can't be exec1!
 
 	#else
@@ -451,9 +451,9 @@ void rx_cmd_ctrl_z_g_rr(uint8_t *buf, uint8_t *info)
 
 		//Store value:
 		executePtrXid(&exPtr2, buf[P_XID]);
-		exPtr2->ctrl[0].impedance.gain.Z_K = tmp_zk;
-		exPtr2->ctrl[0].impedance.gain.Z_B = tmp_zb;
-		exPtr2->ctrl[0].impedance.gain.Z_I = tmp_zi;
+		exPtr2->ctrl.impedance.gain.Z_K = tmp_zk;
+		exPtr2->ctrl.impedance.gain.Z_B = tmp_zb;
+		exPtr2->ctrl.impedance.gain.Z_I = tmp_zi;
 
 	#else
 

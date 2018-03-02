@@ -599,11 +599,11 @@ void rx_cmd_ctrl_p_rr(uint8_t *buf, uint8_t *info)
 
 		//Store value:
 		executePtrXid(&exPtr1, buf[P_XID]);
-		exPtr1->ctrl[0].position.pos = tmp_pos;
-		exPtr1->ctrl[0].position.posi = tmp_posi;
-		exPtr1->ctrl[0].position.posf = tmp_posf;
-		exPtr1->ctrl[0].position.spdm = tmp_spdm;
-		exPtr1->ctrl[0].position.acc = tmp_acc;
+		exPtr1->ctrl.position.pos = tmp_pos;
+		exPtr1->ctrl.position.posi = tmp_posi;
+		exPtr1->ctrl.position.posf = tmp_posf;
+		exPtr1->ctrl.position.spdm = tmp_spdm;
+		exPtr1->ctrl.position.acc = tmp_acc;
 
 	#else
 
