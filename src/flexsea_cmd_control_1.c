@@ -148,9 +148,7 @@ void rx_cmd_ctrl_mode_w(uint8_t *buf, uint8_t *info)
 	(void)info;
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
-
 		control_strategy(buf[P_DATA1],0);
-
 	#else
 		(void)buf;
 	#endif	//BOARD_TYPE_FLEXSEA_EXECUTE
@@ -515,10 +513,10 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 		if(ctrl[0].active_ctrl == CTRL_POSITION)
 		{
 			#ifdef USE_TRAPEZ
-			ctrl.position.posi = ctrl.position.setp;
-			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
-										ctrl.position.spdm, \
-										ctrl.position.acc = tmp_acc);
+			ctrl[0].position.posi = ctrl[0].position.setp;
+			steps = trapez_gen_motion_1(ctrl[0].position.posi, ctrl[0].position.posf,\
+										ctrl[0].position.spdm, \
+										ctrl[0].position.acc = tmp_acc);
 			#else
 			ctrl[0].position.setp = tmp_posf;
 			#endif
@@ -537,10 +535,10 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 
 			#ifdef USE_TRAPEZ
 			//New trajectory
-			ctrl.position.posi = ctrl.impedance.setpoint_val;
-			steps = trapez_gen_motion_1(ctrl.position.posi, ctrl.position.posf,\
-										ctrl.position.spdm, \
-										ctrl.position.acc = tmp_acc);
+			ctrl[0].position.posi = ctrl[0].impedance.setpoint_val;
+			steps = trapez_gen_motion_1(ctrl[0].position.posi, ctrl[0].position.posf,\
+										ctrl[0].position.spdm, \
+										ctrl[0].position.acc = tmp_acc);
 			#else
 			ctrl[0].impedance.setpoint_val = tmp_posf;
 			#endif //USE_TRAPEZ
