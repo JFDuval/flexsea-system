@@ -92,10 +92,6 @@ void initializeGlobalStructs()
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
 		#endif
-		
-		//#ifdef USE_QEI
-		//	exec1.enc_ang = &encoder.count;
-		//#endif	//USE_QEI
 	#endif
 }
 
