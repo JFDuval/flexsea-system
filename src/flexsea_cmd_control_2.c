@@ -150,6 +150,7 @@ void rx_cmd_ctrl_i_g_w(uint8_t *buf, uint8_t *info)
 		ctrl[0].current.gain.I_KP = tmp_kp;
 		ctrl[0].current.gain.I_KI = tmp_ki;
 		ctrl[0].current.gain.I_KD = tmp_kd;
+		ctrl[0].current.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
@@ -277,6 +278,7 @@ void rx_cmd_ctrl_p_g_w(uint8_t *buf, uint8_t *info)
 		ctrl[0].position.gain.P_KP = tmp_kp;
 		ctrl[0].position.gain.P_KI = tmp_ki;
 		ctrl[0].position.gain.P_KD = tmp_kd;
+		ctrl[0].position.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
@@ -405,6 +407,7 @@ void rx_cmd_ctrl_z_g_w(uint8_t *buf, uint8_t *info)
 		ctrl[0].impedance.gain.Z_K = tmp_zk;
 		ctrl[0].impedance.gain.Z_B = tmp_zb;
 		ctrl[0].impedance.gain.Z_I = tmp_zi;
+		ctrl[0].impedance.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
