@@ -92,6 +92,11 @@ void initializeGlobalStructs()
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
 		#endif
+        
+        user_data_1.w[0] = 0;
+        user_data_1.w[1] = 0;
+        user_data_1.w[2] = 0;
+        user_data_1.w[3] = 0;
 	#endif
 }
 
