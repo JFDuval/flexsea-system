@@ -92,6 +92,11 @@ extern "C" {
 #define CMD_CALIBRATION_MODE	91
 #define CMD_STREAM				92
 
+//MultiPacket Capable commands
+//Maybe one day all commands will be multi packet.. or maybe we don't need that
+
+#define CMD_SYSDATA				20
+
 //User commands (100-127):
 
 #define CMD_USER1				100

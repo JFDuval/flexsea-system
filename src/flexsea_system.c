@@ -72,6 +72,23 @@ uint16_t cmdLen = 0;
 // Function(s)
 //****************************************************************************
 
+void flexsea_multi_payload_catchall(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
+
+	// Only for testing during development purposes!!
+	uint8_t i, l = 0;
+	for(i=0; i<(COMM_STR_BUF_LEN*3)/2; i++) {
+		responseBuf[l++] = 'a' + (i%26);
+	}
+
+	*responseLen = l;
+
+	(void) msgBuf;
+	(void) info;
+//	(void) responseBuf;
+//	(void) responseLen;
+	return;
+}
+
 //Initialize function pointer array
 void init_flexsea_payload_ptr(void)
 {
@@ -83,6 +100,10 @@ void init_flexsea_payload_ptr(void)
 		flexsea_payload_ptr[i][RX_PTYPE_READ] = &flexsea_payload_catchall;
 		flexsea_payload_ptr[i][RX_PTYPE_WRITE] = &flexsea_payload_catchall;
 		flexsea_payload_ptr[i][RX_PTYPE_REPLY] = &flexsea_payload_catchall;
+
+		flexsea_multipayload_ptr[i][RX_PTYPE_READ] = &flexsea_multi_payload_catchall;
+		flexsea_multipayload_ptr[i][RX_PTYPE_WRITE] = &flexsea_multi_payload_catchall;
+		flexsea_multipayload_ptr[i][RX_PTYPE_REPLY] = &flexsea_multi_payload_catchall;
 	}
 
 	//Associate pointers to your project-specific functions:
