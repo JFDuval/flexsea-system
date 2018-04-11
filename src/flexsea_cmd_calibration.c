@@ -42,6 +42,10 @@ extern "C" {
 	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
+#ifndef NULL
+#define NULL   ((void *) 0)
+#endif
+
 uint8_t handleCalibrationMessage(uint8_t *buf);
 
 void init_flexsea_payload_ptr_calibration(void)
@@ -78,6 +82,13 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 
 	//Payload length:
 	(*len) = index;
+}
+
+//Pack tx_cmd_calibration_mode_rw()
+void ptx_cmd_calibration_mode_rw(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, uint8_t calibrationMode)
+{
+	tx_cmd_calibration_mode_rw(TX_N_DEFAULT, calibrationMode);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info)
@@ -117,7 +128,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf)
 		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 		{
 			calibrationFlags |= procedure;
-			control_strategy(buf[P_DATA1]);
+			control_strategy(buf[P_DATA1], 0);
 		}
 		calibrationFlagToRunOrIsRunning = calibrationFlags;
 

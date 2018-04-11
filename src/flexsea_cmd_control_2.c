@@ -147,9 +147,10 @@ void rx_cmd_ctrl_i_g_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Store value:
-		ctrl.current.gain.I_KP = tmp_kp;
-		ctrl.current.gain.I_KI = tmp_ki;
-		ctrl.current.gain.I_KD = tmp_kd;
+		ctrl[0].current.gain.I_KP = tmp_kp;
+		ctrl[0].current.gain.I_KI = tmp_ki;
+		ctrl[0].current.gain.I_KD = tmp_kd;
+		ctrl[0].current.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
@@ -169,8 +170,8 @@ void rx_cmd_ctrl_i_g_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_i_g_w(TX_N_DEFAULT, ctrl.current.gain.I_KP, \
-						  ctrl.current.gain.I_KI, ctrl.current.gain.I_KD);
+		tx_cmd_ctrl_i_g_w(TX_N_DEFAULT, ctrl[0].current.gain.I_KP, \
+						  ctrl[0].current.gain.I_KI, ctrl[0].current.gain.I_KD);
 		//ToDo: should it be exec1.ctrl?
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
@@ -274,9 +275,10 @@ void rx_cmd_ctrl_p_g_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Store value:
-		ctrl.position.gain.P_KP = tmp_kp;
-		ctrl.position.gain.P_KI = tmp_ki;
-		ctrl.position.gain.P_KD = tmp_kd;
+		ctrl[0].position.gain.P_KP = tmp_kp;
+		ctrl[0].position.gain.P_KI = tmp_ki;
+		ctrl[0].position.gain.P_KD = tmp_kd;
+		ctrl[0].position.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
@@ -296,8 +298,8 @@ void rx_cmd_ctrl_p_g_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_p_g_w(TX_N_DEFAULT, ctrl.position.gain.P_KP, \
-						  ctrl.position.gain.P_KI, ctrl.position.gain.P_KD);
+		tx_cmd_ctrl_p_g_w(TX_N_DEFAULT, ctrl[0].position.gain.P_KP, \
+						  ctrl[0].position.gain.P_KI, ctrl[0].position.gain.P_KD);
 		//ToDo: should it be exec1.ctrl?
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 
@@ -402,9 +404,10 @@ void rx_cmd_ctrl_z_g_w(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 		//Store value:
-		ctrl.impedance.gain.Z_K = tmp_zk;
-		ctrl.impedance.gain.Z_B = tmp_zb;
-		ctrl.impedance.gain.Z_I = tmp_zi;
+		ctrl[0].impedance.gain.Z_K = tmp_zk;
+		ctrl[0].impedance.gain.Z_B = tmp_zb;
+		ctrl[0].impedance.gain.Z_I = tmp_zi;
+		ctrl[0].impedance.error_sum = 0;
 		//ToDo: do we need to call something?
 
 	#else
@@ -424,8 +427,8 @@ void rx_cmd_ctrl_z_g_rw(uint8_t *buf, uint8_t *info)
 
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
-		tx_cmd_ctrl_z_g_w(TX_N_DEFAULT, ctrl.impedance.gain.Z_K, \
-						  ctrl.impedance.gain.Z_B, ctrl.impedance.gain.Z_I);
+		tx_cmd_ctrl_z_g_w(TX_N_DEFAULT, ctrl[0].impedance.gain.Z_K, \
+						  ctrl[0].impedance.gain.Z_B, ctrl[0].impedance.gain.Z_I);
 		//ToDo: should it be exec1.ctrl?
 		packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
 

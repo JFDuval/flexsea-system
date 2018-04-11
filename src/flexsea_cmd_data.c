@@ -55,7 +55,7 @@ extern "C" {
 #if (defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_GOSSIP \
 	|| defined BOARD_TYPE_FLEXSEA_STRAIN_AMP)
 	#include "main.h"
-	#ifndef BOARD_SUBTYPE_RIGID
+	#if(!defined BOARD_SUBTYPE_RIGID && !defined BOARD_SUBTYPE_POCKET)
 		#include "user-ex.h"
 	#else
 		#include "user-ex-rigid.h"
@@ -151,9 +151,9 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	SPLIT_16(read_analog(1), shBuf, &index);
 
 	SPLIT_32((uint32_t)(*exec1.enc_ang), shBuf, &index);
-	SPLIT_32((uint32_t)ctrl.current.actual_val, shBuf, &index);
+	SPLIT_32((uint32_t)ctrl[0].current.actual_val, shBuf, &index);
 
-	#ifndef BOARD_SUBTYPE_RIGID
+	#if(!defined BOARD_SUBTYPE_RIGID && !defined BOARD_SUBTYPE_POCKET)
 		shBuf[index++] = safety_cop.v_vb;
 		shBuf[index++] = safety_cop.v_vg;
 		shBuf[index++] = safety_cop.temperature;

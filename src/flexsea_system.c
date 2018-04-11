@@ -56,6 +56,7 @@ For rx_* functions, the suffix options are:
 #include <flexsea_board.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
+#include "flexsea_user_structs.h"
 
 //****************************************************************************
 // Variable(s)
@@ -294,6 +295,24 @@ void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid)
 			break;
 		default:
 			*myPtr = &strain1;
+			break;
+	}
+}
+
+//Assign a pointer based on P_XID:
+void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
+{
+	//Based on selected slave, what structure do we use?
+	switch(p_xid)
+	{
+		case FLEXSEA_MANAGE_1:
+			*myPtr = &rigid1;
+			break;
+		case FLEXSEA_MANAGE_2:
+			*myPtr = &rigid2;
+			break;
+		default:
+			*myPtr = &rigid1;
 			break;
 	}
 }

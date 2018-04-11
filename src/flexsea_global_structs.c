@@ -35,11 +35,12 @@
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 	#include "mag_encoders.h"
-	#include "user-ex.h"
 	
-	#ifdef BOARD_SUBTYPE_RIGID
+	#if(!defined BOARD_SUBTYPE_RIGID && !defined BOARD_SUBTYPE_POCKET)
+		#include "user-ex.h"
+	#else
 		#include "user-ex-rigid.h"
-	#endif	//BOARD_SUBTYPE_RIGID
+	#endif
 	
 	#ifdef USE_QEI
 		#include "ext_input.h"
@@ -84,12 +85,18 @@ void initializeGlobalStructs()
 		exec3.enc_ang_vel = &exec3AngVel;
 		exec4.enc_ang_vel = &exec4AngVel;
 	#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+		
+		#ifdef BOARD_SUBTYPE_POCKET
+		exec1.enc_ang = &encoder.count;
+		#else
 		exec1.enc_ang = &(as5047.signed_ang);
 		exec1.enc_ang_vel = &(as5047.signed_ang_vel);
-		
-		//#ifdef USE_QEI
-		//	exec1.enc_ang = &encoder.count;
-		//#endif	//USE_QEI
+		#endif
+        
+        user_data_1.w[0] = 0;
+        user_data_1.w[1] = 0;
+        user_data_1.w[2] = 0;
+        user_data_1.w[3] = 0;
 	#endif
 }
 
