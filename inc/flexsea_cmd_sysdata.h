@@ -32,6 +32,26 @@
 #define FLEXSEA_SYSTEM_INC_FLEXSEA_CMD_SYSDATA_H_
 
 #include <stdint.h>
+#include "flexsea_dataformats.h"
+
+/* Interface format defined here
+ *
+ */
+
+typedef struct {
+	char* name;
+	uint8_t numFields;
+
+	const char** fieldLabels;
+
+	const uint8_t* fieldTypes;
+	uint8_t** fieldPointers;
+} FlexseaDeviceSpec;
+
+#define NUM_DEVICE_TYPES 1
+#define FX_RIGID_SPEC 0
+
+extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
@@ -46,7 +66,7 @@ void init_flexsea_payload_ptr_sysdata(void);
 */
 
 void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t *flags, uint8_t lenFlags);
+						uint16_t *len, uint32_t *flags, uint8_t lenFlags);
 
 /* Called by master to send a message to the slave, attempting to inititiate a
 	calibration procedure specified by 'calibrationMode'. Slave will not respond.
@@ -67,7 +87,7 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 
 /* Slave calls this function after receiving a read request from master. This sends the response to master.
 */
-void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t *flags, uint8_t lenFlags);
+void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *flags, uint8_t lenFlags);
 
 /* Slave calls this function automatically after receiving a write from master.
 	It determines what to do with the information passed to it,

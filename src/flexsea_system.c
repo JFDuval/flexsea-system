@@ -316,3 +316,5 @@ void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
 			break;
 	}
 }
+
+const int FORMAT_SIZE_MAP[] = {4, 4, 2, 2, 1, 1, -1, 0, -1};

@@ -36,6 +36,35 @@
 extern "C" {
 #endif
 
+#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
+#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
+#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
+
+/** Interface specs */
+FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
+
+uint16_t fx_dev_id = 101;
+uint8_t fx_dev_type = FX_RIGID_SPEC;
+
+/** FX_RIGID */
+#define _rigid_numFields 8
+const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id", 	"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};
+const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+
+// only defined on boards not on plan
+uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
+														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z, \
+														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};
+
+FlexseaDeviceSpec fx_rigid_spec = {
+		.numFields = 7,
+		.fieldLabels = _rigid_fieldlabels,
+		.fieldTypes = _rigid_field_formats,
+		.fieldPointers = _rigid_field_pointers
+};
+
+static const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
+
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
 */
@@ -56,9 +85,9 @@ void init_flexsea_payload_ptr_sysdata(void) {
 
 #define MAX_BYTES_OF_FLAGS 3
 void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t *flags, uint8_t lenFlags) {
+						uint16_t *len, uint32_t *flags, uint8_t lenFlags) {
 
-	uint8_t index = 0;
+	uint16_t index = 0;
 	(*cmd) = CMD_SYSDATA;
 	(*cmdType) = CMD_READ;
 
@@ -68,10 +97,8 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	shBuf[index++] = lenFlags;
 
 	uint8_t i=0;
-	while((i) < lenFlags)
-	{
-		shBuf[index++] = flags[i++];
-	}
+	while(i < lenFlags)
+		SPLIT_32(flags[i], shBuf, &index);
 
 	(*len) = index;
 }
@@ -83,17 +110,16 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
 	uint8_t lenFlags;
-	uint8_t flags[MAX_BYTES_OF_FLAGS];
+	uint32_t flags[MAX_BYTES_OF_FLAGS];
 
-	uint8_t index=0, i=0;
+	uint16_t index=0, i=0;
 	lenFlags = msgBuf[index++];
 
 	if(lenFlags > MAX_BYTES_OF_FLAGS)
 		lenFlags=3;
 
-	while(i < lenFlags)
-	{
-		msgBuf[index++] = flags[i++];
+	while(i < lenFlags) {
+		REBUILD_UINT32(msgBuf, &index);
 	}
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, flags, lenFlags);
@@ -104,24 +130,51 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 /* Called by slave to send a read response to the master. Master will not respond
 	TODO: implement
 */
-void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t *flags, uint8_t lenFlags) {
+void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *flags, uint8_t lenFlags) {
 
 	// For now we're going to try sending more than 48 bytes
 	// And it'll just be garbage data until I implement actual exhaustive list system data read :D
 	// TODO: implement exhaustive list system data read
 
-	uint8_t l = 0;
-	// comm str length is 100
-	uint8_t i;
-	for(i=0;i<100;i++)
-	{
-		responseBuf[l++] = 'a' + (i%26);
-	}
+	uint16_t index = 0;
 
-	*responseLen = l;
+	//we save bytes to write our flags
+    uint32_t *responseFlags = (uint32_t*)(responseBuf+index);
+    index += 4 * lenFlags;
 
-	(void) flags;
-	(void) lenFlags;
+    const FlexseaDeviceSpec *ds = fx_this_device_spec;
+
+    int i, j, fieldLength, fieldOffset = 0;
+    for(i = 0; i < ds->numFields; i++)
+    {
+    	if(IS_FIELD_HIGH(i, flags) && ds->fieldPointers[i])
+    	{
+        	fieldLength = 0;
+        	if(ds->fieldTypes[i] < FORMAT_FILLER && FORMAT_SIZE_MAP[ds->fieldTypes[i]] > 0)
+        		fieldLength = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
+
+        	if(fieldLength)
+        	{
+        		SET_MAP_HIGH(i, responseFlags);
+
+        		// we will pack bytes by LSB first
+        		// if device is big endian we have to reverse order
+        		// fill our buffer with the data
+#ifdef BIG_ENDIAN
+				for(j=fieldLength-1; j>=0; j--)
+#else
+        		for(j=0; j<fieldLength; j++)
+#endif
+        		{
+					responseBuf[index++] = ds->fieldPointers[i][j];
+        		}
+        	}
+    	}
+
+    	fieldOffset += fieldLength;
+    }
+
+    *responseLen = index;
 }
 
 /* Master calls this function automatically after receiving a response from slave
