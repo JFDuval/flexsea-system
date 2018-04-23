@@ -76,8 +76,8 @@ uint16_t cmdLen = 0;
 void flexsea_multi_payload_catchall(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
 	// Only for testing during development purposes!!
-	uint8_t i, l = 0;
-	for(i=0; i<(COMM_STR_BUF_LEN*3)/2; i++) {
+	uint16_t i, l = 0;
+	for(i=0; i< (COMM_PERIPH_ARR_LEN*3) +20; i++) {
 		responseBuf[l++] = 'a' + (i%26);
 	}
 
