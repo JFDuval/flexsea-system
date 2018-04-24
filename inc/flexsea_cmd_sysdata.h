@@ -45,7 +45,7 @@ typedef struct {
 	const char** fieldLabels;
 
 	const uint8_t* fieldTypes;
-	uint8_t* fieldPointers[];
+	uint8_t** fieldPointers;
 } FlexseaDeviceSpec;
 
 #define NUM_DEVICE_TYPES 1

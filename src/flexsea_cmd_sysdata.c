@@ -153,7 +153,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 
     const FlexseaDeviceSpec *ds = fx_this_device_spec;
 
-    int i, j, fieldLength, fieldOffset = 0;
+    int j, fieldLength, fieldOffset = 0;
     for(i = 0; i < ds->numFields; i++)
     {
     	if(IS_FIELD_HIGH(i, flags) && ds->fieldPointers[i])
