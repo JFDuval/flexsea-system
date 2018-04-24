@@ -28,50 +28,19 @@
 	*
 ****************************************************************************/
 
-#include "flexsea_cmd_sysdata.h"
-#include "flexsea_system.h"
-#include <flexsea.h>
-#include <stdlib.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include "flexsea_cmd_sysdata.h"
+#include "flexsea_system.h"
+#include <flexsea.h>
+#include <stdlib.h>
+#include "flexsea_device_spec.h"
+
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
-
-/** Interface specs */
-
-FlexseaDeviceSpec fx_none_spec = {
-		.numFields = 0,
-		.fieldLabels = NULL,
-		.fieldTypes = NULL,
-		.fieldPointers = NULL
-};
-
-uint16_t fx_dev_id = 101;
-uint8_t fx_dev_type = FX_RIGID_SPEC;
-
-/** FX_RIGID */											// type
-const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id", 	"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};
-const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
-
-// only defined on boards not on plan
-uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
-														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z, \
-														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};
-FlexseaDeviceSpec fx_rigid_spec = {
-		.numFields = 7,
-		.fieldLabels = _rigid_fieldlabels,
-		.fieldTypes = _rigid_field_formats,
-		.fieldPointers = _rigid_field_pointers
-};
-
-// initialization goes in payload_ptr initialization which is a hack :(
-FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
-
-static const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
@@ -82,9 +51,8 @@ void init_flexsea_payload_ptr_sysdata(void) {
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_WRITE] = &rx_cmd_sysdata_w;
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
 
-	deviceSpecs[FX_NONE_SPEC] = fx_none_spec;
-	deviceSpecs[FX_RIGID_SPEC] = fx_rigid_spec;
-
+	// this should perhaps go in a different initialization function
+	initializeDeviceSpecs();
 }
 
 // Flexsea General System Data Passing:
@@ -198,29 +166,80 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
     *responseLen = index;
 }
 
-/* Master calls this function automatically after receiving a response from slave
-*/
-
-
 /* Called by master to send a message to the slave, attempting to initiate a
 	Slave will not respond.
 	TODO: I don't think this is needed even??
 	TODO: rename this to 'write'
 */
 void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t *flags, uint8_t lenFlags) {
-
-}
-
+						uint16_t *len, uint8_t *flags, uint8_t lenFlags) {}
 
 /* Slave calls this function automatically after receiving a write from master.
 	It determines what to do with the information passed to it,
 	And it does not reply.
 */
-void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
+void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {}
 
+/* Master calls this function automatically after receiving a response from slave
+*/
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
+
+	uint16_t index=0;
+	uint8_t lenFlags;
+	uint32_t flags[MAX_BYTES_OF_FLAGS];
+
+	lenFlags = msgBuf[index++];
+
+	//read in our fields
+	int i, j, fieldOffset;
+	for(i=0;i<lenFlags;i++)
+		flags[i]=REBUILD_UINT32(msgBuf, &index);
+
+	// first two fields are always device type and id
+	// if these fields are not sent then we can't do much with the response
+	if(!IS_FIELD_HIGH(0, flags) || !IS_FIELD_HIGH(1, flags)) return;
+
+	uint8_t devType = msgBuf[index++];
+	uint16_t devId = REBUILD_UINT16(msgBuf, &index);
+
+	// match this message to a connected device
+	for(i = 0; i < fx_spec_numConnectedDevices; i++)
+	{
+		if(	devType == (deviceData[i][0]) &&
+			devId 	== *(uint16_t*)(deviceData[i]+1))
+					break;
+	}
+
+	//in the event we found no match and we have no more space to allocate we are screwed
+	if(i >= MAX_CONNECTED_DEVICES)
+		return;
+
+	// in the event we found no connected device we need to add a new connected device
+	if(i == fx_spec_numConnectedDevices)
+		addConnectedDevice(devType, devId);
+
+	// read into the appropriate device
+	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[i];
+	fieldOffset = 3; //3 bytes are taken between devType and devId
+	for(i = 0; i < ds->numFields; i++)
+	{
+		uint8_t fw = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
+		if(IS_FIELD_HIGH(i, flags))
+		{
+			for(j = 0; j < fw; j++)
+				deviceData[i][fieldOffset + j] = msgBuf[index++];
+		}
+
+		fieldOffset += fw;
+	}
 }
+#else
+void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen)
+	{ (void) msgBuf; (void) info; (void) responseBuf; (void) responseLen; }
+#endif
 
 #ifdef __cplusplus
 }
 #endif
+
