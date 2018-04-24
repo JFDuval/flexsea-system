@@ -56,6 +56,7 @@ For rx_* functions, the suffix options are:
 #include <flexsea_board.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
+#include "flexsea_cmd_sysdata.h"
 #include "flexsea_user_structs.h"
 
 #ifndef NULL
@@ -128,6 +129,9 @@ void init_flexsea_payload_ptr(void)
 
 	//Data:
 	init_flexsea_payload_ptr_data();
+
+	//Sys Data Device Interface:
+	init_flexsea_payload_ptr_sysdata();
 
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
