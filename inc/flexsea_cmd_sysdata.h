@@ -45,13 +45,27 @@ typedef struct {
 	const char** fieldLabels;
 
 	const uint8_t* fieldTypes;
-	uint8_t** fieldPointers;
+	uint8_t* fieldPointers[];
 } FlexseaDeviceSpec;
 
 #define NUM_DEVICE_TYPES 1
 #define FX_RIGID_SPEC 0
 
+#define MAX_BYTES_OF_FLAGS 3
+
 extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
+
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+#define MAX_CONNECTED_DEVICES 10
+extern FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
+
+#endif //BOARD_TYPE_FLEXSEA_PLAN
+
+/** FX_RIGID */
+#define _rigid_numFields 8
+extern const char* _rigid_fieldlabels[_rigid_numFields];
+extern const uint8_t _rigid_field_formats[_rigid_numFields];
 
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message

@@ -47,7 +47,6 @@ uint16_t fx_dev_id = 101;
 uint8_t fx_dev_type = FX_RIGID_SPEC;
 
 /** FX_RIGID */
-#define _rigid_numFields 8
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id", 	"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};
 const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
@@ -83,7 +82,7 @@ void init_flexsea_payload_ptr_sysdata(void) {
  * Slave will respond with the appropriate data.
 */
 
-#define MAX_BYTES_OF_FLAGS 3
+
 void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint32_t *flags, uint8_t lenFlags) {
 
@@ -127,16 +126,26 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 	(void)info;
 }
 
-/* Called by slave to send a read response to the master. Master will not respond
-	TODO: implement
-*/
+/* Called by slave to send a read response to the master. Master will not respond */
 void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *flags, uint8_t lenFlags) {
 
-	// For now we're going to try sending more than 48 bytes
-	// And it'll just be garbage data until I implement actual exhaustive list system data read :D
 	// TODO: implement exhaustive list system data read
 
 	uint16_t index = 0;
+	responseBuf[index++] = lenFlags;
+
+	// If we received an empty read we just send back our UUID (now just an id) and our device type
+	// TODO: device type is sort of already in RID? maybe we can/should pass that information along by giving full packet
+	int i;
+	uint8_t noFlags = 1;
+	for (i=0;i<lenFlags && noFlags;i++)
+		noFlags = flags[i] > 0;
+
+	if(noFlags)
+	{
+		SET_MAP_HIGH(0, flags);
+		SET_MAP_HIGH(1, flags);
+	}
 
 	//we save bytes to write our flags
     uint32_t *responseFlags = (uint32_t*)(responseBuf+index);
@@ -179,13 +188,6 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 
 /* Master calls this function automatically after receiving a response from slave
 */
-
-void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
-	(void) msgBuf;
-	(void) info;
-	(void) responseBuf;
-	(void) responseLen;
-}
 
 
 /* Called by master to send a message to the slave, attempting to initiate a

@@ -58,6 +58,10 @@ For rx_* functions, the suffix options are:
 #include "../inc/flexsea_cmd_in_control.h"
 #include "flexsea_user_structs.h"
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
@@ -76,17 +80,17 @@ uint16_t cmdLen = 0;
 void flexsea_multi_payload_catchall(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
 	// Only for testing during development purposes!!
-	uint16_t i, l = 0;
-	for(i=0; i< (COMM_PERIPH_ARR_LEN*3) +20; i++) {
-		responseBuf[l++] = 'a' + (i%26);
-	}
-
-	*responseLen = l;
+//	uint16_t i, l = 0;
+//	for(i=0; i< (COMM_PERIPH_ARR_LEN*3) +20; i++) {
+//		responseBuf[l++] = 'a' + (i%26);
+//	}
+//
+//	*responseLen = l;
 
 	(void) msgBuf;
 	(void) info;
-//	(void) responseBuf;
-//	(void) responseLen;
+	(void) responseBuf;
+	*responseLen = 0;
 	return;
 }
 
