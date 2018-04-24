@@ -47,6 +47,7 @@ FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
 FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
 uint8_t fx_spec_numConnectedDevices = 0;
 uint8_t* deviceData[MAX_CONNECTED_DEVICES];
@@ -76,6 +77,9 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 
 	fx_spec_numConnectedDevices++;
 }
+#else
+void addConnectedDevice(uint8_t devType, uint16_t devId) {}
+#endif
 
 void initializeDeviceSpecs()
 {
