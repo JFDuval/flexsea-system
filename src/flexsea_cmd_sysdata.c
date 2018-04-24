@@ -31,6 +31,7 @@
 #include "flexsea_cmd_sysdata.h"
 #include "flexsea_system.h"
 #include <flexsea.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +42,18 @@ extern "C" {
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
 
 /** Interface specs */
-FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
+
+FlexseaDeviceSpec fx_none_spec = {
+		.numFields = 0,
+		.fieldLabels = NULL,
+		.fieldTypes = NULL,
+		.fieldPointers = NULL
+};
 
 uint16_t fx_dev_id = 101;
 uint8_t fx_dev_type = FX_RIGID_SPEC;
 
-/** FX_RIGID */
+/** FX_RIGID */											// type
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id", 	"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};
 const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
@@ -54,13 +61,15 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, 
 uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
 														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z, \
 														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};
-
 FlexseaDeviceSpec fx_rigid_spec = {
 		.numFields = 7,
 		.fieldLabels = _rigid_fieldlabels,
 		.fieldTypes = _rigid_field_formats,
 		.fieldPointers = _rigid_field_pointers
 };
+
+// initialization goes in payload_ptr initialization which is a hack :(
+FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
 static const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 
@@ -72,6 +81,9 @@ void init_flexsea_payload_ptr_sysdata(void) {
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_READ] = &rx_cmd_sysdata_r;
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_WRITE] = &rx_cmd_sysdata_w;
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
+
+	deviceSpecs[FX_NONE_SPEC] = fx_none_spec;
+	deviceSpecs[FX_RIGID_SPEC] = fx_rigid_spec;
 
 }
 

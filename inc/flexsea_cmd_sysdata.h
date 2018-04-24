@@ -34,10 +34,8 @@
 #include <stdint.h>
 #include "flexsea_dataformats.h"
 
-/* Interface format defined here
- *
- */
 
+/* Flexsea Device C Interface defined here - FlexseaDeviceSpec */
 typedef struct {
 	char* name;
 	uint8_t numFields;
@@ -48,24 +46,41 @@ typedef struct {
 	uint8_t** fieldPointers;
 } FlexseaDeviceSpec;
 
-#define NUM_DEVICE_TYPES 1
-#define FX_RIGID_SPEC 0
+/* Specs exist for the following devices */
+#define NUM_DEVICE_TYPES 2
+#define FX_NONE_SPEC 0
+#define FX_RIGID_SPEC 1
 
-#define MAX_BYTES_OF_FLAGS 3
-
+/* this array contains all the device specs */
 extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
+/* defines and externs needed by plan only */
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
+	#define MAX_CONNECTED_DEVICES 10
+	extern FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
+	extern uint8_t* deviceData[MAX_CONNECTED_DEVICES];
+	extern uint8_t fx_spec_numConnectedDevices;
 
-#define MAX_CONNECTED_DEVICES 10
-extern FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
-
+	// convenience define for accessing deviceData
+	// only works on little endian systems
+	// TODO: actually implement a big_endian/little_endian define so this isn't a bug waiting to happen
+#ifdef BIG_ENDIAN
+#else
+	#define DEVICESPEC_TYPE_BY_IDX(i) ( *(deviceData[i]) )
+	#define DEVICESPEC_UUID_BY_IDX(i) ( *((uint16_t*)(deviceData[i] + 1)) )
+#endif
 #endif //BOARD_TYPE_FLEXSEA_PLAN
 
 /** FX_RIGID */
 #define _rigid_numFields 8
 extern const char* _rigid_fieldlabels[_rigid_numFields];
 extern const uint8_t _rigid_field_formats[_rigid_numFields];
+
+/* Related to max number of fields, should probably call it max num fields.. */
+#define MAX_BYTES_OF_FLAGS 3
+
+/* Functions for message passing declared below
+ * */
 
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message

@@ -43,15 +43,15 @@ extern "C" {
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
 
 FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
-uint8_t numConnectedDevices = 0;
+uint8_t fx_spec_numConnectedDevices = 0;
+uint8_t newDeviceConnectedFlag;
 uint8_t* deviceData[MAX_CONNECTED_DEVICES];
-uint8_t newDeviceConnecetedFlag;
 
 void addConnectedDevice(uint8_t devType, uint16_t devId)
 {
-	if(numConnectedDevices == MAX_CONNECTED_DEVICES) return;
+	if(fx_spec_numConnectedDevices == MAX_CONNECTED_DEVICES) return;
 
-	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[numConnectedDevices];
+	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[fx_spec_numConnectedDevices];
 	if(devType == FX_RIGID_SPEC)
 	{
 		ds->numFields = _rigid_numFields;
@@ -63,15 +63,15 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 	for(i=0; i<ds->numFields;i++)
 		totalSpaceNeeded += FORMAT_SIZE_MAP[ds->fieldTypes[i]];
 
-	if(deviceData[numConnectedDevices])
-		realloc(deviceData[numConnectedDevices], totalSpaceNeeded);
+	if(deviceData[fx_spec_numConnectedDevices])
+		realloc(deviceData[fx_spec_numConnectedDevices], totalSpaceNeeded);
 	else
-		deviceData[numConnectedDevices] = malloc(totalSpaceNeeded);
+		deviceData[fx_spec_numConnectedDevices] = malloc(totalSpaceNeeded);
 
-	memset(deviceData[numConnectedDevices], 0, totalSpaceNeeded);
+	memset(deviceData[fx_spec_numConnectedDevices], 0, totalSpaceNeeded);
 
-	numConnectedDevices++;
-	newDeviceConnecetedFlag=1;
+	fx_spec_numConnectedDevices++;
+	newDeviceConnectedFlag=1;
 }
 
 void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
@@ -95,7 +95,7 @@ void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uin
 	uint16_t devId = REBUILD_UINT16(msgBuf, &index);
 
 	// match this message to a connected device
-	for(i = 0; i < numConnectedDevices; i++)
+	for(i = 0; i < fx_spec_numConnectedDevices; i++)
 	{
 		if(	devType == (deviceData[i][0]) &&
 			devId 	== *(uint16_t*)(deviceData[i]+1))
@@ -107,7 +107,7 @@ void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uin
 		return;
 
 	// in the event we found no connected device we need to add a new connected device
-	if(i == numConnectedDevices)
+	if(i == fx_spec_numConnectedDevices)
 		addConnectedDevice(devType, devId);
 
 	// read into the appropriate device
