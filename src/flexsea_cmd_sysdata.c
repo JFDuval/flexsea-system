@@ -91,14 +91,14 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 	uint8_t lenFlags;
 	uint32_t flags[MAX_BYTES_OF_FLAGS];
 
-	uint16_t index=0, i=0;
+	uint16_t index=P_DATA1, i=0;
 	lenFlags = msgBuf[index++];
 
 	if(lenFlags > MAX_BYTES_OF_FLAGS)
 		lenFlags=3;
 
 	while(i < lenFlags) {
-		REBUILD_UINT32(msgBuf, &index);
+		flags[i++] = REBUILD_UINT32(msgBuf, &index);
 	}
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, flags, lenFlags);
@@ -114,56 +114,60 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 	uint16_t index = 0;
 	responseBuf[index++] = lenFlags;
 
-	// If we received an empty read we just send back our UUID (now just an id) and our device type
-	// TODO: device type is sort of already in RID? maybe we can/should pass that information along by giving full packet
-	int i;
-	uint8_t noFlags = 1;
-	for (i=0;i<lenFlags && noFlags;i++)
-		noFlags = flags[i] > 0;
-
-	if(noFlags)
-	{
-		SET_MAP_HIGH(0, flags);
-		SET_MAP_HIGH(1, flags);
-	}
+	// for now I'm just always sending type and id
+	SET_MAP_HIGH(0, flags);
+	SET_MAP_HIGH(1, flags);
 
 	//we save bytes to write our flags
-    uint32_t *responseFlags = (uint32_t*)(responseBuf+index);
+    uint8_t *responseFlagsPtr = (responseBuf+index);
     index += 4 * lenFlags;
 
     const FlexseaDeviceSpec *ds = fx_this_device_spec;
 
-    int j, fieldLength, fieldOffset = 0;
+    int i, j, fieldLength, fieldOffset = 0;
     for(i = 0; i < ds->numFields; i++)
     {
-    	if(IS_FIELD_HIGH(i, flags) && ds->fieldPointers[i])
+    	fieldLength = 0;
+    	if(ds->fieldTypes[i] < FORMAT_FILLER && FORMAT_SIZE_MAP[ds->fieldTypes[i]] > 0)
+    		fieldLength = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
+    	else
+    		; // log error?
+
+    	if(IS_FIELD_HIGH(i, flags))
     	{
-        	fieldLength = 0;
-        	if(ds->fieldTypes[i] < FORMAT_FILLER && FORMAT_SIZE_MAP[ds->fieldTypes[i]] > 0)
-        		fieldLength = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
-
-        	if(fieldLength)
-        	{
-        		SET_MAP_HIGH(i, responseFlags);
-
-        		// we will pack bytes by LSB first
-        		// if device is big endian we have to reverse order
-        		// fill our buffer with the data
+    		if(ds->fieldPointers[i])
+    		{
+            	if(fieldLength)
+            	{
+            		// we will pack bytes by LSB first
+            		// if device is big endian we have to reverse order
+            		// fill our buffer with the data
 #ifdef BIG_ENDIAN
-				for(j=fieldLength-1; j>=0; j--)
+            		for(j=fieldLength-1; j>=0; j--)
 #else
-        		for(j=0; j<fieldLength; j++)
+					for(j=0; j<fieldLength; j++)
 #endif
-        		{
-					responseBuf[index++] = ds->fieldPointers[i][j];
-        		}
-        	}
+            		{
+    					responseBuf[index++] = ds->fieldPointers[i][j];
+            		}
+            	}
+    		}
+    		else
+    			SET_MAP_LOW(i, flags);
+
     	}
 
     	fieldOffset += fieldLength;
     }
 
+    // index already accounts for full length including flags
     *responseLen = index;
+
+    // we write our flags back at the ptr we saved earlier
+    index=0;
+    for(i=0;i<lenFlags;i++)
+    	SPLIT_32(flags[i], responseFlagsPtr, &index);
+
 }
 
 /* Called by master to send a message to the slave, attempting to initiate a
