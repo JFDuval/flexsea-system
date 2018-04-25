@@ -71,13 +71,13 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*cmdType) = CMD_READ;
 
 	if(lenFlags > MAX_BYTES_OF_FLAGS)
-		lenFlags=3;
+		lenFlags=MAX_BYTES_OF_FLAGS;
 
 	shBuf[index++] = lenFlags;
 
 	uint8_t i=0;
 	while(i < lenFlags)
-		SPLIT_32(flags[i], shBuf, &index);
+		SPLIT_32(flags[i++], shBuf, &index);
 
 	(*len) = index;
 }
@@ -91,15 +91,14 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 	uint8_t lenFlags;
 	uint32_t flags[MAX_BYTES_OF_FLAGS];
 
-	uint16_t index=P_DATA1, i=0;
+	uint16_t index=P_DATA1, i;
 	lenFlags = msgBuf[index++];
 
 	if(lenFlags > MAX_BYTES_OF_FLAGS)
 		lenFlags=3;
 
-	while(i < lenFlags) {
+	for(i=0;i<lenFlags;i++) 
 		flags[i++] = REBUILD_UINT32(msgBuf, &index);
-	}
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, flags, lenFlags);
 
@@ -189,23 +188,26 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
-	uint16_t index=0;
+	uint16_t index=P_DATA1;
 	uint8_t lenFlags;
 	uint32_t flags[MAX_BYTES_OF_FLAGS];
 
 	lenFlags = msgBuf[index++];
 
 	//read in our fields
-	int i, j, fieldOffset;
+	int i, j, k, fieldOffset;
 	for(i=0;i<lenFlags;i++)
 		flags[i]=REBUILD_UINT32(msgBuf, &index);
 
 	// first two fields are always device type and id
 	// if these fields are not sent then we can't do much with the response
 	if(!IS_FIELD_HIGH(0, flags) || !IS_FIELD_HIGH(1, flags)) return;
-
+	// get the device type
 	uint8_t devType = msgBuf[index++];
-	uint16_t devId = REBUILD_UINT16(msgBuf, &index);
+
+	// messages are little endian
+	uint16_t devId = msgBuf[index] + (msgBuf[index+1] << 8);
+	index+=2;
 
 	// match this message to a connected device
 	for(i = 0; i < fx_spec_numConnectedDevices; i++)
@@ -224,18 +226,27 @@ void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uin
 		addConnectedDevice(devType, devId);
 
 	// read into the appropriate device
-	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[i];
-	fieldOffset = 3; //3 bytes are taken between devType and devId
-	for(i = 0; i < ds->numFields; i++)
+	FlexseaDeviceSpec ds = connectedDeviceSpecs[i];
+	uint8_t *dataPtr = deviceData[i];
+	if(dataPtr)
 	{
-		uint8_t fw = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
-		if(IS_FIELD_HIGH(i, flags))
+		// first two fields are devType and devId, we skip for reading in
+		fieldOffset = ds.fieldTypes[0] + ds.fieldTypes[1];
+		for(j = 2; j < ds.numFields; j++)
 		{
-			for(j = 0; j < fw; j++)
-				deviceData[i][fieldOffset + j] = msgBuf[index++];
-		}
+			uint8_t fw = FORMAT_SIZE_MAP[ds.fieldTypes[j]];
+			if(IS_FIELD_HIGH(j, flags))
+			{
+				for(k = 0; k < fw; k++)
+					deviceData[i][fieldOffset + k] = msgBuf[index++];
+			}
 
-		fieldOffset += fw;
+			fieldOffset += fw;
+		}
+	}
+	else
+	{
+		; // log error?
 	}
 }
 #else
