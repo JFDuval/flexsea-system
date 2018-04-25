@@ -83,9 +83,6 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 
 	fx_spec_numConnectedDevices++;
 }
-#else
-void addConnectedDevice(uint8_t devType, uint16_t devId) {}
-#endif
 
 void initializeDeviceSpecs()
 {
@@ -93,11 +90,17 @@ void initializeDeviceSpecs()
 	deviceSpecs[FX_RIGID_SPEC] = fx_rigid_spec;
 
 	int i;
+
 	for(i=0;i<MAX_CONNECTED_DEVICES;i++)
 	{
 		deviceData[i] = 0;
 	}
 }
+
+#else
+void addConnectedDevice(uint8_t devType, uint16_t devId) {}
+void initializeDeviceSpecs() {}
+#endif
 
 #ifdef __cplusplus
 }
