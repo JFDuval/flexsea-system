@@ -31,6 +31,10 @@
 #ifndef FLEXSEA_SYSTEM_INC_FLEXSEA_CMD_SYSDATA_H_
 #define FLEXSEA_SYSTEM_INC_FLEXSEA_CMD_SYSDATA_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 /* Functions for message passing declared below
@@ -77,5 +81,9 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 	And it does not reply.
 */
 void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FLEXSEA_SYSTEM_INC_FLEXSEA_CMD_SYSDATA_H_ */

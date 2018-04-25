@@ -58,22 +58,28 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 
 	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[fx_spec_numConnectedDevices];
 	if(devType == FX_RIGID_SPEC)
-	{
-		ds->numFields = _rigid_numFields;
-		ds->fieldLabels = _rigid_fieldlabels;
-		ds->fieldTypes = _rigid_field_formats;
-	}
+		*ds = fx_rigid_spec;
+	else
+		*ds = fx_none_spec;
 
 	uint16_t i, totalSpaceNeeded = 0;
 	for(i=0; i<ds->numFields;i++)
 		totalSpaceNeeded += FORMAT_SIZE_MAP[ds->fieldTypes[i]];
 
-	if(deviceData[fx_spec_numConnectedDevices])
-		realloc(deviceData[fx_spec_numConnectedDevices], totalSpaceNeeded);
-	else
-		deviceData[fx_spec_numConnectedDevices] = malloc(totalSpaceNeeded);
+	if(totalSpaceNeeded)
+	{
+		if(deviceData[fx_spec_numConnectedDevices])
+			realloc(deviceData[fx_spec_numConnectedDevices], totalSpaceNeeded);
+		else
+			deviceData[fx_spec_numConnectedDevices] = malloc(totalSpaceNeeded);
 
-	memset(deviceData[fx_spec_numConnectedDevices], 0, totalSpaceNeeded);
+		memset(deviceData[fx_spec_numConnectedDevices], 0, totalSpaceNeeded);
+	}
+
+	// set the device id and type in the data vector
+	deviceData[fx_spec_numConnectedDevices][0] = devType;
+	uint16_t *devIdPtr = (uint16_t*)(deviceData[fx_spec_numConnectedDevices]+1);
+	(*devIdPtr) = devId;
 
 	fx_spec_numConnectedDevices++;
 }
@@ -85,6 +91,12 @@ void initializeDeviceSpecs()
 {
 	deviceSpecs[FX_NONE_SPEC] = fx_none_spec;
 	deviceSpecs[FX_RIGID_SPEC] = fx_rigid_spec;
+
+	int i;
+	for(i=0;i<MAX_CONNECTED_DEVICES;i++)
+	{
+		deviceData[i] = 0;
+	}
 }
 
 #ifdef __cplusplus
