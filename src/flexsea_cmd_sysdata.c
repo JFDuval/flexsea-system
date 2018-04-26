@@ -134,7 +134,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 
     	if(IS_FIELD_HIGH(i, flags))
     	{
-    		if(ds->fieldPointers[i])
+    		if(_dev_data_pointers && _dev_data_pointers[i])
     		{
             	if(fieldLength)
             	{
@@ -147,7 +147,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint32_t *fl
 					for(j=0; j<fieldLength; j++)
 #endif
             		{
-    					responseBuf[index++] = ds->fieldPointers[i][j];
+    					responseBuf[index++] = _dev_data_pointers[i][j];
             		}
             	}
     		}

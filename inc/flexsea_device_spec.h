@@ -24,13 +24,17 @@ typedef struct FlexseaDeviceSpec_s {
 	const char** fieldLabels;
 
 	const uint8_t* fieldTypes;
-	uint8_t** fieldPointers;
 } FlexseaDeviceSpec;
 
 /* Specs exist for the following devices */
-#define NUM_DEVICE_TYPES 2
-#define FX_NONE_SPEC 0
-#define FX_RIGID_SPEC 1
+#define NUM_DEVICE_TYPES 4
+
+typedef enum {
+    FX_NONE = 0,
+    FX_RIGID = 1,
+    FX_EXECUTE = 2,
+    FX_MANAGE = 3
+} FlexseaDeviceType;
 
 /* this array contains all the device specs */
 extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
@@ -56,7 +60,11 @@ extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
 void addConnectedDevice(uint8_t devType, uint16_t devId);
 void initializeDeviceSpecs();
+
 extern const FlexseaDeviceSpec *fx_this_device_spec;
+extern const uint8_t** _dev_data_pointers;
+extern uint16_t fx_dev_id;
+extern uint8_t fx_dev_type;
 
 /* Related to max number of fields, should probably call it max num fields.. */
 #define MAX_BYTES_OF_FLAGS 3

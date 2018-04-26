@@ -16,18 +16,12 @@ extern "C" {
 FlexseaDeviceSpec fx_none_spec = {
 		.numFields = 0,
 		.fieldLabels = NULL,
-		.fieldTypes = NULL,
-		.fieldPointers = NULL
+		.fieldTypes = NULL
 };
 
-uint16_t fx_dev_id = 101;
-uint8_t fx_dev_type = FX_RIGID_SPEC;
-
-/** FX_RIGID */
-#define _rigid_numFields 8
-extern const char* _rigid_fieldlabels[_rigid_numFields];
-extern const uint8_t _rigid_field_formats[_rigid_numFields];
-															// type
+// FX_RIGID spec starts here
+// -------------------------
+#define _rigid_numFields 8								// type
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id", 	"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};
 const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
@@ -36,16 +30,64 @@ uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (ui
 														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z, \
 														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};
 FlexseaDeviceSpec fx_rigid_spec = {
-		.numFields = 7,
+		.numFields = _rigid_numFields,
 		.fieldLabels = _rigid_fieldlabels,
-		.fieldTypes = _rigid_field_formats,
-		.fieldPointers = _rigid_field_pointers
+		.fieldTypes = _rigid_field_formats
 };
+// -------------------------
+// FX_RIGID spec ends here
+// FX_EXECUTE spec starts here
+// -------------------------
+#define _execute_numFields 5								// type
+const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", 		"id", 	"accelx", 	"accely", 	"accelz"};
+const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+
+// only defined on boards not on plan
+uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
+														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z };
+FlexseaDeviceSpec fx_execute_spec = {
+		.numFields = _execute_numFields,
+		.fieldLabels = _execute_fieldlabels,
+		.fieldTypes = _execute_field_formats
+};
+// -------------------------
+// FX_EXECUTE spec ends here
+// FX_MANAGE spec starts here
+// -------------------------
+#define _manage_numFields 4									// type
+const char* _manage_fieldlabels[_manage_numFields] = 		{"manage", 		"id", 		"accelx", 	"accely"};
+const uint8_t _manage_field_formats[_manage_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S };
+
+// only defined on boards not on plan
+uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
+														(uint8_t*)&manag1.accel.x, (uint8_t*)&manag1.accel.y };
+FlexseaDeviceSpec fx_manage_spec = {
+		.numFields = _manage_numFields,
+		.fieldLabels = _manage_fieldlabels,
+		.fieldTypes = _manage_field_formats
+};
+// -------------------------
+// FX_MANAGE spec ends here
+
+#if(defined BOARD_TYPE_FLEXSEA_MANAGE)
+uint16_t fx_dev_id = 101;
+uint8_t fx_dev_type = FX_RIGID;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
+const uint8_t** _dev_data_pointers = _rigid_field_pointers;
+#elif(defined BOARD_TYPE_FLEXSEA_PLAN)
+uint16_t fx_dev_id = 999;
+uint8_t fx_dev_type = FX_NONE;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
+const uint8_t** _dev_data_pointers = NULL;
+#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+uint16_t fx_dev_id = 102;
+uint8_t fx_dev_type = FX_EXECUTE;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
+const uint8_t** _dev_data_pointers = _execute_field_pointers;
+#endif
 
 // initialization goes in payload_ptr initialization which is a hack :(
 FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
-
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
@@ -60,11 +102,17 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 	}
 
 	FlexseaDeviceSpec *ds = &connectedDeviceSpecs[fx_spec_numConnectedDevices];
-	if(devType == FX_RIGID_SPEC)
+	switch(devType) {
+	case(FX_RIGID):
 		*ds = fx_rigid_spec;
-	else
-	{
-		*ds = fx_none_spec;
+		break;
+	case(FX_EXECUTE):
+		*ds = fx_execute_spec;
+		break;
+	case(FX_MANAGE):
+		*ds = fx_manage_spec;
+		break;
+
 	}
 
 	uint16_t i, totalSpaceNeeded = 0;
@@ -95,8 +143,10 @@ void addConnectedDevice(uint8_t devType, uint16_t devId)
 
 void initializeDeviceSpecs()
 {
-	deviceSpecs[FX_NONE_SPEC] = fx_none_spec;
-	deviceSpecs[FX_RIGID_SPEC] = fx_rigid_spec;
+	deviceSpecs[FX_NONE] = fx_none_spec;
+	deviceSpecs[FX_RIGID] = fx_rigid_spec;
+	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
+	deviceSpecs[FX_MANAGE] = fx_manage_spec;
 
 	int i;
 
