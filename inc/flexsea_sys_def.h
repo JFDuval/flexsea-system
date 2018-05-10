@@ -95,7 +95,7 @@ extern "C" {
 //MultiPacket Capable commands
 //Maybe one day all commands will be multi packet.. or maybe we don't need that
 
-#define CMD_SYSDATA				20
+#define CMD_SYSDATA				93
 
 //User commands (100-127):
 
