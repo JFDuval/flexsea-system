@@ -62,13 +62,14 @@ void init_flexsea_payload_ptr_sysdata(void) {
  * Slave will respond with the appropriate data.
 */
 
-
 void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint32_t *flags, uint8_t lenFlags) {
 
 	uint16_t index = 0;
 	(*cmd) = CMD_SYSDATA;
 	(*cmdType) = CMD_READ;
+
+	shBuf[index++] = SYSDATA_REG_READ_FLAG;
 
 	if(lenFlags > MAX_BYTES_OF_FLAGS)
 		lenFlags=MAX_BYTES_OF_FLAGS;
@@ -88,20 +89,33 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 */
 void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
-	uint8_t lenFlags;
+	uint8_t lenFlags, not_whoami;
 	uint32_t flags[MAX_BYTES_OF_FLAGS];
 
 	uint16_t index=P_DATA1, i;
-	lenFlags = msgBuf[index++];
 
-	if(lenFlags > MAX_BYTES_OF_FLAGS)
-		lenFlags=3;
+	not_whoami = msgBuf[index++];
 
-	for(i=0;i<lenFlags;i++) 
-		flags[i++] = REBUILD_UINT32(msgBuf, &index);
+	if(not_whoami)
+	{
+		lenFlags = msgBuf[index++];
+
+		if(lenFlags > MAX_BYTES_OF_FLAGS)
+			lenFlags=3;
+
+		for(i=0;i<lenFlags;i++)
+			flags[i++] = REBUILD_UINT32(msgBuf, &index);
+
+	}
+	else
+	{
+		// just respond with first two fields which are id and dev type
+		lenFlags = 1;
+		flags[0] = 0x03;
+		// should set internal fields all low later on when I rework this section of code
+	}
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, flags, lenFlags);
-
 	(void)info;
 }
 

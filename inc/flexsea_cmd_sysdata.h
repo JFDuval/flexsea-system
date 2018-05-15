@@ -37,6 +37,9 @@ extern "C" {
 
 #include <stdint.h>
 
+#define SYSDATA_REG_READ_FLAG (0xAA)
+#define SYSDATA_WHO_AM_I_FLAG (0x00)
+
 /* Functions for message passing declared below
  * */
 
