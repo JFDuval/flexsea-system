@@ -65,10 +65,12 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint32_t *flags, uint8_t lenFlags);
 
+
 /* Master calls this function automatically after receiving a response from slave
 */
 void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
 
+#ifndef BOARD_TYPE_FLEXSEA_PLAN
 /* Slave calls this function automatically after receiving a read from master.
 	It determines what to do with the information passed to it,
 	And it replies indicating the resulting decision
@@ -80,6 +82,7 @@ void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 	And it does not reply.
 */
 void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
+#endif // BOARD_TYPE_FLEXSEA_PLAN
 
 #ifdef __cplusplus
 }

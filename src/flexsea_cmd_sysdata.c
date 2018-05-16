@@ -38,6 +38,7 @@ extern "C" {
 #include <stdlib.h>
 #include "flexsea_device_spec.h"
 #include <string.h>
+#include "flexsea_comm_def.h"
 
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
@@ -48,15 +49,15 @@ extern "C" {
 */
 void init_flexsea_payload_ptr_sysdata(void) {
 
+#ifndef BOARD_TYPE_FLEXSEA_PLAN
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_READ] = &rx_cmd_sysdata_r;
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_WRITE] = &rx_cmd_sysdata_w;
-	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
+#endif
 
+	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
 	// this should perhaps go in a different initialization function
 	initializeDeviceSpecs();
 }
-
-void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t sendMetaData);
 
 // Flexsea General System Data Passing:
 
@@ -85,6 +86,10 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	(*len) = index;
 }
+
+#ifndef BOARD_TYPE_FLEXSEA_PLAN
+
+void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t sendMetaData);
 
 /* Slave calls this function automatically after receiving a read from master.
 	It determines what to do with the information passed to it,
@@ -166,30 +171,6 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 
 }
 
-/* Called by master to send a message to the slave, attempting to initiate a
-	Slave will not respond.
-	TODO: I don't think this is needed even??
-	TODO: rename this to 'write'
-*/
-void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint32_t *flags, uint8_t lenFlags)
-{
-	uint16_t index = 0;
-	(*cmd) = CMD_SYSDATA;
-	(*cmdType) = CMD_WRITE;
-
-	if(lenFlags > FX_BITMAP_WIDTH_C)
-		lenFlags = FX_BITMAP_WIDTH_C;
-
-	shBuf[index++] = lenFlags;
-
-	uint8_t i=0;
-	while(i < lenFlags)
-		SPLIT_32(flags[i++], shBuf, &index);
-
-	(*len) = index;
-}
-
 /* Slave calls this function automatically after receiving a write from master.
 	It determines what to do with the information passed to it,
 	And it does not reply.
@@ -208,6 +189,39 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, 1);
 }
+
+#endif //BOARD_TYPE_FLEXSEA_PLAN
+
+/* Called by master to send a message to the slave, attempting to initiate a
+	Slave will not respond.
+	TODO: I don't think this is needed even??
+	TODO: rename this to 'write'
+*/
+#include <stdio.h>
+
+void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint32_t *flags, uint8_t lenFlags)
+{
+	printf("tx_cmd_sysdata_w...\n");
+	fflush(stdout);
+
+	uint16_t index = 0;
+	(*cmd) = CMD_SYSDATA;
+	(*cmdType) = CMD_WRITE;
+
+	if(lenFlags > FX_BITMAP_WIDTH_C)
+		lenFlags = FX_BITMAP_WIDTH_C;
+
+	shBuf[index++] = lenFlags;
+
+	uint8_t i=0;
+	while(i < lenFlags)
+		SPLIT_32(flags[i++], shBuf, &index);
+
+	(*len) = index;
+}
+
+
 
 /* Master calls this function automatically after receiving a response from slave
 */
