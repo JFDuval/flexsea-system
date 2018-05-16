@@ -79,6 +79,8 @@ uint16_t fx_dev_id = 101;
 uint8_t fx_dev_type = FX_RIGID;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 const uint8_t** _dev_data_pointers = _rigid_field_pointers;
+uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
+
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
 uint16_t fx_dev_id = 999;
 uint8_t fx_dev_type = FX_NONE;

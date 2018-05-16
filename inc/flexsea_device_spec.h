@@ -67,7 +67,9 @@ extern uint16_t fx_dev_id;
 extern uint8_t fx_dev_type;
 
 /* Related to max number of fields, should probably call it max num fields.. */
-#define MAX_BYTES_OF_FLAGS 3
+#define FX_BITMAP_WIDTH_C 3
+
+extern uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 
 #ifdef __cplusplus
 }
