@@ -97,7 +97,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 */
 void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
-	uint8_t not_whoami = msgBuf[P_DATA1];
+	uint8_t not_whoami = *msgBuf;
 	if(!not_whoami)
 	{
 		// set flags low and respond with metadata
@@ -177,7 +177,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 */
 void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen)
 {
-	uint16_t index = P_DATA1;
+	uint16_t index = 0;
 
 	uint8_t i=0, lenFlags = msgBuf[index++];
 
@@ -228,7 +228,7 @@ void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
-	uint16_t index=P_DATA1;
+	uint16_t index = 0;
 	uint8_t lenFlags;
 	uint32_t flags[FX_BITMAP_WIDTH_C];
 
