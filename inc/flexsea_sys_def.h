@@ -96,6 +96,8 @@ extern "C" {
 //Maybe one day all commands will be multi packet.. or maybe we don't need that
 
 #define CMD_SYSDATA				93
+#define SYSDATA_REG_READ_FLAG (0x00)
+#define SYSDATA_WHO_AM_I_FLAG (0xAA)
 
 //User commands (100-127):
 

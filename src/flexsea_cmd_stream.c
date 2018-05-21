@@ -81,29 +81,27 @@ uint8_t isLegalStreamCmd(uint8_t cmd)
 	//These are basically all the commands available in slavecomm in Plan GUI
 
 	return
-		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT ||
+		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT || CMD_SYSDATA ||
 		(cmd > 99 && cmd < 127);
 }
 
-void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
+void rx_multi_cmd_stream_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 {
-	(void) info;
+	uint16_t index = 0;
 
-	uint16_t index = P_DATA1;
-
-	volatile uint8_t cmdToStream = buf[index++];
-	uint8_t periodInMS = buf[index++];
-	uint8_t startStop = buf[index++];
-	uint8_t firstIndex = buf[index++];
-	uint8_t lastIndex = buf[index++];
+	volatile uint8_t cmdToStream = msgBuf[index++];
+	uint8_t periodInMS = msgBuf[index++];
+	uint8_t startStop = msgBuf[index++];
+	uint8_t firstIndex = msgBuf[index++];
+	uint8_t lastIndex = msgBuf[index++];
 
 	//case: turn streaming on
 	if(startStop && isLegalStreamCmd(cmdToStream) && (isStreaming < MAX_STREAMS))
 	{
 		streamCmds[isStreaming] = cmdToStream;
 		streamPeriods[isStreaming] = periodInMS;
-		streamReceivers[isStreaming] = buf[P_XID];
-		streamPortInfos[isStreaming] = *info;
+		streamReceivers[isStreaming] = info->xid;
+		streamPortInfos[isStreaming] = info->portIn;
 		streamIndex[isStreaming][0] = firstIndex;
 		streamIndex[isStreaming][1] = lastIndex;
 		isStreaming++;
@@ -161,6 +159,17 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 	}
 }
 
+void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
+{
+	MultiPacketInfo pInfo;
+	pInfo.portIn = info[0];
+	pInfo.xid = buf[P_XID];
+	pInfo.rid = buf[P_RID];
+	pInfo.portOut = info[1];
+
+	rx_multi_cmd_stream_w (buf, &pInfo, NULL, NULL);
+}
+
 void rx_cmd_stream_r(uint8_t *buf, uint8_t *info)
 {
 	(void) buf;
@@ -178,6 +187,8 @@ void init_flexsea_payload_ptr_stream(void)
 	flexsea_payload_ptr[CMD_STREAM][RX_PTYPE_READ] = &rx_cmd_stream_r;
 	flexsea_payload_ptr[CMD_STREAM][RX_PTYPE_WRITE] = &rx_cmd_stream_w;
 	flexsea_payload_ptr[CMD_STREAM][RX_PTYPE_REPLY] = &rx_cmd_stream_rr;
+
+	flexsea_multipayload_ptr[CMD_STREAM][RX_PTYPE_WRITE] = &rx_multi_cmd_stream_w;
 }
 
 #ifdef __cplusplus

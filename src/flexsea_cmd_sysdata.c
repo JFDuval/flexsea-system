@@ -95,16 +95,16 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 	It determines what to do with the information passed to it,
 	And it replies indicating the resulting decision
 */
-void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
+void rx_cmd_sysdata_r(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
-	uint8_t not_whoami = *msgBuf;
-	if(!not_whoami)
+	uint8_t isWhoAmI = msgBuf[0] == SYSDATA_WHO_AM_I_FLAG;
+	if(isWhoAmI)
 	{
 		// set flags low and respond with metadata
 		memset(fx_active_bitmap, 0, sizeof(uint32_t)*FX_BITMAP_WIDTH_C);
 	}
 
-	tx_cmd_sysdata_rr(responseBuf, responseLen, !not_whoami);
+	tx_cmd_sysdata_rr(responseBuf, responseLen, isWhoAmI);
 	(void)info;
 }
 
@@ -175,7 +175,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 	It determines what to do with the information passed to it,
 	And it does not reply.
 */
-void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen)
+void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 {
 	uint16_t index = 0;
 
@@ -226,7 +226,7 @@ void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 /* Master calls this function automatically after receiving a response from slave
 */
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
-void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen) {
+void rx_cmd_sysdata_rr(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen) {
 
 	uint16_t index = 0;
 	uint8_t lenFlags;
@@ -290,7 +290,7 @@ void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uin
 	}
 }
 #else
-void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen)
+void rx_cmd_sysdata_rr(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 	{ (void) msgBuf; (void) info; (void) responseBuf; (void) responseLen; }
 #endif
 

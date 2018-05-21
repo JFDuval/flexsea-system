@@ -37,9 +37,6 @@ extern "C" {
 
 #include <stdint.h>
 
-#define SYSDATA_REG_READ_FLAG (0xAA)
-#define SYSDATA_WHO_AM_I_FLAG (0x00)
-
 /* Functions for message passing declared below
  * */
 
@@ -65,23 +62,25 @@ void tx_cmd_sysdata_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint32_t *flags, uint8_t lenFlags);
 
+struct _MultiPacketInfo_s;
+typedef struct _MultiPacketInfo_s MultiPacketInfo;
 
 /* Master calls this function automatically after receiving a response from slave
 */
-void rx_cmd_sysdata_rr(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_cmd_sysdata_rr(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
 
 #ifndef BOARD_TYPE_FLEXSEA_PLAN
 /* Slave calls this function automatically after receiving a read from master.
 	It determines what to do with the information passed to it,
 	And it replies indicating the resulting decision
 */
-void rx_cmd_sysdata_r(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_cmd_sysdata_r(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
 
 /* Slave calls this function automatically after receiving a write from master.
 	It determines what to do with the information passed to it,
 	And it does not reply.
 */
-void rx_cmd_sysdata_w(uint8_t *msgBuf, uint8_t *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
 #endif // BOARD_TYPE_FLEXSEA_PLAN
 
 #ifdef __cplusplus
