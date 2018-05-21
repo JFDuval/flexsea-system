@@ -65,6 +65,7 @@ extern const FlexseaDeviceSpec *fx_this_device_spec;
 extern const uint8_t** _dev_data_pointers;
 extern uint16_t fx_dev_id;
 extern uint8_t fx_dev_type;
+extern uint32_t *fx_dev_timestamp;
 
 /* Related to max number of fields, should probably call it max num fields.. */
 #define FX_BITMAP_WIDTH_C 3
