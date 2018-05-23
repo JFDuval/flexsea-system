@@ -37,8 +37,11 @@
 extern "C" {
 #endif
 
-#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
 	#include "calibration_tools.h"
+#endif
+
+#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
@@ -123,12 +126,15 @@ uint8_t handleCalibrationMessage(uint8_t *buf)
 
 	uint8_t calibrationFlagToRunOrIsRunning = 0;
 
-	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
 
 		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 		{
 			calibrationFlags |= procedure;
+			calibrationNew = 1;
+			#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 			control_strategy(buf[P_DATA1], 0);
+			#endif
 		}
 		calibrationFlagToRunOrIsRunning = calibrationFlags;
 
