@@ -60,6 +60,12 @@ void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t select_w);
 
+void copyUserWtoStack(struct user_data_s u);
+void readUserRfromStack(struct user_data_s *u);
+void ptx_cmd_data_user_r(uint8_t slaveId, uint16_t *numb, uint8_t *commStr);
+void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							uint8_t select_w);
+
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
