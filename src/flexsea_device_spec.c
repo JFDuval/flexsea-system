@@ -87,6 +87,8 @@ uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 uint16_t fx_dev_id = 999;
 uint8_t fx_dev_type = FX_NONE;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
+uint32_t fx_empty_timestamp;
+uint32_t *fx_dev_timestamp = &fx_empty_timestamp;
 const uint8_t** _dev_data_pointers = NULL;
 #elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 uint16_t fx_dev_id = 102;

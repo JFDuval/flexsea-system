@@ -31,6 +31,7 @@
 #include <flexsea.h>
 #include "flexsea_system.h"
 #include <flexsea_board.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -161,13 +162,11 @@ void rx_multi_cmd_stream_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *res
 
 void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 {
-	MultiPacketInfo pInfo;
-	pInfo.portIn = info[0];
-	pInfo.xid = buf[P_XID];
-	pInfo.rid = buf[P_RID];
-	pInfo.portOut = info[1];
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
 
-	rx_multi_cmd_stream_w (buf, &pInfo, NULL, NULL);
+	rx_multi_cmd_stream_w (buf, &mInfo, 0, 0);
 }
 
 void rx_cmd_stream_r(uint8_t *buf, uint8_t *info)

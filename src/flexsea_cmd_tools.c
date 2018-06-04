@@ -67,6 +67,10 @@ void init_flexsea_payload_ptr_tools(void)
 	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_READ] = &rx_cmd_tools_comm_test_rw;
 	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_WRITE] = &rx_cmd_tools_comm_test_w;
 	flexsea_payload_ptr[CMD_COMM_TEST][RX_PTYPE_REPLY] = &rx_cmd_tools_comm_test_rr;
+
+	flexsea_multipayload_ptr[CMD_COMM_TEST][RX_PTYPE_READ] = &rx_multi_cmd_tools_commtest_r;
+	flexsea_multipayload_ptr[CMD_COMM_TEST][RX_PTYPE_WRITE] = &rx_multi_cmd_tools_commtest_w;
+	flexsea_multipayload_ptr[CMD_COMM_TEST][RX_PTYPE_REPLY] = &rx_multi_cmd_tools_commtest_rr;
 }
 
 //Transmit Comm. Test:
@@ -182,42 +186,17 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //Receive Comm. Test:
 //===================
 
-//Test code? No
-//This function is only used for TEST_PC
-void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info)
+void rx_multi_cmd_tools_commtest_r (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 {
 	(void)info;
 
-	uint8_t offset = buf[P_DATA1];
-	uint8_t packetNum = buf[P_DATA1+1];
-	arrLen = buf[P_DATA1+2];
-
-	goodPackets++;
-
-	#ifdef TEST_PC
-
-		printf("\nrx_cmd_tools_comm_test_w: %i, %i, %i.\n", offset, packetNum, arrLen);
-
-	#else
-
-		(void)offset;
-		(void)packetNum;
-
-	#endif
-}
-
-//Test code? No
-void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
-{
-	(void)info;
-
-	uint8_t offset = buf[P_DATA1];
-	uint8_t packetNum = buf[P_DATA1+1];
-	arrLen = buf[P_DATA1+2];
+	uint8_t offset = msgBuf[0];
+	uint8_t packetNum = msgBuf[1];
+	arrLen = msgBuf[2];
 
 	//Save received array:
 	arrLen = (arrLen <= 48) ? arrLen : 48;
-	memcpy(randomArrayRx, buf + (P_DATA1+3), arrLen);
+	memcpy(randomArrayRx, msgBuf + 3, arrLen);
 
 	/*
 	//Test code: corrupt 1 byte
@@ -242,12 +221,38 @@ void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
 	}
 	*/
 
-	tx_cmd_tools_comm_test_w(TX_N_DEFAULT, offset, 0, packetNum, 1);
-	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+	uint8_t cmdCodePlaceHolder, cmdTypePlaceHolder;
+
+	*responseLen=0;
+
+	tx_cmd_tools_comm_test_w(responseBuf, &cmdCodePlaceHolder, &cmdTypePlaceHolder, responseLen, offset, 0, packetNum, 1);
 }
 
-//Test code? No
-void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
+void rx_multi_cmd_tools_commtest_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	(void)info;
+	(void) responseBuf;
+	(void) responseLen;
+
+	uint8_t offset = msgBuf[0];
+	uint8_t packetNum = msgBuf[1];
+	arrLen = msgBuf[2];
+
+	goodPackets++;
+
+	#ifdef TEST_PC
+
+		printf("\nrx_cmd_tools_comm_test_w: %i, %i, %i.\n", offset, packetNum, arrLen);
+
+	#else
+
+		(void)offset;
+		(void)packetNum;
+
+	#endif
+}
+
+void rx_multi_cmd_tools_commtest_rr (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 {
 	int cmpResult = 0;
 	uint8_t len = 0;
@@ -255,9 +260,9 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	(void)info;
 
 	//Decode data:
-	//uint8_t offset = buf[P_DATA1];
-	uint8_t packetNum = buf[P_DATA1+1];
-	len = buf[P_DATA1+2];
+	//uint8_t offset = msgBuf[0];
+	uint8_t packetNum = msgBuf[1];
+	len = msgBuf[2];
 
 	lastRxPacketIndex = packetNum;
 	packetOffset = (uint8_t)lastTxPacketIndex - (uint8_t)lastRxPacketIndex;
@@ -265,7 +270,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 
 		//Save received array:
-		memcpy(randomArrayRx, &buf[P_DATA1+3], len);
+		memcpy(randomArrayRx, &msgBuf[3], len);
 
 		if(packetOffset >= MAX_PACKETS_BEHIND)
 		{
@@ -286,6 +291,37 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 		(void)cmpResult;
 
 	#endif
+}
+
+//Test code? No
+void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info)
+{
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+
+//	TX_N_DEFAULT : tmpPayload,&cmdCode,&cmdType,&cmdLen
+	rx_multi_cmd_tools_commtest_r(buf + P_DATA1, &mInfo, tmpPayload, &cmdLen);
+	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+
+}
+
+//Test code? No
+//This function is only used for TEST_PC
+void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info)
+{
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+
+	rx_multi_cmd_tools_commtest_w(buf + P_DATA1, &mInfo, tmpPayload, &cmdLen);
+}
+
+//Test code? No
+void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
+{
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+
+	rx_multi_cmd_tools_commtest_rr(buf + P_DATA1, &mInfo, tmpPayload, &cmdLen);
 }
 
 #ifdef __cplusplus
