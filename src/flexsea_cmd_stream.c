@@ -166,7 +166,7 @@ void rx_cmd_stream_w(uint8_t *buf, uint8_t *info)
 	fillMultiInfoFromBuf(&mInfo, buf, info);
 	mInfo.portOut = info[1];
 
-	rx_multi_cmd_stream_w (buf, &mInfo, 0, 0);
+	rx_multi_cmd_stream_w (buf + P_DATA1, &mInfo, 0, 0);
 }
 
 void rx_cmd_stream_r(uint8_t *buf, uint8_t *info)
