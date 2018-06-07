@@ -28,12 +28,12 @@ FlexseaDeviceSpec fx_none_spec = {
 // -------------------------
 
 #define _rigid_numFields 18								// type
-const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",
-														"state_time"
-														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",
-														"enc_ang", "enc_vel",
-														"motor_accel", "motor_current", "motor_voltage",
-														"batt_voltage", "batt_current", "temperature", "status"
+const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA
+														"state_time",																// STATE TIME
+														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU
+														"enc_ang", "enc_vel",														// ENC
+														"motor_accel", "motor_current", "motor_voltage",							// MOTOR
+														"batt_voltage", "batt_current", "temperature", "status",					// BATTERY
 };
 
 const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA
