@@ -187,6 +187,15 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseB
 	while(i < FX_BITMAP_WIDTH_C)
 		fx_active_bitmap[i++] = 0;
 
+	// set any non existent fields low
+	i = fx_this_device_spec->numFields;
+	while(i < 32*FX_BITMAP_WIDTH_C)
+	{
+		SET_MAP_LOW(i, fx_active_bitmap);
+		++i;
+	}
+
+
 	tx_cmd_sysdata_rr(responseBuf, responseLen, 1);
 }
 
