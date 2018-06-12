@@ -4,9 +4,9 @@ extern "C" {
 
 #include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
-#include "flexsea_system.h"
 #include "stdlib.h"
 #include "string.h"
+#include "flexsea_user_structs.h"
 
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
