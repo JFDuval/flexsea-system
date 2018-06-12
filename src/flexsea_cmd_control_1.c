@@ -261,6 +261,8 @@ void rx_cmd_ctrl_i_w(uint8_t *buf, uint8_t *info)
 		{
 			ctrl[0].current.setpoint_val = tmp_wanted_current;
 		}
+		
+		(void)tmp_measured_current;
 
 	#else
 
@@ -519,6 +521,11 @@ void rx_cmd_ctrl_p_w(uint8_t *buf, uint8_t *info)
 										ctrl[0].position.acc = tmp_acc);
 			#else
 			ctrl[0].position.setp = tmp_posf;
+			(void)buf;
+			(void)tmp_pos;
+			(void)tmp_posi;
+			(void)tmp_spdm;
+			(void)tmp_acc;
 			#endif
 		}
 		else if(ctrl[0].active_ctrl == CTRL_IMPEDANCE)

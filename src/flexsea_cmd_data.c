@@ -382,6 +382,12 @@ void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	(*len) = index;
 }
 
+void ptx_cmd_data_user_r(uint8_t slaveId, uint16_t *numb, uint8_t *commStr)
+{
+	tx_cmd_data_user_r(TX_N_DEFAULT);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
+}
+
 /*Writes one of the User W fields. Note: only Plan can set a W field; this
 command is made to be used by Plan and a slave, not between say Manage &
 Execute */
@@ -415,6 +421,29 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Payload length:
 	(*len) = index;
+}
+
+void copyUserWtoStack(struct user_data_s u)
+{
+	user_data_1.w[0] = u.w[0];
+	user_data_1.w[1] = u.w[1];
+	user_data_1.w[2] = u.w[2];
+	user_data_1.w[3] = u.w[3];
+}
+
+void readUserRfromStack(struct user_data_s *u)
+{
+	u->r[0] = user_data_1.r[0];
+	u->r[1] = user_data_1.r[1];
+	u->r[2] = user_data_1.r[2];
+	u->r[3] = user_data_1.r[3];
+}
+
+void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							uint8_t select_w)
+{
+	tx_cmd_data_user_w(TX_N_DEFAULT, select_w);
+	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 
 //Receive User R/W:
