@@ -27,34 +27,59 @@ FlexseaDeviceSpec fx_none_spec = {
 // FX_RIGID spec starts here
 // -------------------------
 
-#define _rigid_numFields 18								// type
-const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA
-														"state_time",																// STATE TIME
-														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU
-														"enc_ang", "enc_vel",														// ENC
-														"motor_accel", "motor_current", "motor_voltage",							// MOTOR
-														"batt_voltage", "batt_current", "temperature", "status",					// BATTERY
+#define _rigid_numFields 36								// type
+const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA			2 2
+														"state_time",																// STATE TIME		1 3
+														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU				6 9
+
+														"mot_ang", 		"mot_vel", 	"mot_acc", 										// MOTOR KIN		3 12
+														"mot_cur", 		"mot_volt",													// MOTOR ELEC		2 14
+														"batt_volt", 	"batt_curr",												// BATTERY			2 16
+														"temp", 		"status",													// STATS			2 18
+														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 23
+														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 28
+
+														"ank_ang", "ank_vel", "ank_from_mot", "ank_torque"							// ANKLE			4 32
+														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
 };
 
-const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA
-														FORMAT_32U,																	// STATE TIME
-														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S ,	// IMU
-														FORMAT_32S, FORMAT_32S,														// ENC
-														FORMAT_32S, FORMAT_32S, FORMAT_32S,											// MOTOR
-														FORMAT_16U, FORMAT_16S, FORMAT_8S, FORMAT_16U								// BATTERY
+const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA			2 2
+														FORMAT_32U,																	// STATE TIME		1 3
+														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S ,	// IMU				6 9
+
+														FORMAT_32S, FORMAT_32S, FORMAT_32S,											// MOTOR KIN		3 12
+														FORMAT_32S, FORMAT_32S,														// MOTOR ELEC		2 14
+														FORMAT_16U, FORMAT_16S,														// BATTERY			2 16
+														FORMAT_8S, 	FORMAT_16U,														// STATS			2 18
+														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 23
+														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 28
+
+														FORMAT_16S, FORMAT_16S, FORMAT_16S,	FORMAT_16S,								// ANKLE			4 32
+														FORMAT_32S, FORMAT_16S, FORMAT_8S, FORMAT_8S								// CONTROLLER		4 36
 };
 
 #define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
-uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*) STM32_UUID_PTR,											// METADATA
-														PTR2(rigid1.ctrl.timestamp),																// STATE TIME
-														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU
-														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,
+uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*) STM32_UUID_PTR,											// METADATA			2 2
+														PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
+														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
+														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,		// IMU 				3 9
 
-														PTR2(rigid1.ex.enc_ang), PTR2(rigid1.ex.enc_ang_vel),										// ENC
-														PTR2(rigid1.ex.mot_acc), PTR2(rigid1.ex.mot_current), PTR2(rigid1.ex.mot_volt),				// MOTOR
-														PTR2(rigid1.re.vb), PTR2(rigid1.re.current), PTR2(rigid1.re.temp),  PTR2(rigid1.re.status)	// BATTERY
+														PTR2(rigid1.ex._enc_ang_), PTR2(rigid1.ex._enc_ang_vel_), PTR2(rigid1.ex.mot_acc), 			// MOTOR KIN		3 12
+														PTR2(rigid1.ex.mot_current), PTR2(rigid1.ex.mot_volt),	 						 			// MOTOR ELEC		2 14
+														PTR2(rigid1.re.vb), PTR2(rigid1.re.current), 												// BATTERY			2 16
+														PTR2(rigid1.re.temp),  PTR2(rigid1.re.status),												// STATS			2 18
+														(uint8_t*)(rigid1.mn.genVar),	(uint8_t*)(rigid1.mn.genVar+1),								// GEN VARS
+														(uint8_t*)(rigid1.mn.genVar+2), (uint8_t*)(rigid1.mn.genVar+3),								// GEN VARS
+														(uint8_t*)(rigid1.mn.genVar+4), (uint8_t*)(rigid1.mn.genVar+5),								// GEN VARS
+														(uint8_t*)(rigid1.mn.genVar+6), (uint8_t*)(rigid1.mn.genVar+7),								// GEN VARS
+														(uint8_t*)(rigid1.mn.genVar+8), (uint8_t*)(rigid1.mn.genVar+9),								// GEN VARS			10 28
+
+														PTR2(rigid1.ctrl._ank_ang_deg_), PTR2(rigid1.ctrl._ank_vel_), 								// ANKLE			2 30
+														PTR2(rigid1.ctrl._ank_ang_from_mot_),  0,													// ANKLE			2 32
+														PTR2(rigid1.ex.ctrl.current.setpoint_val), PTR2(rigid1.ctrl.step_energy),					// CONTROLLER		2 34
+														PTR2(rigid1.ctrl.walkingState), PTR2(rigid1.ctrl.gaitState),								// CONTROLLER		2 36
 };
 
 #undef PTR2
