@@ -58,6 +58,7 @@ For rx_* functions, the suffix options are:
 #include "../inc/flexsea_cmd_in_control.h"
 #include "flexsea_cmd_sysdata.h"
 #include "flexsea_user_structs.h"
+#include "flexsea_cmd_user.h"
 #include "flexsea_dataformats.h"
 
 #ifndef NULL
