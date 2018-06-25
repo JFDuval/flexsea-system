@@ -206,13 +206,10 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseB
 	TODO: I don't think this is needed even??
 	TODO: rename this to 'write'
 */
-#include <stdio.h>
 
 void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint32_t *flags, uint8_t lenFlags)
 {
-	printf("tx_cmd_sysdata_w...\n");
-	fflush(stdout);
 
 	uint16_t index = 0;
 	(*cmd) = CMD_SYSDATA;

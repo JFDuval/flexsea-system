@@ -39,7 +39,7 @@ const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",									
 														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 23
 														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 28
 
-														"ank_ang", "ank_vel", "ank_from_mot", "ank_torque"							// ANKLE			4 32
+														"ank_ang", "ank_vel", "ank_from_mot", "ank_torque",							// ANKLE			4 32
 														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
 };
 
