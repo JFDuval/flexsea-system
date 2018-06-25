@@ -4,6 +4,7 @@ extern "C" {
 
 #include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
+#include "flexsea_sys_def.h"
 #include "stdlib.h"
 #include "string.h"
 #include "flexsea_user_structs.h"
@@ -127,6 +128,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 uint16_t fx_dev_id = 101;
 uint8_t fx_dev_type = FX_RIGID;
+uint8_t fx_dev_role = FLEXSEA_MANAGE_1;
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;

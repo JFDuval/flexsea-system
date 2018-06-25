@@ -124,6 +124,8 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 		uint8_t i;
 		for(i=0;i<FX_BITMAP_WIDTH_C;i++)
 			SPLIT_32(fx_active_bitmap[i], responseBuf, &l);
+
+		responseBuf[l++] = fx_dev_role;
 	}
 	else
 	{
@@ -195,6 +197,14 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseB
 		++i;
 	}
 
+	// check that for all fields we have valid data pointers
+	i = 0;
+	while(i < fx_this_device_spec->numFields)
+	{
+		if(!_dev_data_pointers[i])
+			SET_MAP_LOW(i, fx_active_bitmap);
+		++i;
+	}
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, 1);
 }
