@@ -4,6 +4,7 @@ extern "C" {
 
 #include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
+#include "flexsea_sys_def.h"
 #include "stdlib.h"
 #include "string.h"
 #include "flexsea_user_structs.h"
@@ -27,7 +28,12 @@ FlexseaDeviceSpec fx_none_spec = {
 // FX_RIGID spec starts here
 // -------------------------
 
-#define _rigid_numFields 36								// type
+#ifdef DEPHY
+#define _rigid_numFields 36
+#else
+#define _rigid_numFields 28
+#endif // DEPHY
+
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA			2 2
 														"state_time",																// STATE TIME		1 3
 														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU				6 9
@@ -39,8 +45,11 @@ const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",									
 														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 23
 														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 28
 
+#ifdef DEPHY
 														"ank_ang", "ank_vel", "ank_from_mot", "ank_torque",							// ANKLE			4 32
 														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
+#endif
+
 };
 
 const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA			2 2
@@ -54,8 +63,10 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,	
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 23
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 28
 
+#ifdef DEPHY
 														FORMAT_16S, FORMAT_16S, FORMAT_16S,	FORMAT_16S,								// ANKLE			4 32
 														FORMAT_32S, FORMAT_16S, FORMAT_8S, FORMAT_8S								// CONTROLLER		4 36
+#endif
 };
 
 #define PTR2(x) (uint8_t*)&(x)
@@ -76,10 +87,12 @@ uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (ui
 														(uint8_t*)(rigid1.mn.genVar+6), (uint8_t*)(rigid1.mn.genVar+7),								// GEN VARS
 														(uint8_t*)(rigid1.mn.genVar+8), (uint8_t*)(rigid1.mn.genVar+9),								// GEN VARS			10 28
 
+#ifdef DEPHY
 														PTR2(rigid1.ctrl._ank_ang_deg_), PTR2(rigid1.ctrl._ank_vel_), 								// ANKLE			2 30
 														PTR2(rigid1.ctrl._ank_ang_from_mot_),  0,													// ANKLE			2 32
 														PTR2(rigid1.ex.ctrl.current.setpoint_val), PTR2(rigid1.ctrl.step_energy),					// CONTROLLER		2 34
 														PTR2(rigid1.ctrl.walkingState), PTR2(rigid1.ctrl.gaitState),								// CONTROLLER		2 36
+#endif
 };
 
 #undef PTR2
@@ -127,6 +140,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 uint16_t fx_dev_id = 101;
 uint8_t fx_dev_type = FX_RIGID;
+uint8_t fx_dev_role = FLEXSEA_MANAGE_1;
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
