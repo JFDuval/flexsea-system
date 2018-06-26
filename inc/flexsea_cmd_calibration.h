@@ -45,6 +45,9 @@ extern "C" {
 // Prototype(s):
 //****************************************************************************
 
+struct _MultiPacketInfo_s;
+typedef struct _MultiPacketInfo_s MultiPacketInfo;
+
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
 */
@@ -69,18 +72,21 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 /* Master calls this function automatically after receiving a response from slave
 */
 void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 
 /* Slave calls this function automatically after receiving a read from master.
 	It determines what to do with the information passed to it,
 	And it replies indicating the resulting decision
 */
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_calibration_mode_rw(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 
 /* Slave calls this function automatically after receiving a read from master.
 	It determines what to do with the information passed to it,
 	And it does not reply.
 */
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_calibration_mode_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 
 //****************************************************************************
 // Prototype(s) - simplified functions (DLL):

@@ -57,6 +57,10 @@ void init_flexsea_payload_ptr_calibration(void)
 	flexsea_payload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_READ] = &rx_cmd_calibration_mode_rw;
 	flexsea_payload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_WRITE] = &rx_cmd_calibration_mode_w;
 	flexsea_payload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_REPLY] = &rx_cmd_calibration_mode_rr;
+
+	flexsea_multipayload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_READ] = &rx_multi_cmd_calibration_mode_rw;
+	flexsea_multipayload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_WRITE] = &rx_multi_cmd_calibration_mode_w;
+	flexsea_multipayload_ptr[CMD_CALIBRATION_MODE][RX_PTYPE_REPLY] = &rx_multi_cmd_calibration_mode_rr;
 }
 
 void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -96,26 +100,51 @@ void ptx_cmd_calibration_mode_rw(uint8_t slaveId, uint16_t *numb, uint8_t *commS
 
 void rx_cmd_calibration_mode_rr(uint8_t *buf, uint8_t *info)
 {
-	(void)buf;
-	(void)info;
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_calibration_mode_rr( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
 }
 
+void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	(void)msgBuf;
+	(void)mInfo;
+	(void)responseBuf;
+	(void)responseLen;
+}
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info)
 {
-	uint8_t response = handleCalibrationMessage(buf);
-	tx_cmd_calibration_mode_rw(TX_N_DEFAULT, response);
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_calibration_mode_rw( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+}
+
+void rx_multi_cmd_calibration_mode_rw(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	uint8_t response = handleCalibrationMessage(msgBuf);
+	tx_cmd_calibration_mode_rw(responseBuf, &cmdCode, &cmdType, responseLen, response);
 }
 
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info)
 {
-	handleCalibrationMessage(buf);
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_calibration_mode_w( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
+}
+
+void rx_multi_cmd_calibration_mode_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	handleCalibrationMessage(msgBuf);
 
 	#ifndef BOARD_TYPE_FLEXSEA_EXECUTE
-		(void)buf;
+		(void)msgBuf;
 	#endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
-	(void)info;
+	(void)mInfo;
 }
 
 

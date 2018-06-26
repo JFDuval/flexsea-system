@@ -40,10 +40,6 @@ extern "C" {
 #include <string.h>
 #include "flexsea_comm_def.h"
 
-#ifdef DEPHY
-#include "stm32f7xx_hal.h"
-#endif
-
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
