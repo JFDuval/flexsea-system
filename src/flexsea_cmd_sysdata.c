@@ -121,8 +121,8 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 	if(sendMetaData)
 	{
 		// {devType, devId, lenFlags, flag0, ... , flagn-1)
-		responseBuf[l++] = fx_dev_type;
-		responseBuf[l++] = HAL_GetUIDw0();
+		responseBuf[l++] = getDeviceType();
+		responseBuf[l++] = getDeviceId();
 		// send info about which flags are high
 		responseBuf[l++] = FX_BITMAP_WIDTH_C;
 		uint8_t i;

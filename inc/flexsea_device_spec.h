@@ -14,7 +14,7 @@ extern "C" {
 
 #include <stdint.h>
 #include "flexsea_dataformats.h"
-
+#include "flexsea_sys_def.h"
 
 /* Flexsea Device C Interface defined here - FlexseaDeviceSpec */
 typedef struct FlexseaDeviceSpec_s {
@@ -29,12 +29,7 @@ typedef struct FlexseaDeviceSpec_s {
 /* Specs exist for the following devices */
 #define NUM_DEVICE_TYPES 4
 
-typedef enum {
-    FX_NONE = 0,
-    FX_RIGID = 1,
-    FX_EXECUTE = 2,
-    FX_MANAGE = 3
-} FlexseaDeviceType;
+
 
 /* this array contains all the device specs */
 extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
