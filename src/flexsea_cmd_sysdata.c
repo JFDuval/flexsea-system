@@ -40,6 +40,10 @@ extern "C" {
 #include <string.h>
 #include "flexsea_comm_def.h"
 
+#ifdef DEPHY
+#include "stm32f7xx_hal.h"
+#endif
+
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
@@ -118,7 +122,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 	{
 		// {devType, devId, lenFlags, flag0, ... , flagn-1)
 		responseBuf[l++] = fx_dev_type;
-		responseBuf[l++] = STM32_BOARD_ID;
+		responseBuf[l++] = HAL_GetUIDw0();
 		// send info about which flags are high
 		responseBuf[l++] = FX_BITMAP_WIDTH_C;
 		uint8_t i;

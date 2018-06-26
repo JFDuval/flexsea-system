@@ -23,7 +23,14 @@ FlexseaDeviceSpec fx_none_spec = {
 // STM 32 UUID location from manual
 // https://ee-programming-notepad.blogspot.com/2017/06/reading-stm32f4-unique-device-id-from.html
 // http://www.st.com/content/ccc/resource/technical/document/reference_manual/3d/6d/5a/66/b4/99/40/d4/DM00031020.pdf/files/DM00031020.pdf/jcr:content/translations/en.DM00031020.pdf
+
+#ifdef DEPHY
+#include "stm32f777xx.h"
+
+#define STM32_UUID_PTR (UID_BASE)
+#else
 #define STM32_UUID_PTR (0x1FFF7A10)
+#endif // DEPHY
 
 // FX_RIGID spec starts here
 // -------------------------
