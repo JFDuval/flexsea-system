@@ -8,6 +8,7 @@ extern "C" {
 #include "stdlib.h"
 #include "string.h"
 #include "flexsea_user_structs.h"
+#include "flexsea_board.h"
 
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
@@ -24,13 +25,7 @@ FlexseaDeviceSpec fx_none_spec = {
 // https://ee-programming-notepad.blogspot.com/2017/06/reading-stm32f4-unique-device-id-from.html
 // http://www.st.com/content/ccc/resource/technical/document/reference_manual/3d/6d/5a/66/b4/99/40/d4/DM00031020.pdf/files/DM00031020.pdf/jcr:content/translations/en.DM00031020.pdf
 
-#ifdef DEPHY
-#include "stm32f777xx.h"
 
-#define STM32_UUID_PTR (UID_BASE)
-#else
-#define STM32_UUID_PTR (0x1FFF7A10)
-#endif // DEPHY
 
 // FX_RIGID spec starts here
 // -------------------------
@@ -77,13 +72,12 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,	
 };
 
 #define PTR2(x) (uint8_t*)&(x)
-
+#define UIDPTR(o) (uint8_t*)(0x1FFF7A10U + o)
 // only defined on boards not on plan
-uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*) STM32_UUID_PTR,											// METADATA			2 2
+uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	0,	0,																						// METADATA			2 2
 														PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
 														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
 														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,		// IMU 				3 9
-
 														PTR2(rigid1.ex._enc_ang_), PTR2(rigid1.ex._enc_ang_vel_), PTR2(rigid1.ex.mot_acc), 			// MOTOR KIN		3 12
 														PTR2(rigid1.ex.mot_current), PTR2(rigid1.ex.mot_volt),	 						 			// MOTOR ELEC		2 14
 														PTR2(rigid1.re.vb), PTR2(rigid1.re.current), 												// BATTERY			2 16
