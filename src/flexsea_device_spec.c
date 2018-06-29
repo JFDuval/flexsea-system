@@ -112,7 +112,7 @@ const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", 		"id", 	"a
 const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
 // only defined on boards not on plan
-uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
+uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
 														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z };
 FlexseaDeviceSpec fx_execute_spec = {
 		.numFields = _execute_numFields,
@@ -128,7 +128,7 @@ const char* _manage_fieldlabels[_manage_numFields] = 		{"manage", 		"id", 		"acc
 const uint8_t _manage_field_formats[_manage_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S };
 
 // only defined on boards not on plan
-uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)&fx_dev_type, (uint8_t*)&fx_dev_id, \
+uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
 														(uint8_t*)&manag1.accel.x, (uint8_t*)&manag1.accel.y };
 FlexseaDeviceSpec fx_manage_spec = {
 		.numFields = _manage_numFields,
@@ -139,9 +139,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 // FX_MANAGE spec ends here
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
-uint16_t fx_dev_id = 101;
-uint8_t fx_dev_type = FX_RIGID;
-uint8_t fx_dev_role = FLEXSEA_MANAGE_1;
+
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
@@ -149,15 +147,11 @@ const uint8_t** _dev_data_pointers = _rigid_field_pointers;
 uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
-uint16_t fx_dev_id = 999;
-uint8_t fx_dev_type = FX_NONE;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
 uint32_t fx_empty_timestamp;
 uint32_t *fx_dev_timestamp = &fx_empty_timestamp;
 const uint8_t** _dev_data_pointers = NULL;
 #elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
-uint16_t fx_dev_id = 102;
-uint8_t fx_dev_type = FX_EXECUTE;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
 const uint8_t** _dev_data_pointers = _execute_field_pointers;
 #endif

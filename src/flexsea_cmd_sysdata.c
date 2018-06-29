@@ -37,6 +37,7 @@ extern "C" {
 #include <flexsea.h>
 #include <stdlib.h>
 #include "flexsea_device_spec.h"
+#include "flexsea_board.h"
 #include <string.h>
 #include "flexsea_comm_def.h"
 
@@ -125,7 +126,7 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 		for(i=0;i<FX_BITMAP_WIDTH_C;i++)
 			SPLIT_32(fx_active_bitmap[i], responseBuf, &l);
 
-		responseBuf[l++] = fx_dev_role;
+		responseBuf[l++] = getBoardID();
 	}
 	else
 	{
