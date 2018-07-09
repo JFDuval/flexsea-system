@@ -44,6 +44,13 @@ void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_stream_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 
+struct _MultiPacketInfo_s;
+typedef struct _MultiPacketInfo_s MultiPacketInfo;
+
+void rx_multi_cmd_stream_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_multi_cmd_stream_rw (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_multi_cmd_stream_rr (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+
 void rx_cmd_stream_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_stream_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_stream_rr(uint8_t *buf, uint8_t *info);

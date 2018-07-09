@@ -56,7 +56,14 @@ For rx_* functions, the suffix options are:
 #include <flexsea_board.h>
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_in_control.h"
+#include "flexsea_cmd_sysdata.h"
 #include "flexsea_user_structs.h"
+#include "flexsea_cmd_user.h"
+#include "flexsea_dataformats.h"
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 //****************************************************************************
 // Variable(s)
@@ -73,6 +80,15 @@ uint16_t cmdLen = 0;
 // Function(s)
 //****************************************************************************
 
+void flexsea_multi_payload_catchall(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen) {
+
+	(void) msgBuf;
+	(void) info;
+	(void) responseBuf;
+	*responseLen = 0;
+	return;
+}
+
 //Initialize function pointer array
 void init_flexsea_payload_ptr(void)
 {
@@ -84,6 +100,10 @@ void init_flexsea_payload_ptr(void)
 		flexsea_payload_ptr[i][RX_PTYPE_READ] = &flexsea_payload_catchall;
 		flexsea_payload_ptr[i][RX_PTYPE_WRITE] = &flexsea_payload_catchall;
 		flexsea_payload_ptr[i][RX_PTYPE_REPLY] = &flexsea_payload_catchall;
+
+		flexsea_multipayload_ptr[i][RX_PTYPE_READ] = &flexsea_multi_payload_catchall;
+		flexsea_multipayload_ptr[i][RX_PTYPE_WRITE] = &flexsea_multi_payload_catchall;
+		flexsea_multipayload_ptr[i][RX_PTYPE_REPLY] = &flexsea_multi_payload_catchall;
 	}
 
 	//Associate pointers to your project-specific functions:
@@ -103,6 +123,9 @@ void init_flexsea_payload_ptr(void)
 
 	//Data:
 	init_flexsea_payload_ptr_data();
+
+	//Sys Data Device Interface:
+	init_flexsea_payload_ptr_sysdata();
 
 	//Sensors:
 	init_flexsea_payload_ptr_sensors();
@@ -295,3 +318,5 @@ void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
 			break;
 	}
 }
+
+const int FORMAT_SIZE_MAP[] = {4, 4, 2, 2, 1, 1, -1, 0, -1};

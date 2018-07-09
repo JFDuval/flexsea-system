@@ -92,6 +92,13 @@ extern "C" {
 #define CMD_CALIBRATION_MODE	91
 #define CMD_STREAM				92
 
+//MultiPacket Capable commands
+//Maybe one day all commands will be multi packet.. or maybe we don't need that
+
+#define CMD_SYSDATA				93
+#define SYSDATA_REG_READ_FLAG (0x00)
+#define SYSDATA_WHO_AM_I_FLAG (0xAA)
+
 //User commands (100-127):
 
 #define CMD_USER1				100
@@ -182,6 +189,13 @@ extern "C" {
 #define Z_K		g0
 #define Z_B		g1
 #define Z_I		g2
+
+typedef enum {
+    FX_NONE = 0,
+    FX_RIGID = 1,
+    FX_EXECUTE = 2,
+    FX_MANAGE = 3
+} FlexseaDeviceType;
 
 //In Control combined fields:
 #define IN_CONTROL_CONTROLLER(x)		((x & 0xE000) >> 13)

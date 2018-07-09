@@ -99,6 +99,10 @@ void init_flexsea_payload_ptr_data(void)
 	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_cmd_data_user_rw;
 	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_REPLY] = &rx_cmd_data_user_rr;
 	flexsea_payload_ptr[CMD_USER_DATA][RX_PTYPE_WRITE] = &rx_cmd_data_user_w;
+
+	flexsea_multipayload_ptr[CMD_USER_DATA][RX_PTYPE_READ] = &rx_multi_cmd_data_user_rw;
+	flexsea_multipayload_ptr[CMD_USER_DATA][RX_PTYPE_REPLY] = &rx_multi_cmd_data_user_rr;
+	flexsea_multipayload_ptr[CMD_USER_DATA][RX_PTYPE_WRITE] = &rx_multi_cmd_data_user_w;
 }
 
 void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
@@ -451,35 +455,58 @@ void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
 
 void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info)
 {
-	uint16_t index = P_DATA1;
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_data_user_w( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
+}
+
+void rx_multi_cmd_data_user_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	uint16_t index = 0;
 	uint8_t wSelect = 0;
 	uint32_t wVal = 0;
-	(void)info;	//Unused for now
+	(void)mInfo;	//Unused for now
 
-	wSelect = buf[index++];
-	wVal = (int32_t) REBUILD_UINT32(buf, &index);
+	wSelect = msgBuf[index++];
+	wVal = (int32_t) REBUILD_UINT32(msgBuf, &index);
 	user_data_1.w[wSelect] = wVal;
 }
 
 void rx_cmd_data_user_rw(uint8_t *buf, uint8_t *info)
 {
-	(void)info;	//Unused for now
-
-	tx_cmd_data_user_w(TX_N_DEFAULT, 0);
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_data_user_rw( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
 	packAndSend(P_AND_S_DEFAULT, buf[P_XID], info, SEND_TO_MASTER);
+}
+
+void rx_multi_cmd_data_user_rw(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	(void)mInfo;	//Unused for now
+
+	tx_cmd_data_user_w(responseBuf, &cmdCode, &cmdType, responseLen, 0);
 }
 
 void rx_cmd_data_user_rr(uint8_t *buf, uint8_t *info)
 {
-	uint16_t index = P_DATA1;
-	(void)info;	//Unused for now
-
-	user_data_1.r[0] = (int32_t)REBUILD_UINT32(buf, &index);
-	user_data_1.r[1] = (int32_t)REBUILD_UINT32(buf, &index);
-	user_data_1.r[2] = (int32_t)REBUILD_UINT32(buf, &index);
-	user_data_1.r[3] = (int32_t)REBUILD_UINT32(buf, &index);
+	MultiPacketInfo mInfo;
+	fillMultiInfoFromBuf(&mInfo, buf, info);
+	mInfo.portOut = info[1];
+	rx_multi_cmd_data_user_rr( buf + P_DATA1, &mInfo, tmpPayload, &cmdLen );
 }
 
+void rx_multi_cmd_data_user_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
+{
+	uint16_t index = 0;
+	(void)mInfo;	//Unused for now
+
+	user_data_1.r[0] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+	user_data_1.r[1] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+	user_data_1.r[2] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+	user_data_1.r[3] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+}
 #ifdef __cplusplus
 }
 #endif

@@ -40,6 +40,8 @@
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
+struct _MultiPacketInfo_s;
+typedef struct _MultiPacketInfo_s MultiPacketInfo;
 
 void init_flexsea_payload_ptr_data(void);
 
@@ -53,8 +55,11 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 //User Data
 void rx_cmd_data_user_rw(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_data_user_rw(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 void rx_cmd_data_user_rr(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_data_user_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info);
+void rx_multi_cmd_data_user_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len);
 void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \

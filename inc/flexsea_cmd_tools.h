@@ -51,6 +51,14 @@ void tx_cmd_tools_comm_test_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t offset, uint8_t randomArrayLen, \
 						uint8_t packetNum);
+
+struct _MultiPacketInfo_s;
+typedef struct _MultiPacketInfo_s MultiPacketInfo;
+
+void rx_multi_cmd_tools_commtest_r (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_multi_cmd_tools_commtest_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+void rx_multi_cmd_tools_commtest_rr (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen);
+
 void rx_cmd_tools_comm_test_rw(uint8_t *buf, uint8_t *info);
 void rx_cmd_tools_comm_test_w(uint8_t *buf, uint8_t *info);
 void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info);
