@@ -143,7 +143,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
-const uint8_t** _dev_data_pointers = _rigid_field_pointers;
+const uint8_t ** _dev_data_pointers = (const uint8_t **) _rigid_field_pointers;
 uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
