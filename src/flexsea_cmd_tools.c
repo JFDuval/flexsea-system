@@ -162,13 +162,13 @@ void tx_cmd_tools_comm_test_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	{
 		//Use this for the actual test:
 		int indexToWriteTo = (indexOfLastWritten + 1) % MAX_PACKETS_BEHIND;
-		
+
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined TEST_PC)
 		uint8_t* writeTo = &randomArray[indexToWriteTo][0];
 		generateRandomUint8_tArray(writeTo, arrLen);
 		memcpy(&shBuf[index], writeTo, arrLen);
 		#endif	//(defined BOARD_TYPE_FLEXSEA_PLAN || defined TEST_PC)
-		
+
 		indexOfLastWritten = indexToWriteTo;
 		//Generate and send new Tx array:
 		index += arrLen;
@@ -284,6 +284,7 @@ void rx_cmd_tools_comm_test_rr(uint8_t *buf, uint8_t *info)
 	#else
 
 		(void)cmpResult;
+		(void)len;
 
 	#endif
 }
