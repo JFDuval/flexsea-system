@@ -51,6 +51,11 @@ extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 	#endif
 #else
 
+	extern const uint16_t const* read_num_fields_active;
+	extern const uint8_t const* const* read_device_active_field_pointers;
+	extern const uint8_t const* read_device_active_field_lengths;
+	void setActiveFieldsByMap(uint32_t *map);
+
 #endif //BOARD_TYPE_FLEXSEA_PLAN
 
 void addConnectedDevice(uint8_t devType, uint16_t devId);

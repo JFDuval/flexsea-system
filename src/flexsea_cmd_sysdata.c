@@ -127,50 +127,26 @@ void tx_cmd_sysdata_rr(uint8_t *responseBuf, uint16_t* responseLen, uint8_t send
 			SPLIT_32(fx_active_bitmap[i], responseBuf, &l);
 
 		responseBuf[l++] = getBoardID();
+		*responseLen = l;
 	}
 	else
 	{
 		// send the actual data
-	    const FlexseaDeviceSpec *ds = fx_this_device_spec;
-
-	    int i, j, fieldLength;
-	    for(i = 0; i < ds->numFields; i++)
+	    int i, j;
+		uint8_t* dest = responseBuf + l;
+	    for(i=0;i< *read_num_fields_active; ++i)
 	    {
-	    	fieldLength = 0;
-	    	if(ds->fieldTypes[i] < FORMAT_FILLER && FORMAT_SIZE_MAP[ds->fieldTypes[i]] > 0)
-	    		fieldLength = FORMAT_SIZE_MAP[ds->fieldTypes[i]];
-	    	else
-	    	{ ; } // log error?
+	    	// unclear which of these copying methods is fastest, try both and measure
 
+	    	// memcpy(dest, read_device_active_field_pointers[i], read_device_active_field_lengths[i]);
+	    	for(j=0; j<read_device_active_field_lengths[i]; ++j)
+	    		dest[j] = read_device_active_field_pointers[i][j];
 
-	    	if(IS_FIELD_HIGH(i, fx_active_bitmap))
-	    	{
-	    		if(_dev_data_pointers && _dev_data_pointers[i])
-	    		{
-//	            	if(fieldLength)
-//	            	{
-	            		// we will pack bytes by LSB first
-	            		// if device is big endian we have to reverse order
-	            		// fill our buffer with the data
-	#ifdef BIG_ENDIAN
-	            		for(j=fieldLength-1; j>=0; j--)
-	#else
-						for(j=0; j<fieldLength; j++)
-	#endif
-	            		{
-	    					responseBuf[l++] = _dev_data_pointers[i][j];
-	            		}
-//	            	}
-	    		}
-	    		else
-	    			SET_MAP_LOW(i, fx_active_bitmap);
-
-	    	}
+	    	dest = dest + read_device_active_field_lengths[i];
 	    }
-	}
-	*responseLen = l;
 
-	// TODO: implement exhaustive list system data read
+	    *responseLen = dest - responseBuf;
+	}
 
 }
 
@@ -206,6 +182,8 @@ void rx_cmd_sysdata_w(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseB
 			SET_MAP_LOW(i, fx_active_bitmap);
 		++i;
 	}
+
+	setActiveFieldsByMap(fx_active_bitmap);
 
 	tx_cmd_sysdata_rr(responseBuf, responseLen, 1);
 }

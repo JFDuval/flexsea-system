@@ -105,6 +105,38 @@ FlexseaDeviceSpec fx_rigid_spec = {
 };
 // -------------------------
 // FX_RIGID spec ends here
+
+#ifndef BOARD_TYPE_FLEXSEA_PLAN
+
+uint16_t fx_num_fields_active = 0;
+uint8_t* _device_active_field_pointers[_rigid_numFields];
+uint8_t _device_active_field_lengths[_rigid_numFields];
+
+const uint16_t const* read_num_fields_active = &fx_num_fields_active;
+const uint8_t const* const* read_device_active_field_pointers = (const uint8_t const* const*)_device_active_field_pointers;
+const uint8_t const* read_device_active_field_lengths =_device_active_field_lengths;
+
+void setActiveFieldsByMap(uint32_t *map)
+{
+	int i, j=0;
+	for(i=0;i<_rigid_numFields; ++i)
+	{
+		if(IS_FIELD_HIGH(i, map))
+		{
+			_device_active_field_pointers[j] = _rigid_field_pointers[i];
+			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[_rigid_field_formats[i]];
+			++j;
+		}
+	}
+
+	fx_num_fields_active = j;
+}
+
+#endif
+
+
+
+
 // FX_EXECUTE spec starts here
 // -------------------------
 #define _execute_numFields 5								// type
