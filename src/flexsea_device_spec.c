@@ -30,6 +30,8 @@ FlexseaDeviceSpec fx_none_spec = {
 // FX_RIGID spec starts here
 // -------------------------
 
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+
 #ifdef DEPHY
 #define _rigid_numFields 36
 #else
@@ -105,41 +107,15 @@ FlexseaDeviceSpec fx_rigid_spec = {
 };
 // -------------------------
 // FX_RIGID spec ends here
+#endif // BOARD_TYPE_FLEXSEA_MANAGE
 
-#ifndef BOARD_TYPE_FLEXSEA_PLAN
-
-uint16_t fx_num_fields_active = 0;
-uint8_t* _device_active_field_pointers[_rigid_numFields];
-uint8_t _device_active_field_lengths[_rigid_numFields];
-
-const uint16_t const* read_num_fields_active = &fx_num_fields_active;
-const uint8_t const* const* read_device_active_field_pointers = (const uint8_t const* const*)_device_active_field_pointers;
-const uint8_t const* read_device_active_field_lengths =_device_active_field_lengths;
-
-void setActiveFieldsByMap(uint32_t *map)
-{
-	int i, j=0;
-	for(i=0;i<_rigid_numFields; ++i)
-	{
-		if(IS_FIELD_HIGH(i, map))
-		{
-			_device_active_field_pointers[j] = _rigid_field_pointers[i];
-			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[_rigid_field_formats[i]];
-			++j;
-		}
-	}
-
-	fx_num_fields_active = j;
-}
-
-#endif
-
-
-
-
+#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+	
 // FX_EXECUTE spec starts here
 // -------------------------
-#define _execute_numFields 5								// type
+#define _execute_numFields 5								
+#define	_dev_numFields _execute_numFields
+															// type
 const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", 		"id", 	"accelx", 	"accely", 	"accelz"};
 const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
@@ -153,9 +129,15 @@ FlexseaDeviceSpec fx_execute_spec = {
 };
 // -------------------------
 // FX_EXECUTE spec ends here
+#endif // BOARD_TYPE_FLEXSEA_EXECUTE
+
 // FX_MANAGE spec starts here
 // -------------------------
-#define _manage_numFields 4									// type
+
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+	
+#define _manage_numFields 4									// type				
+#define	_dev_numFields _manage_numFields
 const char* _manage_fieldlabels[_manage_numFields] = 		{"manage", 		"id", 		"accelx", 	"accely"};
 const uint8_t _manage_field_formats[_manage_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S };
 
@@ -170,26 +152,59 @@ FlexseaDeviceSpec fx_manage_spec = {
 // -------------------------
 // FX_MANAGE spec ends here
 
+#endif // BOARD_TYPE_FLEXSEA_MANAGE
+
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
 const uint8_t ** _dev_data_pointers = (const uint8_t **) _rigid_field_pointers;
-uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
 uint32_t fx_empty_timestamp;
 uint32_t *fx_dev_timestamp = &fx_empty_timestamp;
 const uint8_t** _dev_data_pointers = NULL;
+	
 #elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+	
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
-const uint8_t** _dev_data_pointers = _execute_field_pointers;
+const uint8_t** _dev_data_pointers = (const uint8_t**)_execute_field_pointers;
+const uint8_t * _dev_field_formats = _execute_field_formats;
+
 #endif
 
 // initialization goes in payload_ptr initialization which is a hack :(
 FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
+
+#ifndef BOARD_TYPE_FLEXSEA_PLAN
+
+uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
+uint16_t fx_num_fields_active = 0;
+const uint8_t *_device_active_field_pointers[_dev_numFields];
+uint8_t _device_active_field_lengths[_dev_numFields];
+
+const uint16_t const* read_num_fields_active = &fx_num_fields_active;
+const uint8_t const* const* read_device_active_field_pointers = (const uint8_t const* const*)_device_active_field_pointers;
+const uint8_t const* read_device_active_field_lengths =_device_active_field_lengths;
+
+void setActiveFieldsByMap(uint32_t *map)
+{
+	int i, j=0;
+	for(i=0;i<_dev_numFields; ++i)
+	{
+		if(IS_FIELD_HIGH(i, map))
+		{
+			_device_active_field_pointers[j] = _dev_data_pointers[i];
+			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[_dev_field_formats[i]];
+			++j;
+		}
+	}
+
+	fx_num_fields_active = j;
+}
+
+#endif
 
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
@@ -259,7 +274,7 @@ void initializeDeviceSpecs()
 }
 
 #else
-void addConnectedDevice(uint8_t devType, uint16_t devId) {}
+void addConnectedDevice(uint8_t devType, uint16_t devId) {(void)devType; (void) devId;}
 void initializeDeviceSpecs() {}
 #endif
 
