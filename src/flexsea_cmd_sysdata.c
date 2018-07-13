@@ -55,7 +55,7 @@ void init_flexsea_payload_ptr_sysdata(void) {
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_WRITE] = &rx_cmd_sysdata_w;
 #endif
 
-	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
+//	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
 	// this should perhaps go in a different initialization function
 	initializeDeviceSpecs();
 }
@@ -220,74 +220,9 @@ void tx_cmd_sysdata_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 /* Master calls this function automatically after receiving a response from slave
 */
-#ifdef BOARD_TYPE_FLEXSEA_PLAN
-void rx_cmd_sysdata_rr(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen) {
-
-	uint16_t index = 0;
-	uint8_t lenFlags;
-	uint32_t flags[FX_BITMAP_WIDTH_C];
-
-	lenFlags = msgBuf[index++];
-
-	//read in our fields
-	int i, j, k, fieldOffset;
-	for(i=0;i<lenFlags;i++)
-		flags[i]=REBUILD_UINT32(msgBuf, &index);
-
-	// first two fields are always device type and id
-	// if these fields are not sent then we can't do much with the response
-	if(!IS_FIELD_HIGH(0, flags) || !IS_FIELD_HIGH(1, flags)) return;
-	// get the device type
-	uint8_t devType = msgBuf[index++];
-
-	// messages are little endian
-	uint16_t devId = msgBuf[index] + (msgBuf[index+1] << 8);
-	index+=2;
-
-	// match this message to a connected device
-	for(i = 0; i < fx_spec_numConnectedDevices; i++)
-	{
-		if(	devType == (deviceData[i][0]) &&
-			devId 	== *(uint16_t*)(deviceData[i]+1))
-					break;
-	}
-
-	//in the event we found no match and we have no more space to allocate we are screwed
-	if(i >= MAX_CONNECTED_DEVICES)
-		return;
-
-	// in the event we found no connected device we need to add a new connected device
-	if(i == fx_spec_numConnectedDevices)
-		addConnectedDevice(devType, devId);
-
-	// read into the appropriate device
-	FlexseaDeviceSpec ds = connectedDeviceSpecs[i];
-	uint8_t *dataPtr = deviceData[i];
-	if(dataPtr)
-	{
-		// first two fields are devType and devId, we skip for reading in
-		fieldOffset = ds.fieldTypes[0] + ds.fieldTypes[1];
-		for(j = 2; j < ds.numFields; j++)
-		{
-			uint8_t fw = FORMAT_SIZE_MAP[ds.fieldTypes[j]];
-			if(IS_FIELD_HIGH(j, flags))
-			{
-				for(k = 0; k < fw; k++)
-					deviceData[i][fieldOffset + k] = msgBuf[index++];
-			}
-
-			fieldOffset += fw;
-		}
-	}
-	else
-	{
-		; // log error?
-	}
-}
-#else
 void rx_cmd_sysdata_rr(uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *responseBuf, uint16_t* responseLen)
 	{ (void) msgBuf; (void) info; (void) responseBuf; (void) responseLen; }
-#endif
+
 
 #ifdef __cplusplus
 }
