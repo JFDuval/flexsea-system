@@ -30,13 +30,15 @@ FlexseaDeviceSpec fx_none_spec = {
 // FX_RIGID spec starts here
 // -------------------------
 
-#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+#if(defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID )
 
 #ifdef DEPHY
 #define _rigid_numFields 36
 #else
 #define _rigid_numFields 28
 #endif // DEPHY
+
+#define	_dev_numFields _rigid_numFields
 
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA			2 2
 														"state_time",																// STATE TIME		1 3
@@ -134,7 +136,7 @@ FlexseaDeviceSpec fx_execute_spec = {
 // FX_MANAGE spec starts here
 // -------------------------
 
-#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+#if( defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID) )
 	
 #define _manage_numFields 4									// type				
 #define	_dev_numFields _manage_numFields
