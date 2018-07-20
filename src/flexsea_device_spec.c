@@ -76,7 +76,7 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,	
 };
 
 #define PTR2(x) (uint8_t*)&(x)
-#define UIDPTR(o) (uint8_t*)(0x1FFF7A10U + o)
+
 // only defined on boards not on plan
 uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	0,	0,																						// METADATA			2 2
 														PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
