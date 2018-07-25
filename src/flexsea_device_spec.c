@@ -21,12 +21,6 @@ FlexseaDeviceSpec fx_none_spec = {
 		.fieldTypes = NULL
 };
 
-// STM 32 UUID location from manual
-// https://ee-programming-notepad.blogspot.com/2017/06/reading-stm32f4-unique-device-id-from.html
-// http://www.st.com/content/ccc/resource/technical/document/reference_manual/3d/6d/5a/66/b4/99/40/d4/DM00031020.pdf/files/DM00031020.pdf/jcr:content/translations/en.DM00031020.pdf
-
-
-
 // FX_RIGID spec starts here
 // -------------------------
 
@@ -158,10 +152,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
-uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
-const uint8_t ** _dev_data_pointers = (const uint8_t **) _rigid_field_pointers;
-const uint8_t * _dev_field_formats = _rigid_field_formats;
+// definition moved to flexsea_device_spec_m7.c / flexsea_device_spec_mn.c
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
@@ -193,13 +184,16 @@ const uint8_t const* read_device_active_field_lengths =_device_active_field_leng
 
 void setActiveFieldsByMap(uint32_t *map)
 {
+
+	uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
+
 	int i, j=0;
 	for(i=0;i<_dev_numFields; ++i)
 	{
 		if(IS_FIELD_HIGH(i, map))
 		{
 			_device_active_field_pointers[j] = _dev_data_pointers[i];
-			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[_dev_field_formats[i]];
+			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[dev_field_formats[i]];
 			++j;
 		}
 	}
