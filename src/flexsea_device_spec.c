@@ -185,7 +185,7 @@ const uint8_t const* read_device_active_field_lengths =_device_active_field_leng
 void setActiveFieldsByMap(uint32_t *map)
 {
 
-	uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
+	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
 
 	int i, j=0;
 	for(i=0;i<_dev_numFields; ++i)
