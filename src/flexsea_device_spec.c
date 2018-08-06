@@ -3,6 +3,7 @@ extern "C" {
 #endif
 
 #include "flexsea_device_spec.h"
+#include "flexsea_device_spec_defs.h"
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
 #include "stdlib.h"
@@ -21,22 +22,18 @@ FlexseaDeviceSpec fx_none_spec = {
 		.fieldTypes = NULL
 };
 
-// STM 32 UUID location from manual
-// https://ee-programming-notepad.blogspot.com/2017/06/reading-stm32f4-unique-device-id-from.html
-// http://www.st.com/content/ccc/resource/technical/document/reference_manual/3d/6d/5a/66/b4/99/40/d4/DM00031020.pdf/files/DM00031020.pdf/jcr:content/translations/en.DM00031020.pdf
-
-
-
 // FX_RIGID spec starts here
 // -------------------------
 
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE || defined BOARD_TYPE_FLEXSEA_PLAN)
+#if((defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID && HW_VER < 10) || defined BOARD_TYPE_FLEXSEA_PLAN)
 
 #ifdef DEPHY
 #define _rigid_numFields 36
 #else
 #define _rigid_numFields 28
 #endif // DEPHY
+
+#define	_dev_numFields _rigid_numFields
 
 const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",													// METADATA			2 2
 														"state_time",																// STATE TIME		1 3
@@ -74,7 +71,7 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,	
 };
 
 #define PTR2(x) (uint8_t*)&(x)
-#define UIDPTR(o) (uint8_t*)(0x1FFF7A10U + o)
+
 // only defined on boards not on plan
 uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	0,	0,																						// METADATA			2 2
 														PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
@@ -107,6 +104,7 @@ FlexseaDeviceSpec fx_rigid_spec = {
 };
 // -------------------------
 // FX_RIGID spec ends here
+
 #endif // BOARD_TYPE_FLEXSEA_MANAGE
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE  || defined BOARD_TYPE_FLEXSEA_PLAN)
@@ -133,7 +131,7 @@ FlexseaDeviceSpec fx_execute_spec = {
 // FX_MANAGE spec starts here
 // -------------------------
 
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE  || defined BOARD_TYPE_FLEXSEA_PLAN)
+#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID)))
 	
 #define _manage_numFields 4									// type
 const char* _manage_fieldlabels[_manage_numFields] = 		{"manage", 		"id", 		"accelx", 	"accely"};
@@ -154,11 +152,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
-#define	_dev_numFields _manage_numFields
-uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
-const uint8_t ** _dev_data_pointers = (const uint8_t **) _rigid_field_pointers;
-const uint8_t * _dev_field_formats = _rigid_field_formats;
+// definition moved to flexsea_device_spec_m7.c / flexsea_device_spec_mn.c
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
 
@@ -184,6 +178,7 @@ FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 #ifndef BOARD_TYPE_FLEXSEA_PLAN
 uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 uint16_t fx_num_fields_active = 0;
+
 const uint8_t *_device_active_field_pointers[_dev_numFields];
 uint8_t _device_active_field_lengths[_dev_numFields];
 
@@ -193,13 +188,16 @@ const uint8_t const* read_device_active_field_lengths =_device_active_field_leng
 
 void setActiveFieldsByMap(uint32_t *map)
 {
+
+	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
+
 	int i, j=0;
 	for(i=0;i<_dev_numFields; ++i)
 	{
 		if(IS_FIELD_HIGH(i, map))
 		{
 			_device_active_field_pointers[j] = _dev_data_pointers[i];
-			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[_dev_field_formats[i]];
+			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[dev_field_formats[i]];
 			++j;
 		}
 	}

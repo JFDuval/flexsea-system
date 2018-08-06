@@ -61,7 +61,7 @@ It includes a sub-structure named decoded_X that contains decoded values
 #define LIMINDX(x,y)				(x = (x<0)?0:((x>=ARRLEN(y)?ARRLEN(y)-1:x)))
 //Limit x to be between a and b:
 #define LIMIT(x,a,b)				(x = (x)<=(a)?(a):((x)>=(b)?(b):(x)))
-#define LININTERP(x1,y1,x2,y2,x)	((y1)+(((x)-(x1))*((y2)-(y1)))/((x2)-(x1)))
+#define LININTERP(x1,y1,x2,y2,x)	((x2==x1)?0:((y1)+(((x)-(x1))*((y2)-(y1)))/((x2)-(x1))))
 #define MINVAL(a,b)					((a<b)?a:b)
 #define MAXVAL(a,b)					((a>b)?a:b)
 
