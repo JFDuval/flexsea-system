@@ -3,6 +3,7 @@ extern "C" {
 #endif
 
 #include "flexsea_device_spec.h"
+#include "flexsea_device_spec_defs.h"
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
 #include "stdlib.h"
@@ -24,7 +25,7 @@ FlexseaDeviceSpec fx_none_spec = {
 // FX_RIGID spec starts here
 // -------------------------
 
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID )
+#if(defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID && HW_VER < 10)
 
 #ifdef DEPHY
 #define _rigid_numFields 36
@@ -103,6 +104,7 @@ FlexseaDeviceSpec fx_rigid_spec = {
 };
 // -------------------------
 // FX_RIGID spec ends here
+
 #endif // BOARD_TYPE_FLEXSEA_MANAGE
 
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
@@ -175,6 +177,7 @@ FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
 uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 uint16_t fx_num_fields_active = 0;
+
 const uint8_t *_device_active_field_pointers[_dev_numFields];
 uint8_t _device_active_field_lengths[_dev_numFields];
 
@@ -185,7 +188,7 @@ const uint8_t const* read_device_active_field_lengths =_device_active_field_leng
 void setActiveFieldsByMap(uint32_t *map)
 {
 
-	uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
+	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
 
 	int i, j=0;
 	for(i=0;i<_dev_numFields; ++i)
