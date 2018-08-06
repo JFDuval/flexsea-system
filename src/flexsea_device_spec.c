@@ -2,8 +2,11 @@
 extern "C" {
 #endif
 
-#include "flexsea_device_spec.h"
+#if(defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID && HW_VER < 10)
 #include "flexsea_device_spec_defs.h"
+#endif
+
+#include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
 #include "stdlib.h"
