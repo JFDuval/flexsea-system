@@ -33,7 +33,7 @@ FlexseaDeviceSpec fx_none_spec = {
 #ifdef DEPHY
 #define _rigid_numFields 36
 #else
-#define _rigid_numFields 28
+#define _rigid_numFields 30
 #endif // DEPHY
 
 #define	_dev_numFields _rigid_numFields
@@ -48,9 +48,9 @@ const char* _rigid_fieldlabels[_rigid_numFields] = 		{"rigid", 			"id",									
 														"temp", 		"status",													// STATS			2 18
 														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 23
 														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 28
-
+														"ank_ang", "ank_vel", 														// ANKLE			2 30
 #ifdef DEPHY
-														"ank_ang", "ank_vel", "ank_from_mot", "ank_torque",							// ANKLE			4 32
+														"ank_from_mot", "ank_torque",												// ANKLE			2 32
 														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
 #endif
 
@@ -66,9 +66,9 @@ const uint8_t _rigid_field_formats[_rigid_numFields] =	{FORMAT_8U, 	FORMAT_16U,	
 														FORMAT_8S, 	FORMAT_16U,														// STATS			2 18
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 23
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 28
-
+														FORMAT_16S, FORMAT_16S, 													// ANKLE			2 30
 #ifdef DEPHY
-														FORMAT_16S, FORMAT_16S, FORMAT_16S,	FORMAT_16S,								// ANKLE			4 32
+														FORMAT_16S,	FORMAT_16S,														// ANKLE			2 32
 														FORMAT_32S, FORMAT_16S, FORMAT_8S, FORMAT_8S								// CONTROLLER		4 36
 #endif
 };
@@ -89,9 +89,8 @@ uint8_t* _rigid_field_pointers[_rigid_numFields] =	{	0,	0,																						
 														(uint8_t*)(rigid1.mn.genVar+4), (uint8_t*)(rigid1.mn.genVar+5),								// GEN VARS
 														(uint8_t*)(rigid1.mn.genVar+6), (uint8_t*)(rigid1.mn.genVar+7),								// GEN VARS
 														(uint8_t*)(rigid1.mn.genVar+8), (uint8_t*)(rigid1.mn.genVar+9),								// GEN VARS			10 28
-
-#ifdef DEPHY
 														PTR2(rigid1.ctrl._ank_ang_deg_), PTR2(rigid1.ctrl._ank_vel_), 								// ANKLE			2 30
+#ifdef DEPHY
 														PTR2(rigid1.ctrl._ank_ang_from_mot_),  0,													// ANKLE			2 32
 														PTR2(rigid1.ex.ctrl.current.setpoint_val), PTR2(rigid1.ctrl.step_energy),					// CONTROLLER		2 34
 														PTR2(rigid1.ctrl.walkingState), PTR2(rigid1.ctrl.gaitState),								// CONTROLLER		2 36
