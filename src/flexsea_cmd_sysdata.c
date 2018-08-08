@@ -53,11 +53,12 @@ void init_flexsea_payload_ptr_sysdata(void) {
 #ifndef BOARD_TYPE_FLEXSEA_PLAN
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_READ] = &rx_cmd_sysdata_r;
 	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_WRITE] = &rx_cmd_sysdata_w;
-#endif
-
-//	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
+#else
+	//	flexsea_multipayload_ptr[CMD_SYSDATA][RX_PTYPE_REPLY] = &rx_cmd_sysdata_rr;
 	// this should perhaps go in a different initialization function
 	initializeDeviceSpecs();
+#endif
+
 }
 
 // Flexsea General System Data Passing:
