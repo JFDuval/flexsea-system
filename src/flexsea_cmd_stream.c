@@ -39,12 +39,12 @@ extern "C" {
 
 uint8_t isStreaming = 0;
 
-int streamCmds[MAX_STREAMS] = {-1 , -1 };
-uint16_t streamPeriods[MAX_STREAMS] = {1, 1};
-uint16_t streamReceivers[MAX_STREAMS] = {0, 0};
-uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE, PORT_NONE};
+int streamCmds[MAX_STREAMS] = {-1};
+uint16_t streamPeriods[MAX_STREAMS] = {1};
+uint16_t streamReceivers[MAX_STREAMS] = {0};
+uint8_t streamPortInfos[MAX_STREAMS] = {PORT_NONE};
 uint16_t streamIndex[MAX_STREAMS][2];
-uint8_t streamCurrentOffset[MAX_STREAMS] = {0,0};
+uint8_t streamCurrentOffset[MAX_STREAMS] = {0};
 
 void tx_cmd_stream_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t cmdToStream, uint8_t periodInMS, \
