@@ -41,7 +41,7 @@ typedef volatile uint8_t MutexFlag;
 //		1 if successfully acquired the mutex
 //		0 if failed to acquire the mutex
 
-__attribute__((always_inline)) inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
+__attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 {
 	__LDREXB(flag);
 	return !__STREXB(MUTEX_UNLOCKED, flag);
@@ -59,7 +59,7 @@ __attribute__((always_inline)) inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 //		1 if successfully wrote UNLOCKED to the mutex
 //		0 if failed to write UNLOCKED to the mutex
 
-__attribute__((always_inline)) inline uint8_t TRY_LOCK_MUTEX(MutexFlag* flag)
+__attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* flag)
 {
 	uint8_t value = __LDREXB(flag);
 	if(value == MUTEX_LOCKED)
