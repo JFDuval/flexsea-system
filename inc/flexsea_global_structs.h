@@ -445,6 +445,15 @@ struct filt_float_s
 	float curdiff;
 };
 
+//I2t Protection
+struct i2t_s
+{
+	uint8_t shift;
+	uint16_t leak;
+	uint32_t limit;
+	uint8_t nonLinThreshold;
+};
+
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
