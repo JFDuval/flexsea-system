@@ -3,8 +3,12 @@ extern "C" {
 #endif
 
 //TODO implement same on execute, if we ever actually use this on execute...
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
+#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 #include "flexsea_device_spec_defs.h"
+#endif
+
+#if(defined BOARD_TYPE_FLEXSEA_PLAN)
+
 #endif
 
 #include "flexsea_device_spec.h"
@@ -31,7 +35,7 @@ FlexseaDeviceSpec fx_none_spec = {
 
 #if((defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID && HW_VER < 10) || defined BOARD_TYPE_FLEXSEA_PLAN)
 
-const char* _rigid_fieldlabels[_rigid_mn_numFields] = 		{"rigid", 			"id",													// METADATA			2 2
+const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",													// METADATA			2 2
 														"state_time",																// STATE TIME		1 3
 														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU				6 9
 
@@ -57,6 +61,16 @@ const uint8_t _rigid_field_formats[_rigid_mn_numFields] =	{FORMAT_8U, 	FORMAT_16
 														FORMAT_16S, FORMAT_16S, 													// ANKLE			2 30
 };
 
+FlexseaDeviceSpec fx_rigid_spec = {
+		.numFields = _rigid_mn_numFields,
+		.fieldLabels = _rigid_fieldlabels,
+		.fieldTypes = _rigid_field_formats
+};
+
+#endif
+
+#if((defined BOARD_TYPE_FLEXSEA_MANAGE  && defined BOARD_SUBTYPE_RIGID && HW_VER < 10))
+
 #define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
@@ -77,12 +91,6 @@ uint8_t* _rigid_field_pointers[_rigid_mn_numFields] =	{	0,	0,																			
 };
 
 #undef PTR2
-
-FlexseaDeviceSpec fx_rigid_spec = {
-		.numFields = _rigid_mn_numFields,
-		.fieldLabels = _rigid_fieldlabels,
-		.fieldTypes = _rigid_field_formats
-};
 
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_rigid_spec;
