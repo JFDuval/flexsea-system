@@ -451,7 +451,10 @@ struct i2t_s
 	uint8_t shift;
 	uint16_t leak;
 	uint32_t limit;
+	uint32_t warning;
 	uint8_t nonLinThreshold;
+	uint8_t useNL;
+	uint8_t config;
 };
 
 //****************************************************************************
