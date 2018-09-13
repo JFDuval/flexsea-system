@@ -32,6 +32,7 @@
 #include <flexsea.h>
 #include "flexsea_system.h"
 #include <flexsea_board.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +48,14 @@ extern "C" {
 
 #ifndef NULL
 #define NULL   ((void *) 0)
+#endif
+
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+uint16_t uvlo = 0;
+uint16_t getUVLO(void)
+{
+	return uvlo;
+}
 #endif
 
 uint8_t handleCalibrationMessage(uint8_t *buf);
@@ -91,6 +100,24 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	(*len) = index;
 }
 
+//Overloading this function to take an extra parameter
+void tx_cmd_calibration_mode_long_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+						uint16_t *len, uint8_t calibrationMode, uint16_t v)
+{
+	//Variable(s) & command:
+	uint16_t index = 0;
+	(*cmd) = CMD_CALIBRATION_MODE;
+	(*cmdType) = CMD_WRITE;
+
+	//Data:
+	shBuf[index++] = calibrationMode;
+	SPLIT_16(v, shBuf, &index);
+	printf("tx_cmd_calibration_mode_long_rw");
+
+	//Payload length:
+	(*len) = index;
+}
+
 //Pack tx_cmd_calibration_mode_rw()
 void ptx_cmd_calibration_mode_rw(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, uint8_t calibrationMode)
 {
@@ -112,7 +139,12 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	(void)mInfo;
 	(void)responseBuf;
 	(void)responseLen;
+
+	printf("rx_multi_cmd_calibration_mode_rr");
+	uint16_t index = 1;
+	uvlo = REBUILD_UINT16(msgBuf, &index);
 }
+
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info)
 {
 	MultiPacketInfo mInfo;
@@ -146,7 +178,6 @@ void rx_multi_cmd_calibration_mode_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, ui
 
 	(void)mInfo;
 }
-
 
 uint8_t handleCalibrationMessage(uint8_t *buf)
 {
