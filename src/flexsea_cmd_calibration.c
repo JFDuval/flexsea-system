@@ -45,11 +45,15 @@ extern "C" {
 	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+	#include "rigid.h"
+#endif //BOARD_TYPE_FLEXSEA_MANAGE
+
 #ifndef NULL
 #define NULL   ((void *) 0)
 #endif
 
-uint8_t handleCalibrationMessage(uint8_t *buf);
+uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write);
 
 void init_flexsea_payload_ptr_calibration(void)
 {
@@ -86,6 +90,10 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 
 	//Data:
 	shBuf[index++] = calibrationMode;
+	if(calibrationMode & CALIBRATION_UVLO)
+	{
+		SPLIT_16(getUVLO(), shBuf, &index);
+	}
 
 	//Payload length:
 	(*len) = index;
@@ -113,6 +121,7 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	(void)responseBuf;
 	(void)responseLen;
 }
+
 void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info)
 {
 	MultiPacketInfo mInfo;
@@ -124,7 +133,8 @@ void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info)
 
 void rx_multi_cmd_calibration_mode_rw(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
 {
-	uint8_t response = handleCalibrationMessage(msgBuf);
+	uint8_t response = handleCalibrationMessage(msgBuf, 0);
+	response = msgBuf[0];
 	tx_cmd_calibration_mode_rw(responseBuf, &cmdCode, &cmdType, responseLen, response);
 }
 
@@ -138,7 +148,7 @@ void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info)
 
 void rx_multi_cmd_calibration_mode_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen)
 {
-	handleCalibrationMessage(msgBuf);
+	handleCalibrationMessage(msgBuf, 1);
 
 	#ifndef BOARD_TYPE_FLEXSEA_EXECUTE
 		(void)msgBuf;
@@ -148,28 +158,40 @@ void rx_multi_cmd_calibration_mode_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, ui
 }
 
 
-uint8_t handleCalibrationMessage(uint8_t *buf)
+uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 {
 	uint16_t index = 0;
-	uint8_t procedure = buf[index];
+	uint8_t procedure = buf[index++];
+	uint16_t v = 0;
 
 	uint8_t calibrationFlagToRunOrIsRunning = 0;
 
-	#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
+	if(write)
+	{
+		#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
 
-		if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
-		{
-			calibrationFlags |= procedure;
-			calibrationNew = 1;
-			#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
-			control_strategy(buf[0], 0);
-			#endif
-		}
-		calibrationFlagToRunOrIsRunning = calibrationFlags;
+			if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
+			{
+				calibrationFlags |= procedure;
+				calibrationNew = 1;
+				#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+				control_strategy(buf[0], 0);
+				#endif
 
-	#else
-		(void)procedure;	//Unused
-	#endif
+				#if(defined BOARD_TYPE_FLEXSEA_MANAGE)
+				if(isUVLO())
+				{
+					v = REBUILD_UINT16(buf, &index);
+					saveUVLO(v);
+				}
+				#endif
+			}
+			calibrationFlagToRunOrIsRunning = calibrationFlags;
+
+		#else
+			(void)procedure;	//Unused
+		#endif
+	}
 
 	return calibrationFlagToRunOrIsRunning;
 }
