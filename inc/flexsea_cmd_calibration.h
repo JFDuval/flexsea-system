@@ -60,13 +60,13 @@ void init_flexsea_payload_ptr_calibration(void);
 //Calibration mode:
 
 
-/* Called by master to send a message to the slave, attempting to inititiate a calibration procedure specified by
+/* Called by master to send a message to the slave, attempting to initiate a calibration procedure specified by
 	'calibrationMode'. Slave will respond with the calibration procedure it is running or about to run.
 */
 void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t calibrationMode);
 
-/* Called by master to send a message to the slave, attempting to inititiate a
+/* Called by master to send a message to the slave, attempting to initiate a
 	calibration procedure specified by 'calibrationMode'. Slave will not respond.
 	TODO: rename this to 'write'
 */
