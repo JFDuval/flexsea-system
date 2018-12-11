@@ -120,6 +120,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tBatt;
 		#endif
 
+		shBuf[index++] = i2tTmp->leak;							//I2T_SHIFT
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
 		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
 		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
@@ -179,8 +180,7 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	}
 	else if(msgBuf[0] & CALIBRATION_I2T)
 	{
-		uvlo = 1;	//Debugging only - ToDo remove
-
+		i2tBattR.shift = msgBuf[index++];
 		i2tBattR.leak = REBUILD_UINT16(msgBuf, &index);
 		i2tBattR.limit = REBUILD_UINT32(msgBuf, &index);
 		i2tBattR.nonLinThreshold = msgBuf[index++];
@@ -252,7 +252,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				}
 				else if(isI2T())
 				{
-
+					i2tBattR.shift = buf[index++];
 					i2tBattR.leak = REBUILD_UINT16(buf, &index);
 					i2tBattR.limit = REBUILD_UINT32(buf, &index);
 					i2tBattR.nonLinThreshold = buf[index++];
