@@ -120,7 +120,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tBatt;
 		#endif
 
-		shBuf[index++] = i2tTmp->leak;							//I2T_SHIFT
+		shBuf[index++] = i2tTmp->shift;							//I2T_SHIFT
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
 		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
 		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
