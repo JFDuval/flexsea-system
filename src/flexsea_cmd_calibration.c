@@ -56,12 +56,16 @@ extern "C" {
 
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 #include "flexsea_global_structs.h"
-struct i2t_s i2tBattW, i2tBattR;
+struct i2t_s i2tBattW;
 uint16_t uvlo = 0;
 uint16_t getUVLO(void)
 {
 	return uvlo;
 }
+#endif
+
+#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+struct i2t_s i2tBattR;
 #endif
 
 uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write);
@@ -113,7 +117,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		#endif
 
 		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
-		struct i2t_s *i2tTmp = &i2t;
+		struct i2t_s *i2tTmp = &i2tBatt;
 		#endif
 
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
@@ -245,6 +249,15 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				{
 					v = REBUILD_UINT16(buf, &index);
 					saveUVLO(v);
+				}
+				else if(isI2T())
+				{
+
+					i2tBattR.leak = REBUILD_UINT16(buf, &index);
+					i2tBattR.limit = REBUILD_UINT32(buf, &index);
+					i2tBattR.nonLinThreshold = buf[index++];
+					i2tBattR.config = buf[index++];
+					saveI2T(i2tBatt);
 				}
 				#endif
 			}
