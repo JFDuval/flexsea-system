@@ -55,6 +55,8 @@ extern "C" {
 #endif
 
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
+#include "flexsea_global_structs.h"
+struct i2t_s i2tBattW, i2tBattR;
 uint16_t uvlo = 0;
 uint16_t getUVLO(void)
 {
@@ -102,6 +104,22 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	if(calibrationMode & CALIBRATION_UVLO)
 	{
 		SPLIT_16(getUVLO(), shBuf, &index);
+	}
+	else if(calibrationMode & CALIBRATION_I2T)
+	{
+		//Split I2t struct in bytes:
+		#ifdef BOARD_TYPE_FLEXSEA_PLAN
+		struct i2t_s *i2tTmp = &i2tBattW;
+		#endif
+
+		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+		struct i2t_s *i2tTmp = &i2t;
+		#endif
+
+		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
+		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
+		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
+		shBuf[index++] = i2tTmp->config;						//I2T Config
 	}
 
 	//Payload length:
@@ -151,7 +169,19 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 	printf("rx_multi_cmd_calibration_mode_rr");
 	uint16_t index = 1;
-	uvlo = REBUILD_UINT16(msgBuf, &index);
+	if(msgBuf[0] & CALIBRATION_UVLO)
+	{
+		uvlo = REBUILD_UINT16(msgBuf, &index);
+	}
+	else if(msgBuf[0] & CALIBRATION_I2T)
+	{
+		uvlo = 1;	//Debugging only - ToDo remove
+
+		i2tBattR.leak = REBUILD_UINT16(msgBuf, &index);
+		i2tBattR.limit = REBUILD_UINT32(msgBuf, &index);
+		i2tBattR.nonLinThreshold = msgBuf[index++];
+		i2tBattR.config = msgBuf[index++];
+	}
 	#endif
 }
 

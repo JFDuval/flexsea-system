@@ -177,6 +177,7 @@ extern "C" {
 #define CALIBRATION_FIND_CURRENT_ZEROES 	0x02
 #define CALIBRATION_BELT					0x04
 #define CALIBRATION_UVLO					0x08
+#define CALIBRATION_I2T						0x10
 
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
