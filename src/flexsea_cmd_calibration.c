@@ -124,7 +124,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
 		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
 		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
-		shBuf[index++] = i2tTmp->config;						//I2T Config
+		shBuf[index++] = i2tTmp->config;						//I2T_CONFIG
 	}
 
 	//Payload length:
@@ -257,7 +257,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					i2tBattR.limit = REBUILD_UINT32(buf, &index);
 					i2tBattR.nonLinThreshold = buf[index++];
 					i2tBattR.config = buf[index++];
-					saveI2T(i2tBatt);
+					saveI2t(i2tBattR);
 				}
 				#endif
 			}
