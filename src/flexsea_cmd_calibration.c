@@ -250,6 +250,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					v = REBUILD_UINT16(buf, &index);
 					saveUVLO(v);
 				}
+				#ifndef TMP_COMPILE_HACK
 				else if(isI2T())
 				{
 					i2tBattR.shift = buf[index++];
@@ -259,6 +260,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					i2tBattR.config = buf[index++];
 					saveI2t(i2tBattR);
 				}
+				#endif	//TMP_COMPILE_HACK
 				#endif
 			}
 			calibrationFlagToRunOrIsRunning = calibrationFlags;
