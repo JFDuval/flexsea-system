@@ -95,7 +95,11 @@ uint8_t* _rigid_field_pointers[_rigid_mn_numFields] =	{	0,	0,																			
 														(uint8_t*)(rigid1.mn.genVar+4), (uint8_t*)(rigid1.mn.genVar+5),								// GEN VARS
 														(uint8_t*)(rigid1.mn.genVar+6), (uint8_t*)(rigid1.mn.genVar+7),								// GEN VARS
 														(uint8_t*)(rigid1.mn.genVar+8), (uint8_t*)(rigid1.mn.genVar+9),								// GEN VARS			10 28
+#ifdef DEPHY
 														PTR2(rigid1.ctrl._ank_ang_deg_), PTR2(rigid1.ctrl._ank_vel_), 								// ANKLE			2 30
+#else
+														PTR2(rigid1.ex._joint_ang_), PTR2(rigid1.ex._joint_ang_vel_),
+#endif
 };
 
 #undef PTR2
