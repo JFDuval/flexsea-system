@@ -46,10 +46,10 @@ const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",							
 														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 23
 														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 28
 														"ank_ang", "ank_vel", 														// ANKLE			2 30
-//#ifdef DEPHY
+#ifdef DEPHY
 														"ank_from_mot", "ank_torque",												// ANKLE			4 32
 														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
-//#endif
+#endif
 };
 
 const uint8_t _rigid_field_formats[_rigid_mn_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA			2 2
@@ -63,10 +63,10 @@ const uint8_t _rigid_field_formats[_rigid_mn_numFields] =	{FORMAT_8U, 	FORMAT_16
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 23
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,					// GEN VARS			5 28
 														FORMAT_16S, FORMAT_16S, 													// ANKLE			2 30
-//#ifdef DEPHY
+#ifdef DEPHY
 														FORMAT_16S,	FORMAT_16S, 													// ANKLE			2 32
 														FORMAT_32S, FORMAT_16S, FORMAT_8S, FORMAT_8S								// CONTROLLER		4 36
-//#endif
+#endif
 };
 
 FlexseaDeviceSpec fx_rigid_spec = {
