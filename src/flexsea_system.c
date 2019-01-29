@@ -55,6 +55,7 @@ For rx_* functions, the suffix options are:
 #include <flexsea_system.h>
 #include <flexsea_board.h>
 #include "../inc/flexsea_cmd_calibration.h"
+#include "../inc/flexsea_cmd_data.h"
 #include "../inc/flexsea_cmd_in_control.h"
 #include "flexsea_cmd_sysdata.h"
 #include "flexsea_user_structs.h"

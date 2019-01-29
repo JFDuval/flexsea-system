@@ -31,11 +31,16 @@
 #ifndef INC_FLEXSEA_CMD_DATA_H
 #define INC_FLEXSEA_CMD_DATA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
 
 #include <stdint.h>
+#include "flexsea_global_structs.h"
 
 //****************************************************************************
 // Prototype(s):
@@ -82,5 +87,9 @@ void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//INC_FLEXSEA_CMD_DATA_H

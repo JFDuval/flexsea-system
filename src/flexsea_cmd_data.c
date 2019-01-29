@@ -29,6 +29,13 @@
 	* 2016-12-02 | jfduval | Re-integrating User R/W
 ****************************************************************************/
 
+#include "flexsea_cmd_data.h"
+#include <flexsea.h>	//dependency: flexsea-comm
+#include "flexsea_system.h"
+#include <flexsea_board.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,13 +43,6 @@ extern "C" {
 //****************************************************************************
 // Include(s)
 //****************************************************************************
-
-#include <stdio.h>
-#include <stdlib.h>
-#include "../../flexsea-comm/inc/flexsea.h"	//dependency: flexsea-comm
-#include "../inc/flexsea_system.h"
-#include "../inc/flexsea_cmd_data.h"
-#include <flexsea_board.h>
 
 //Manage boards only:
 #ifdef BOARD_TYPE_FLEXSEA_MANAGE
