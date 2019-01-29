@@ -409,6 +409,10 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	#ifdef BOARD_TYPE_FLEXSEA_PLAN
 
 		//Plan can set W:
+		if(select_w >= USER_RW_WVARS)
+		{
+			select_w = USER_RW_WVARS - 1;
+		}
 		shBuf[index++] = select_w;
 		SPLIT_32((uint32_t)user_data_1.w[select_w], shBuf, &index);
 
@@ -420,6 +424,8 @@ void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		SPLIT_32((uint32_t)user_data_1.r[1], shBuf, &index);
 		SPLIT_32((uint32_t)user_data_1.r[2], shBuf, &index);
 		SPLIT_32((uint32_t)user_data_1.r[3], shBuf, &index);
+		SPLIT_32((uint32_t)user_data_1.r[4], shBuf, &index);
+		SPLIT_32((uint32_t)user_data_1.r[5], shBuf, &index);
 
 	#endif	//BOARD_TYPE_FLEXSEA_PLAN
 
@@ -433,6 +439,12 @@ void copyUserWtoStack(struct user_data_s u)
 	user_data_1.w[1] = u.w[1];
 	user_data_1.w[2] = u.w[2];
 	user_data_1.w[3] = u.w[3];
+	user_data_1.w[4] = u.w[4];
+	user_data_1.w[5] = u.w[5];
+	user_data_1.w[6] = u.w[6];
+	user_data_1.w[7] = u.w[7];
+	user_data_1.w[8] = u.w[8];
+	user_data_1.w[9] = u.w[9];
 }
 
 void readUserRfromStack(struct user_data_s *u)
@@ -441,6 +453,8 @@ void readUserRfromStack(struct user_data_s *u)
 	u->r[1] = user_data_1.r[1];
 	u->r[2] = user_data_1.r[2];
 	u->r[3] = user_data_1.r[3];
+	u->r[4] = user_data_1.r[4];
+	u->r[5] = user_data_1.r[5];
 }
 
 void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
@@ -506,6 +520,8 @@ void rx_multi_cmd_data_user_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t 
 	user_data_1.r[1] = (int32_t)REBUILD_UINT32(msgBuf, &index);
 	user_data_1.r[2] = (int32_t)REBUILD_UINT32(msgBuf, &index);
 	user_data_1.r[3] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+	user_data_1.r[4] = (int32_t)REBUILD_UINT32(msgBuf, &index);
+	user_data_1.r[5] = (int32_t)REBUILD_UINT32(msgBuf, &index);
 }
 #ifdef __cplusplus
 }
