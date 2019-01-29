@@ -371,7 +371,7 @@ void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info)
 //==================
 
 void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len)
+						uint16_t *len, uint8_t dummy)
 {
 	uint16_t index = 0;
 
@@ -381,6 +381,8 @@ void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	//Data:
 	(void)shBuf;	//(none)
+	//Added dummy to use same signature as other functions - test
+	shBuf[index++] = dummy;
 
 	//Payload length:
 	(*len) = index;
@@ -388,7 +390,7 @@ void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 void ptx_cmd_data_user_r(uint8_t slaveId, uint16_t *numb, uint8_t *commStr)
 {
-	tx_cmd_data_user_r(TX_N_DEFAULT);
+	tx_cmd_data_user_r(TX_N_DEFAULT, 0);
 	pack(P_AND_S_DEFAULT, slaveId, NULL, numb, commStr);
 }
 

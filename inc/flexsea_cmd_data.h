@@ -66,7 +66,7 @@ void rx_multi_cmd_data_user_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t 
 void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info);
 void rx_multi_cmd_data_user_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8_t *responseBuf, uint16_t* responseLen);
 void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len);
+						uint16_t *len, uint8_t dummy);
 void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t select_w);
 
