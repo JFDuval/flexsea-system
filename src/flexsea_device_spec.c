@@ -139,19 +139,34 @@ FlexseaDeviceSpec fx_execute_spec = {
 // -------------------------
 
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID)))
-	
-#define _manage_numFields 4									// type
-const char* _manage_fieldlabels[_manage_numFields] = 		{"manage", 		"id", 		"accelx", 	"accely"};
-const uint8_t _manage_field_formats[_manage_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S };
+
+#define PTR2(x) (uint8_t*)&(x)
+
+#define _manage_numFields 9									// type
+const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",													// METADATA			2 2
+																"state_time",																// STATE TIME		1 3
+																"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};		// IMU
+const uint8_t _manage_field_formats[_manage_numFields] =	{	FORMAT_8U, 	FORMAT_16U,														// METADATA			2 2
+																FORMAT_32U,																	// STATE TIME		1 3
+																FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
 
 // only defined on boards not on plan
 uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
-														(uint8_t*)&manag1.accel.x, (uint8_t*)&manag1.accel.y };
+															PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
+															(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
+															(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};		// IMU
+#undef PTR2
+
 FlexseaDeviceSpec fx_manage_spec = {
 		.numFields = _manage_numFields,
 		.fieldLabels = _manage_fieldlabels,
 		.fieldTypes = _manage_field_formats
 };
+
+uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_manage_spec;
+const uint8_t ** _dev_data_pointers = (const uint8_t **) _manage_field_pointers;
+const uint8_t * _dev_field_formats = _manage_field_formats;
 // -------------------------
 // FX_MANAGE spec ends here
 
@@ -159,7 +174,9 @@ FlexseaDeviceSpec fx_manage_spec = {
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
-// definition moved to flexsea_device_spec_m7.c / flexsea_device_spec_mn.c
+// definition moved to flexsea_device_spec_m7.c
+
+#include "flexsea_device_spec_defs.h"
 
 #elif(defined BOARD_TYPE_FLEXSEA_PLAN)
 
