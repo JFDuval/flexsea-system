@@ -140,13 +140,15 @@ FlexseaDeviceSpec fx_execute_spec = {
 
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID)))
 
-#define _manage_numFields 9									// type
+#define _manage_numFields 13									// type
 const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",													// METADATA			2 2
 																"state_time",																// STATE TIME		1 3
-																"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz"};		// IMU
+																"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU
+																"analog0", "analog1", "analog2", "analog3"};								// Analog
 const uint8_t _manage_field_formats[_manage_numFields] =	{	FORMAT_8U, 	FORMAT_16U,														// METADATA			2 2
 																FORMAT_32U,																	// STATE TIME		1 3
-																FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+																FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,
+																FORMAT_16U, FORMAT_16U, FORMAT_16U, FORMAT_16U};
 
 FlexseaDeviceSpec fx_manage_spec = {
 		.numFields = _manage_numFields,
@@ -164,7 +166,9 @@ FlexseaDeviceSpec fx_manage_spec = {
 uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
 															PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
 															(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
-															(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z};		// IMU
+															(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,		// IMU
+															(uint8_t*)&rigid1.mn.analog[0], (uint8_t*)&rigid1.mn.analog[1], 							// Analog 0-1
+															(uint8_t*)&rigid1.mn.analog[2], (uint8_t*)&rigid1.mn.analog[3]};							// Analog 2-3
 #undef PTR2
 
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
