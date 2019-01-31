@@ -140,8 +140,6 @@ FlexseaDeviceSpec fx_execute_spec = {
 
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID)))
 
-#define PTR2(x) (uint8_t*)&(x)
-
 #define _manage_numFields 9									// type
 const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",													// METADATA			2 2
 																"state_time",																// STATE TIME		1 3
@@ -149,6 +147,12 @@ const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",					
 const uint8_t _manage_field_formats[_manage_numFields] =	{	FORMAT_8U, 	FORMAT_16U,														// METADATA			2 2
 																FORMAT_32U,																	// STATE TIME		1 3
 																FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+
+#endif // BOARD_TYPE_FLEXSEA_MANAGE
+
+#if(defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID))
+
+#define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
 uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
@@ -167,10 +171,9 @@ uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_manage_spec;
 const uint8_t ** _dev_data_pointers = (const uint8_t **) _manage_field_pointers;
 const uint8_t * _dev_field_formats = _manage_field_formats;
-// -------------------------
-// FX_MANAGE spec ends here
 
-#endif // BOARD_TYPE_FLEXSEA_MANAGE
+#endif
+
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 
