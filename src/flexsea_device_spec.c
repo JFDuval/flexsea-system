@@ -52,7 +52,7 @@ const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",							
 #endif
 };
 
-const uint8_t _rigid_field_formats[_rigid_mn_numFields] =	{FORMAT_8U, 	FORMAT_16U,													// METADATA			2 2
+const uint8_t _rigid_field_formats[_rigid_mn_numFields] =	{FORMAT_8U, 	FORMAT_16U,												// METADATA			2 2
 														FORMAT_32U,																	// STATE TIME		1 3
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S ,	// IMU				6 9
 
@@ -82,7 +82,7 @@ FlexseaDeviceSpec fx_rigid_spec = {
 #define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
-uint8_t* _rigid_field_pointers[_rigid_mn_numFields] =	{	0,	0,																						// METADATA			2 2
+uint8_t* _rigid_field_pointers[_rigid_mn_numFields] =	{	0,	0,																					// METADATA			2 2
 														PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
 														(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
 														(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,		// IMU 				3 9
@@ -118,14 +118,22 @@ const uint8_t * _dev_field_formats = _rigid_field_formats;
 	
 // FX_EXECUTE spec starts here
 // -------------------------
-#define _execute_numFields 5
+#define _execute_numFields 6
+#define	_dev_numFields _execute_numFields
+
 															// type
-const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", 		"id", 	"accelx", 	"accely", 	"accelz"};
-const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, 	FORMAT_16U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", "id", "state_time", "accelx", "accely", "accelz"};
+const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+
+#define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
 uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
+														PTR2(rigid1.ctrl.timestamp),
 														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z };
+
+#undef PTR2
+
 FlexseaDeviceSpec fx_execute_spec = {
 		.numFields = _execute_numFields,
 		.fieldLabels = _execute_fieldlabels,
@@ -195,6 +203,7 @@ const uint8_t** _dev_data_pointers = NULL;
 #elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 
 #define	_dev_numFields _execute_numFields
+
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
 const uint8_t** _dev_data_pointers = (const uint8_t**)_execute_field_pointers;
