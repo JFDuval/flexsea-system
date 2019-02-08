@@ -61,6 +61,7 @@ For rx_* functions, the suffix options are:
 #include "flexsea_user_structs.h"
 #include "flexsea_cmd_user.h"
 #include "flexsea_dataformats.h"
+#include "systemStackConfig.h"
 
 #ifndef NULL
 #define NULL 0
@@ -312,8 +313,10 @@ void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
 			*myPtr = &rigid1;
 			break;
 		case FLEXSEA_MANAGE_2:
+			#ifdef SC_EN_RI2
 			*myPtr = &rigid2;
 			break;
+			#endif
 		default:
 			*myPtr = &rigid1;
 			break;

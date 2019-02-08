@@ -111,7 +111,9 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	shBuf[index++] = calibrationMode;
 	if(calibrationMode & CALIBRATION_UVLO)
 	{
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
 		SPLIT_16(getUVLO(), shBuf, &index);
+		#endif
 	}
 	else if(calibrationMode & CALIBRATION_I2T)
 	{
