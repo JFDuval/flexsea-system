@@ -313,7 +313,7 @@ void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
 			*myPtr = &rigid1;
 			break;
 		case FLEXSEA_MANAGE_2:
-			#ifdef SC_EN_RI2
+			#ifdef SC_SYS_EN_RI2
 			*myPtr = &rigid2;
 			break;
 			#endif
