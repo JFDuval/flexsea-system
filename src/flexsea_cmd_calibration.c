@@ -68,6 +68,10 @@ uint16_t getUVLO(void)
 struct i2t_s i2tBattR;
 #endif
 
+#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
+struct i2t_s i2tMotor;
+#endif
+
 uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write);
 
 void init_flexsea_payload_ptr_calibration(void)
@@ -118,6 +122,10 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 
 		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 		struct i2t_s *i2tTmp = &i2tBatt;
+		#endif
+		
+		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+		struct i2t_s *i2tTmp = &i2tMotor;
 		#endif
 
 		shBuf[index++] = i2tTmp->shift;							//I2T_SHIFT
