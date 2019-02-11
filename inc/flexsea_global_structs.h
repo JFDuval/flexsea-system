@@ -202,6 +202,9 @@ struct execute_s
 
 	//Decoded values:
 	struct decoded_execute_s decoded;
+
+	//For stack only:
+	int32_t _enc_ang_;
 };
 
 //FlexSEA-Manage:

@@ -72,6 +72,8 @@ void gossipPtrXid(struct gossip_s **myPtr, uint8_t p_xid);
 void strainPtrXid(struct strain_s **myPtr, uint8_t p_xid);
 void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid);
 void flexsea_payload_catchall(uint8_t *buf, uint8_t *info);
+void initializeExecutePointers(struct execute_s *r);
+void init_execute(void);
 
 //****************************************************************************
 // Definition(s):

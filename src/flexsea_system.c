@@ -58,6 +58,7 @@ For rx_* functions, the suffix options are:
 #include "../inc/flexsea_cmd_data.h"
 #include "../inc/flexsea_cmd_in_control.h"
 #include "flexsea_cmd_sysdata.h"
+#include "flexsea_global_structs.h"
 #include "flexsea_user_structs.h"
 #include "flexsea_cmd_user.h"
 #include "flexsea_dataformats.h"
@@ -324,3 +325,17 @@ void rigidPtrXid(struct rigid_s **myPtr, uint8_t p_xid)
 }
 
 const int FORMAT_SIZE_MAP[] = {4, 4, 2, 2, 1, 1, -1, 0, -1};
+
+void initializeExecutePointers(struct execute_s *r)
+{
+	r->_enc_ang_ = 0;
+
+	r->enc_ang = &r->_enc_ang_;
+
+}
+
+//Initialize pointers
+void init_execute(void)
+{
+	initializeExecutePointers(&exec1);
+}
