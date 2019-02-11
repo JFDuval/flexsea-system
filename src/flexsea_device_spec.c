@@ -113,15 +113,15 @@ const uint8_t * _dev_field_formats = _rigid_field_formats;
 	
 // FX_EXECUTE spec starts here
 // -------------------------
-#define _execute_numFields 16
+#define _execute_numFields 17
 #define	_dev_numFields _execute_numFields
 
 															// type
 const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", "id", "state_time", "accelx", "accely", "accelz", \
-																"accelx", "accely", "accelz", "encoder", "analog0", "analog1", \
-																"vb", "vg", "temp"};
+																"accelx", "accely", "accelz", "encoder", "current", "analog0", \
+																"analog1", "vb", "vg", "temp"};
 const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, FORMAT_16S, FORMAT_16S, FORMAT_16S, \
-															FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_32S, \
+															FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_32S, FORMAT_32S, \
 															FORMAT_16U, FORMAT_16U, \
 															FORMAT_32S, FORMAT_32S, FORMAT_32S};
 
