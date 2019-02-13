@@ -114,7 +114,7 @@ void rx_multi_cmd_stream_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *res
 	{
 		int i;
 		//get rid of the appropriate stream (find the index of the appropriate stream)
-		for(i=0;i<isStreaming;i++)
+		for(i = 0; i < isStreaming; i++)
 		{
 			if(streamCmds[i] == cmdToStream)
 			{
@@ -126,7 +126,7 @@ void rx_multi_cmd_stream_w (uint8_t *msgBuf, MultiPacketInfo *info, uint8_t *res
 		//these conditions will be met if using an older version of plan
 		if(i == isStreaming || cmdToStream == ((uint8_t)-1))
 		{
-			for(i=0;i<MAX_STREAMS;i++)
+			for(i = 0; i < MAX_STREAMS; i++)
 			{
 				streamCmds[i] = -1;
 				streamPeriods[i] = 12345;

@@ -2,13 +2,8 @@
 extern "C" {
 #endif
 
-//TODO implement same on execute, if we ever actually use this on execute...
 #if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 #include "flexsea_device_spec_defs.h"
-#endif
-
-#if(defined BOARD_TYPE_FLEXSEA_PLAN)
-
 #endif
 
 #include "flexsea_device_spec.h"
@@ -118,19 +113,31 @@ const uint8_t * _dev_field_formats = _rigid_field_formats;
 	
 // FX_EXECUTE spec starts here
 // -------------------------
-#define _execute_numFields 6
+#define _execute_numFields 16
 #define	_dev_numFields _execute_numFields
 
 															// type
-const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", "id", "state_time", "accelx", "accely", "accelz"};
-const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, FORMAT_16S, FORMAT_16S, FORMAT_16S };
+const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", "id", "state_time", \
+																"accelx", "accely", "accelz", \
+																"accelx", "accely", "accelz", \
+																"encoder", "current", \
+																"analog0", "analog1", \
+																"vb", "vg", "temp"};
+const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, \
+															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
+															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
+															FORMAT_32S, FORMAT_32S, FORMAT_16U, FORMAT_16U, \
+															FORMAT_32S, FORMAT_32S, FORMAT_32S};
 
 #define PTR2(x) (uint8_t*)&(x)
 
 // only defined on boards not on plan
-uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
-														PTR2(rigid1.ctrl.timestamp),
-														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z };
+uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)0, (uint8_t*)0, PTR2(rigid1.ctrl.timestamp),
+														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z, \
+														(uint8_t*)&exec1.gyro.x, (uint8_t*)&exec1.gyro.y, (uint8_t*)&exec1.gyro.z, \
+														PTR2(exec1._enc_ang_), (uint8_t*)&exec1.current, \
+														(uint8_t*)&exec1.analog[0], (uint8_t*)&exec1.analog[1], \
+														(uint8_t*)&exec1.decoded.volt_batt, (uint8_t*)&exec1.decoded.volt_int, (uint8_t*)&exec1.decoded.temp};
 
 #undef PTR2
 

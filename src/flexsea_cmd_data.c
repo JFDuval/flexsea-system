@@ -135,12 +135,12 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 	#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 	#ifdef USE_IMU
-		SPLIT_16((uint16_t)imu.gyro.x, shBuf, &index);
-		SPLIT_16((uint16_t)imu.gyro.y, shBuf, &index);
-		SPLIT_16((uint16_t)imu.gyro.z, shBuf, &index);
-		SPLIT_16((uint16_t)imu.accel.x, shBuf, &index);
-		SPLIT_16((uint16_t)imu.accel.y, shBuf, &index);
-		SPLIT_16((uint16_t)imu.accel.z, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.gyro.x, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.gyro.y, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.gyro.z, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.accel.x, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.accel.y, shBuf, &index);
+		SPLIT_16((uint16_t)exec1.accel.z, shBuf, &index);
 	#else
 		SPLIT_16((uint16_t)0, shBuf, &index);
 		SPLIT_16((uint16_t)0, shBuf, &index);
@@ -150,19 +150,19 @@ void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 		SPLIT_16((uint16_t)0, shBuf, &index);
 	#endif
 
-	SPLIT_16(strain_read(), shBuf, &index);
-	SPLIT_16(read_analog(0), shBuf, &index);
-	SPLIT_16(read_analog(1), shBuf, &index);
+	SPLIT_16(exec1.strain, shBuf, &index);
+	SPLIT_16(exec1.analog[0], shBuf, &index);
+	SPLIT_16(exec1.analog[1], shBuf, &index);
 
 	SPLIT_32((uint32_t)(*exec1.enc_ang), shBuf, &index);
-	SPLIT_32((uint32_t)ctrl[0].current.actual_val, shBuf, &index);
+	SPLIT_32((uint32_t)exec1.current, shBuf, &index);
 
 	#if(!defined BOARD_SUBTYPE_RIGID && !defined BOARD_SUBTYPE_POCKET)
-		shBuf[index++] = safety_cop.v_vb;
-		shBuf[index++] = safety_cop.v_vg;
-		shBuf[index++] = safety_cop.temperature;
-		shBuf[index++] = safety_cop.status1;
-		shBuf[index++] = safety_cop.status2;
+		shBuf[index++] = exec1.volt_batt;
+		shBuf[index++] = exec1.volt_int;
+		shBuf[index++] = exec1.temp;
+		shBuf[index++] = exec1.status1;
+		shBuf[index++] = exec1.status2;
 	#else
 		shBuf[index++] = 0;
 		shBuf[index++] = 0;
