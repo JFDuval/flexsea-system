@@ -135,7 +135,7 @@ const uint8_t _execute_field_formats[_execute_numFields] =	{FORMAT_8U, FORMAT_16
 uint8_t* _execute_field_pointers[_execute_numFields] =	{	(uint8_t*)0, (uint8_t*)0, PTR2(rigid1.ctrl.timestamp),
 														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z, \
 														(uint8_t*)&exec1.gyro.x, (uint8_t*)&exec1.gyro.y, (uint8_t*)&exec1.gyro.z, \
-														PTR2(exec1.enc_ang), (uint8_t*)&exec1.current, \
+														PTR2(exec1._enc_ang_), (uint8_t*)&exec1.current, \
 														(uint8_t*)&exec1.analog[0], (uint8_t*)&exec1.analog[1], \
 														(uint8_t*)&exec1.decoded.volt_batt, (uint8_t*)&exec1.decoded.volt_int, (uint8_t*)&exec1.decoded.temp};
 
