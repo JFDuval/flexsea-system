@@ -82,7 +82,7 @@ uint8_t isLegalStreamCmd(uint8_t cmd)
 	//These are basically all the commands available in slavecomm in Plan GUI
 
 	return
-		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT || CMD_SYSDATA ||
+		cmd == CMD_READ_ALL || cmd == CMD_IN_CONTROL || cmd == CMD_BATT || cmd == CMD_SYSDATA ||
 		(cmd > 99 && cmd < 127);
 }
 
