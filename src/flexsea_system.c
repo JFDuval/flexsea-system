@@ -239,14 +239,20 @@ void executePtrXid(struct execute_s **myPtr, uint8_t p_xid)
 			*myPtr = &exec1;
 			break;
 		case FLEXSEA_EXECUTE_2:
+			#ifdef SC_SYS_EN_EX2
 			*myPtr = &exec2;
 			break;
+			#endif
 		case FLEXSEA_EXECUTE_3:
+			#ifdef SC_SYS_EN_EX3
 			*myPtr = &exec3;
 			break;
+			#endif
 		case FLEXSEA_EXECUTE_4:
+			#ifdef SC_SYS_EN_EX4
 			*myPtr = &exec4;
 			break;
+			#endif
 		default:
 			*myPtr = &exec1;
 			break;

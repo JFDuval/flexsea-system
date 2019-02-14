@@ -7,9 +7,16 @@
 extern "C" {
 #endif
 
+//Note: Rigid and Pocket have to be enabled/disabled here, and in projectsStackConfig.h
+
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 	#define SC_SYS_EN_RI1
+
+#elif(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_HABSOLUTE)
+
+	#define SC_SYS_EN_RI1
+	#define SC_SYS_EN_EX1
 
 #else
 
@@ -18,6 +25,10 @@ extern "C" {
 	#define SC_SYS_EN_RI1
 	#define SC_SYS_EN_RI2
 	#define SC_SYS_EN_PCK1
+	#define SC_SYS_EN_EX1
+	#define SC_SYS_EN_EX2
+	#define SC_SYS_EN_EX3
+	#define SC_SYS_EN_EX4
 
 #endif
 

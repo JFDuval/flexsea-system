@@ -32,6 +32,7 @@
 #include <stdint.h>
 #include <flexsea_board.h>
 #include <flexsea_global_structs.h>
+#include "systemStackConfig.h"
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 	#include "mag_encoders.h"
@@ -52,7 +53,18 @@
 //****************************************************************************
 
 //Data structures:
-struct execute_s exec1, exec2, exec3, exec4;
+#ifdef SC_SYS_EN_EX1
+struct execute_s exec1;
+#endif
+#ifdef SC_SYS_EN_EX2
+struct execute_s exec2;
+#endif
+#ifdef SC_SYS_EN_EX3
+struct execute_s exec3;
+#endif
+#ifdef SC_SYS_EN_EX4
+struct execute_s exec4;
+#endif
 struct ricnu_s ricnu_1;
 struct battery_s batt1;
 struct manage_s manag1 = {.battPtr = &batt1}, manag2 = {.battPtr = &batt1};
@@ -75,15 +87,24 @@ int32_t exec1AngVel, exec2AngVel, exec3AngVel, exec4AngVel;
 void initializeGlobalStructs()
 {
 	#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
-		exec1.enc_ang = &exec1Ang;
-		exec2.enc_ang = &exec2Ang;
-		exec3.enc_ang = &exec3Ang;
-		exec4.enc_ang = &exec4Ang;
 
+		#ifdef SC_SYS_EN_EX1
+		exec1.enc_ang = &exec1Ang;
 		exec1.enc_ang_vel = &exec1AngVel;
+		#endif
+		#ifdef SC_SYS_EN_EX2
+		exec2.enc_ang = &exec2Ang;
 		exec2.enc_ang_vel = &exec2AngVel;
+		#endif
+		#ifdef SC_SYS_EN_EX3
+		exec3.enc_ang = &exec3Ang;
 		exec3.enc_ang_vel = &exec3AngVel;
+		#endif
+		#ifdef SC_SYS_EN_EX4
+		exec4.enc_ang = &exec4Ang;
 		exec4.enc_ang_vel = &exec4AngVel;
+		#endif
+
 	#elif(defined BOARD_TYPE_FLEXSEA_EXECUTE)
 		
 		#ifdef BOARD_SUBTYPE_POCKET
