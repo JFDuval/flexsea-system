@@ -27,11 +27,22 @@
 */
 
 #include <stdint.h>
+#include <pthread.h>
 
-typedef volatile uint8_t MutexFlag;
+//typedef volatile pthread_mutex_t MutexFlag;
+typedef pthread_mutex_t MutexFlag;
 
-#define MUTEX_LOCKED 1
-#define MUTEX_UNLOCKED 0
+//#define MUTEX_LOCKED 1
+//#define MUTEX_UNLOCKED 0
+
+__attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
+{
+#ifdef __WIN32
+	return pthread_mutex_init(flag, NULL);
+#else
+#error("INIT_MUTEX is not implemented");
+#endif
+}
 
 // simple try lock implementation
 
@@ -43,8 +54,17 @@ typedef volatile uint8_t MutexFlag;
 
 __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 {
+#ifdef __WIN32
+	return pthread_mutex_unlock(flag);
+#else
+#error("UNLOCK_MUTEX is not implemented");
+	#if 0
 	__LDREXB(flag);
 	return !__STREXB(MUTEX_UNLOCKED, flag);
+	#endif
+	
+	return MUTEX_UNLOCKED;
+#endif
 }
 
 // simple unlock mutex implementation
@@ -61,6 +81,11 @@ __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* fla
 
 __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* flag)
 {
+#ifdef __WIN32
+	return pthread_mutex_trylock(flag);
+#else
+#error("TRY_LOCK_MUTEX is not implemented");
+	#if 0
 	uint8_t value = __LDREXB(flag);
 	if(value == MUTEX_LOCKED)
 		__CLREX();
@@ -69,7 +94,18 @@ __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* f
 	// if the load did succeed, but value was already high, the store will fail because of CLREX
 	// if the load did succeed and the value of the flag was low, the store will succeed
 	return !__STREXB(MUTEX_LOCKED, flag);
+	#endif
+	
+	return MUTEX_UNLOCKED;
+#endif
 }
 
-
+__attribute__((always_inline)) static inline uint8_t LOCK_MUTEX(MutexFlag* flag)
+{
+#ifdef __WIN32
+	return pthread_mutex_lock(flag);
+#else
+#error("TRY_LOCK_MUTEX is not implemented");
+#endif
+}
 #endif //__FLEXSEA_MUTEX_
