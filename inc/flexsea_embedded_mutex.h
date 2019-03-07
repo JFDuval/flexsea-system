@@ -37,7 +37,7 @@ typedef pthread_mutex_t MutexFlag;
 
 __attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
 {
-#ifdef __WIN32
+#if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_init(flag, NULL);
 #else
 #error("INIT_MUTEX is not implemented");
@@ -54,7 +54,7 @@ __attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
 
 __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 {
-#ifdef __WIN32
+#if defined(__WIN32) || defined(__linux) 
 	return pthread_mutex_unlock(flag);
 #else
 #error("UNLOCK_MUTEX is not implemented");
@@ -81,7 +81,7 @@ __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* fla
 
 __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* flag)
 {
-#ifdef __WIN32
+#if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_trylock(flag);
 #else
 #error("TRY_LOCK_MUTEX is not implemented");
@@ -102,7 +102,7 @@ __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* f
 
 __attribute__((always_inline)) static inline uint8_t LOCK_MUTEX(MutexFlag* flag)
 {
-#ifdef __WIN32
+#if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_lock(flag);
 #else
 #error("TRY_LOCK_MUTEX is not implemented");
