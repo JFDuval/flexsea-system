@@ -40,7 +40,7 @@ __attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
 #if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_init(flag, NULL);
 #else
-#error("INIT_MUTEX is not implemented");
+	return 1;
 #endif
 }
 
@@ -57,13 +57,7 @@ __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* fla
 #if defined(__WIN32) || defined(__linux) 
 	return pthread_mutex_unlock(flag);
 #else
-#error("UNLOCK_MUTEX is not implemented");
-	#if 0
-	__LDREXB(flag);
-	return !__STREXB(MUTEX_UNLOCKED, flag);
-	#endif
-	
-	return MUTEX_UNLOCKED;
+	return 0;
 #endif
 }
 
@@ -84,19 +78,7 @@ __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* f
 #if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_trylock(flag);
 #else
-#error("TRY_LOCK_MUTEX is not implemented");
-	#if 0
-	uint8_t value = __LDREXB(flag);
-	if(value == MUTEX_LOCKED)
-		__CLREX();
-
-	// if the load didn't succeed, the store will fail anyways
-	// if the load did succeed, but value was already high, the store will fail because of CLREX
-	// if the load did succeed and the value of the flag was low, the store will succeed
-	return !__STREXB(MUTEX_LOCKED, flag);
-	#endif
-	
-	return MUTEX_UNLOCKED;
+	return 1;
 #endif
 }
 
@@ -105,7 +87,7 @@ __attribute__((always_inline)) static inline uint8_t LOCK_MUTEX(MutexFlag* flag)
 #if defined(__WIN32) || defined(__linux)
 	return pthread_mutex_lock(flag);
 #else
-#error("TRY_LOCK_MUTEX is not implemented");
+	return 1;
 #endif
 }
 #endif //__FLEXSEA_MUTEX_
