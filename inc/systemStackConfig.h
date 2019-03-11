@@ -12,6 +12,7 @@ extern "C" {
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 
 	#define SC_SYS_EN_RI1
+	#define SC_SYS_EN_EX1
 
 #elif(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_HABSOLUTE)
 
