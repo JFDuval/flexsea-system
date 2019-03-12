@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-typedef unsigned int size_t;
+#include <stddef.h>
 
 #define FM_BLOCK_SIZE 256
 #define FM_NUM_BLOCKS 20

@@ -70,6 +70,8 @@ Block memory_pool[FM_NUM_BLOCKS];
 #define fm_offsetof(st, m) ((size_t)(&((st *)0)->m))
 
 static Block* get_block(void * raw_block) {
+	// TODO: may need to check how casting raw_block
+	// behaves on different platforms
 	uint32_t p =  ((uint32_t) raw_block);
 	if ((p & 0x3) != 0)
 		fail();
