@@ -37,11 +37,22 @@ extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 /* defines and externs needed by plan only */
 #ifdef BOARD_TYPE_FLEXSEA_PLAN
 	void initializeDeviceSpecs();
+	#define MAX_CONNECTED_DEVICES 10
+	extern FlexseaDeviceSpec connectedDeviceSpecs[MAX_CONNECTED_DEVICES];
+	extern uint8_t* deviceData[MAX_CONNECTED_DEVICES];
+	extern uint8_t fx_spec_numConnectedDevices;
+	#ifdef BIG_ENDIAN
+		// TODO: nothing was here but appears like it should have one of these
+		// DEVICESPEC definitions
+	#else
+		#define DEVICESPEC_TYPE_BY_IDX(i) ( *(deviceData[i]) )
+		#define DEVICESPEC_UUID_BY_IDX(i) ( *((uint16_t*)(deviceData[i] + 1)) )
+	#endif
 #else
 
-	extern const uint16_t const* read_num_fields_active;
-	extern const uint8_t const* const* read_device_active_field_pointers;
-	extern const uint8_t const* read_device_active_field_lengths;
+	extern const uint16_t* read_num_fields_active;
+	extern const uint8_t* read_device_active_field_pointers;
+	extern const uint8_t* read_device_active_field_lengths;
 	void setActiveFieldsByMap(uint32_t *map);
 
 #endif //BOARD_TYPE_FLEXSEA_PLAN
@@ -49,6 +60,8 @@ extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 extern const FlexseaDeviceSpec *fx_this_device_spec;
 extern const uint8_t** _dev_data_pointers;
 extern uint32_t *fx_dev_timestamp;
+extern uint16_t fx_dev_id;
+extern uint8_t fx_dev_type;
 
 /* Related to max number of fields, should probably call it max num fields.. */
 #define FX_BITMAP_WIDTH_C 3
