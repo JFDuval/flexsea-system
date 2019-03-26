@@ -196,7 +196,8 @@ typedef enum {
     FX_NONE = 0,
     FX_RIGID = 1,
     FX_EXECUTE = 2,
-    FX_MANAGE = 3
+    FX_MANAGE = 3,
+    FX_CUSTOM = 99,
 } FlexseaDeviceType;
 
 //In Control combined fields:
