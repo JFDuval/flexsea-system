@@ -32,6 +32,7 @@
 #include <flexsea.h>
 #include "flexsea_system.h"
 #include <flexsea_board.h>
+#include "i2t-current-limit.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
