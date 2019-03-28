@@ -9,7 +9,7 @@ extern "C" {
 
 //Note: Rigid and Pocket have to be enabled/disabled here, and in projectsStackConfig.h
 
-#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+#if (defined BOARD_TYPE_FLEXSEA_EXECUTE && !defined BOARD_SUBTYPE_RIGID)
 
 	#define SC_SYS_EN_RI1
 	#define SC_SYS_EN_EX1

@@ -6,15 +6,14 @@
 #if defined(__linux)
 #include <pthread.h>
 typedef pthread_mutex_t MutexFlag;
-#define MUTEX_LOCKED 1
 #elif defined(__WIN32) 
 #include <pthread.h>
 typedef pthread_mutex_t MutexFlag;
-#define MUTEX_LOCKED 1
 #else
 typedef uint8_t MutexFlag;
 //typedef volatile pthread_mutex_t MutexFlag;
 #define MUTEX_UNLOCKED 0
+#define MUTEX_LOCKED 1
 #endif
 
 __attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
@@ -25,6 +24,7 @@ __attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
 	return MUTEX_UNLOCKED; // indicates sucess (See man pages)
 #endif
 }
+
 
 __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 {
@@ -53,4 +53,5 @@ __attribute__((always_inline)) static inline uint8_t LOCK_MUTEX(MutexFlag* flag)
 	return MUTEX_LOCKED;
 #endif
 }
+
 #endif //__FLEXSEA_MUTEX_
