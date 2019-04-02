@@ -150,6 +150,61 @@ FlexseaDeviceSpec fx_execute_spec = {
 // FX_EXECUTE spec ends here
 #endif // BOARD_TYPE_FLEXSEA_EXECUTE
 
+//Prototype boards.
+#if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE  || defined BOARD_TYPE_FLEXSEA_PLAN)
+#include "user-proto.h"
+#if (ACTIVE_PROJECT == PROJECT_SCCD)
+	
+// FX_PROTOTYPE spec starts here
+// -------------------------
+#define _proto_numFields 16
+#define	_dev_numFields _proto_numFields
+
+															// type
+const char* _proto_fieldlabels[_proto_numFields] = 		{"execute", "id", "state_time", \
+																"accelx", "accely", "accelz", \
+																"accelx", "accely", "accelz", \
+																"encoder", "current", \
+																"analog0", "analog1", \
+																"vb", "vg", "temp"};
+const uint8_t _proto_field_formats[_proto_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, \
+															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
+															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
+															FORMAT_32S, FORMAT_32S, FORMAT_16U, FORMAT_16U, \
+															FORMAT_32S, FORMAT_32S, FORMAT_32S};
+
+#define PTR2(x) (uint8_t*)&(x)
+
+// only defined on boards not on plan
+uint8_t* _proto_field_pointers[_proto_numFields] =	{	(uint8_t*)0, (uint8_t*)0, PTR2(rigid1.ctrl.timestamp),
+														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z, \
+														(uint8_t*)&exec1.gyro.x, (uint8_t*)&exec1.gyro.y, (uint8_t*)&exec1.gyro.z, \
+														PTR2(exec1._enc_ang_), (uint8_t*)&exec1.current, \
+														(uint8_t*)&exec1.analog[0], (uint8_t*)&exec1.analog[1], \
+														(uint8_t*)&exec1.decoded.volt_batt, (uint8_t*)&exec1.decoded.volt_int, (uint8_t*)&exec1.decoded.temp};
+
+#undef PTR2
+
+FlexseaDeviceSpec fx_proto_spec = {
+		.numFields = _proto_numFields,
+		.fieldLabels = _proto_fieldlabels,
+		.fieldTypes = _proto_field_formats};
+
+uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_proto_spec;
+const uint8_t ** _dev_data_pointers = (const uint8_t **) _proto_field_pointers;
+const uint8_t * _dev_field_formats = _proto_field_formats;
+
+// -------------------------
+// FX_PROTOTYPE spec ends here
+
+#else
+	
+	#warning "BOARD_TYPE_FLEXSEA_PROTOTYPE only supports PROJECT_SCCD!"
+
+#endif // (ACTIVE_PROJECT == PROJECT_SCCD)
+#endif	//(defined BOARD_TYPE_FLEXSEA_PROTOTYPE  || defined BOARD_TYPE_FLEXSEA_PLAN)
+
 // FX_MANAGE spec starts here
 // -------------------------
 
@@ -259,7 +314,7 @@ void initializeDeviceSpecs()
 	deviceSpecs[FX_RIGID] = fx_rigid_spec;
 	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
 	deviceSpecs[FX_MANAGE] = fx_manage_spec;
-
+	deviceSpecs[FX_PROTOTYPE] = fx_proto_spec;
 }
 
 #endif
