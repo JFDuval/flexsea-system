@@ -155,21 +155,33 @@ FlexseaDeviceSpec fx_execute_spec = {
 #include "user-proto.h"
 #if (ACTIVE_PROJECT == PROJECT_SCCD)
 
-#define _proto_numFields 16
+#define _proto_numFields 31
 #define	_dev_numFields _proto_numFields
 
 															// type
-const char* _proto_fieldlabels[_proto_numFields] = 		{"execute", "id", "state_time", \
-																"accelx", "accely", "accelz", \
-																"accelx", "accely", "accelz", \
-																"encoder", "current", \
-																"analog0", "analog1", \
-																"vb", "vg", "temp"};
+const char* _proto_fieldlabels[_proto_numFields] = 		{"prototype", "id", "state_time", \
+														"cells[0].cdStatus", "cells[0].mV", "cells[0].mAh", \
+														"cells[1].cdStatus", "cells[1].mV", "cells[1].mAh", \
+														"cells[2].cdStatus", "cells[2].mV", "cells[2].mAh", \
+														"cells[3].cdStatus", "cells[3].mV", "cells[3].mAh", \
+														"cells[4].cdStatus", "cells[4].mV", "cells[4].mAh", \
+														"cells[5].cdStatus", "cells[5].mV", "cells[5].mAh", \
+														"cells[6].cdStatus", "cells[6].mV", "cells[6].mAh", \
+														"cells[7].cdStatus", "cells[7].mV", "cells[7].mAh", \
+														"cells[8].cdStatus", "cells[8].mV", "cells[8].mAh", \
+														"Status"};
+
 const uint8_t _proto_field_formats[_proto_numFields] =	{FORMAT_8U, FORMAT_16U, FORMAT_32U, \
-															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
-															FORMAT_16S, FORMAT_16S, FORMAT_16S, \
-															FORMAT_32S, FORMAT_32S, FORMAT_16U, FORMAT_16U, \
-															FORMAT_32S, FORMAT_32S, FORMAT_32S};
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U, FORMAT_16U, FORMAT_16U, \
+														FORMAT_8U};
 
 FlexseaDeviceSpec fx_proto_spec = {
 		.numFields = _proto_numFields,
@@ -186,16 +198,23 @@ FlexseaDeviceSpec fx_proto_spec = {
 #if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
 #if (ACTIVE_PROJECT == PROJECT_SCCD)
 	
+	#include "sccd.h"
+	
 	#define PTR2(x) (uint8_t*)&(x)
 
 	// only defined on boards not on plan
 	uint8_t* _proto_field_pointers[_proto_numFields] =	{	(uint8_t*)0, (uint8_t*)0, PTR2(rigid1.ctrl.timestamp),
-														(uint8_t*)&exec1.accel.x, (uint8_t*)&exec1.accel.y, (uint8_t*)&exec1.accel.z, \
-														(uint8_t*)&exec1.gyro.x, (uint8_t*)&exec1.gyro.y, (uint8_t*)&exec1.gyro.z, \
-														PTR2(exec1._enc_ang_), (uint8_t*)&exec1.current, \
-														(uint8_t*)&exec1.analog[0], (uint8_t*)&exec1.analog[1], \
-														(uint8_t*)&exec1.decoded.volt_batt, (uint8_t*)&exec1.decoded.volt_int, (uint8_t*)&exec1.decoded.temp};
-
+														(uint8_t*)&cells[0].cdStatus, (uint8_t*)&cells[0].mV, (uint8_t*)&cells[0].dischargeMah, \
+														(uint8_t*)&cells[1].cdStatus, (uint8_t*)&cells[1].mV, (uint8_t*)&cells[1].dischargeMah, \
+														(uint8_t*)&cells[2].cdStatus, (uint8_t*)&cells[2].mV, (uint8_t*)&cells[2].dischargeMah, \
+														(uint8_t*)&cells[3].cdStatus, (uint8_t*)&cells[3].mV, (uint8_t*)&cells[3].dischargeMah, \
+														(uint8_t*)&cells[4].cdStatus, (uint8_t*)&cells[4].mV, (uint8_t*)&cells[4].dischargeMah, \
+														(uint8_t*)&cells[5].cdStatus, (uint8_t*)&cells[5].mV, (uint8_t*)&cells[5].dischargeMah, \
+														(uint8_t*)&cells[6].cdStatus, (uint8_t*)&cells[6].mV, (uint8_t*)&cells[6].dischargeMah, \
+														(uint8_t*)&cells[7].cdStatus, (uint8_t*)&cells[7].mV, (uint8_t*)&cells[7].dischargeMah, \
+														(uint8_t*)&cells[8].cdStatus, (uint8_t*)&cells[8].mV, (uint8_t*)&cells[8].dischargeMah, \
+														(uint8_t*)&sccdStatus};
+	
 	#undef PTR2
 	
 #endif
