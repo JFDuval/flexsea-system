@@ -314,7 +314,7 @@ void initializeDeviceSpecs()
 	deviceSpecs[FX_RIGID] = fx_rigid_spec;
 	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
 	deviceSpecs[FX_MANAGE] = fx_manage_spec;
-	deviceSpecs[FX_PROTOTYPE] = fx_proto_spec;
+	deviceSpecs[FX_PROTO] = fx_proto_spec;
 }
 
 #endif
