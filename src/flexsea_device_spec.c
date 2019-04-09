@@ -38,7 +38,7 @@ const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",							
 														"mot_ang", 		"mot_vel", 	"mot_acc", 										// MOTOR KIN		3 12
 														"mot_cur", 		"mot_volt",													// MOTOR ELEC		2 14
 														"batt_volt", 	"batt_curr",												// BATTERY			2 16
-														"temperature", 	"status-Mn", "status-Ex", "status-Re",						// STATS			4 20
+														"temperature", 	"status_Mn", "status_Ex", "status_Re",						// STATS			4 20
 
 														"genvar_0", "genvar_1", "genvar_2", "genvar_3", "genvar_4", 				// GEN VARS			5 25
 														"genvar_5", "genvar_6", "genvar_7", "genvar_8", "genvar_9", 				// GEN VARS			5 30
@@ -47,7 +47,7 @@ const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",							
 														"ank_from_mot", "ank_torque",												// ANKLE			2 34
 														"step_energy", "walking_state", "gait_state", 								// CONTROLLER		3 37
 														"shk_ang_deg", "gbl_shnk_ang", 												// CONTROLLER		2 39
-														"gbl_shnk_ang", "mot_from_ank_ang"											// CONTROLLER		2 41
+														"dge_state", "mot_from_ank_ang"												// CONTROLLER		2 41
 #endif
 };
 
@@ -131,7 +131,6 @@ const uint8_t * _dev_field_formats = _rigid_field_formats;
 // FX_EXECUTE spec starts here
 // -------------------------
 #define _execute_numFields 16
-#define	_dev_numFields _execute_numFields
 
 															// type
 const char* _execute_fieldlabels[_execute_numFields] = 		{"execute", "id", "state_time", \
@@ -170,10 +169,9 @@ FlexseaDeviceSpec fx_execute_spec = {
 //Prototype boards.
 #if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE  || defined BOARD_TYPE_FLEXSEA_PLAN)
 #include "user-proto.h"
-#if (ACTIVE_PROJECT == PROJECT_SCCD)
+//#if (ACTIVE_PROJECT == PROJECT_SCCD)
 
 #define _proto_numFields 24
-#define	_dev_numFields _proto_numFields
 
 															// type
 const char* _proto_fieldlabels[_proto_numFields] = 		{"prototype", "id", "state_time", \
@@ -207,11 +205,11 @@ FlexseaDeviceSpec fx_proto_spec = {
 		.fieldLabels = _proto_fieldlabels,
 		.fieldTypes = _proto_field_formats};
 
-#else
+//#else
 
-	#warning "BOARD_TYPE_FLEXSEA_PROTOTYPE only supports PROJECT_SCCD!"
+//	#warning "BOARD_TYPE_FLEXSEA_PROTOTYPE only supports PROJECT_SCCD!"
 
-#endif // (ACTIVE_PROJECT == PROJECT_SCCD)
+//#endif // (ACTIVE_PROJECT == PROJECT_SCCD)
 
 //Prototype boards
 #if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
@@ -309,6 +307,8 @@ const uint8_t** _dev_data_pointers = (const uint8_t**)_execute_field_pointers;
 const uint8_t * _dev_field_formats = _execute_field_formats;
 
 #elif (defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
+	
+#define	_dev_numFields _proto_numFields
 
 uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_proto_spec;
@@ -334,7 +334,6 @@ const uint8_t const* read_device_active_field_lengths =_device_active_field_leng
 
 void setActiveFieldsByMap(uint32_t *map)
 {
-
 	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
 
 	int i, j=0;
