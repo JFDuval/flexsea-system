@@ -215,7 +215,7 @@ FlexseaDeviceSpec fx_proto_spec = {
 														(uint8_t*)&cells[6].mV, (uint8_t*)&cells[6].dischargeMah, \
 														(uint8_t*)&cells[7].mV, (uint8_t*)&cells[7].dischargeMah, \
 														(uint8_t*)&cells[8].mV, (uint8_t*)&cells[8].dischargeMah, \
-														(uint8_t*)&cellCharge, (uint8_t*)&cellCharge, \
+														(uint8_t*)&cellCharge, (uint8_t*)&cellDischarge, \
 														(uint8_t*)&sccdStatus};
 	
 	#undef PTR2
