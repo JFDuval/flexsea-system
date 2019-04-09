@@ -29,8 +29,6 @@ typedef struct FlexseaDeviceSpec_s {
 /* Specs exist for the following devices */
 #define NUM_DEVICE_TYPES 4
 
-
-
 /* this array contains all the device specs */
 extern FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 
