@@ -118,6 +118,7 @@ extern "C" {
 #define FLEXSEA_BATTERY			4
 #define FLEXSEA_STRAIN			5
 #define FLEXSEA_GOSSIP			6
+#define FLEXSEA_PROTOTYPE		7
 
 //Board addresses:
 #define FLEXSEA_DEFAULT			0
@@ -138,6 +139,9 @@ extern "C" {
 #define FLEXSEA_GOSSIP_BASE		80						//Gossip: from 80 to 89
 #define FLEXSEA_GOSSIP_1		(FLEXSEA_GOSSIP_BASE + 0)
 #define FLEXSEA_GOSSIP_2		(FLEXSEA_GOSSIP_BASE + 1)
+#define FLEXSEA_PROTO_BASE		90						//Prototypes: from 90 to 99
+#define FLEXSEA_PROTO_1			(FLEXSEA_PROTO_BASE + 0)
+#define FLEXSEA_PROTO_2			(FLEXSEA_PROTO_BASE + 1)
 //Dummy addresses for virtual project.
 #define FLEXSEA_VIRTUAL_PROJECT	255
 
@@ -196,7 +200,9 @@ typedef enum {
     FX_NONE = 0,
     FX_RIGID = 1,
     FX_EXECUTE = 2,
-    FX_MANAGE = 3
+    FX_MANAGE = 3,
+	FX_PROTO = 4,
+    FX_CUSTOM = 99,
 } FlexseaDeviceType;
 
 //In Control combined fields:

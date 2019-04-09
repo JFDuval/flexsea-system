@@ -14,9 +14,9 @@ extern "C" {
 #include "flexsea_user_structs.h"
 #include "flexsea_board.h"
 
-#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
-#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
-#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
+#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1U << ((i)%32)) )
+#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1U << ((i)%32)) )
+#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1U << ((i)%32))) )
 
 /** Interface specs */
 FlexseaDeviceSpec fx_none_spec = {
@@ -112,7 +112,6 @@ uint8_t* _rigid_field_pointers[_rigid_mn_numFields] =	{	0,	0,																			
 														PTR2(shk_ang_deg_int), PTR2(RGD_STRUCT.ctrl.gbl_shnk_ang),												// CONTROLLER		2 39
 														PTR2(dge_state), PTR2(mot_from_ank_ang)																	// CONTROLLER		2 41
 #endif
-};
 };
 
 #undef PTR2
@@ -217,9 +216,9 @@ FlexseaDeviceSpec fx_proto_spec = {
 //Prototype boards
 #if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
 #if (ACTIVE_PROJECT == PROJECT_SCCD)
-
+	
 	#include "sccd.h"
-
+	
 	#define PTR2(x) (uint8_t*)&(x)
 
 	// only defined on boards not on plan
@@ -240,7 +239,6 @@ FlexseaDeviceSpec fx_proto_spec = {
 
 #endif
 #endif
-
 
 #endif	//(defined BOARD_TYPE_FLEXSEA_PROTOTYPE  || defined BOARD_TYPE_FLEXSEA_PLAN)
 
@@ -360,7 +358,7 @@ void initializeDeviceSpecs()
 	deviceSpecs[FX_RIGID] = fx_rigid_spec;
 	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
 	deviceSpecs[FX_MANAGE] = fx_manage_spec;
-
+	deviceSpecs[FX_PROTO] = fx_proto_spec;
 }
 
 #endif

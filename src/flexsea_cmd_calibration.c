@@ -32,6 +32,7 @@
 #include <flexsea.h>
 #include "flexsea_system.h"
 #include <flexsea_board.h>
+#include "i2t-current-limit.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -129,12 +130,26 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
 		struct i2t_s *i2tTmp = &i2tMotor;
 		#endif
+		
+		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_MANAGE || \
+			defined BOARD_TYPE_FLEXSEA_PLAN)
 
 		shBuf[index++] = i2tTmp->shift;							//I2T_SHIFT
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
 		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
 		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
 		shBuf[index++] = i2tTmp->config;						//I2T_CONFIG
+		
+		#else
+			
+		//Board not supported
+		shBuf[index++] = 0;
+		SPLIT_16(0, shBuf, &index);
+		SPLIT_32(0, shBuf, &index);
+		shBuf[index++] = 0;
+		shBuf[index++] = 0;
+		
+		#endif
 	}
 
 	//Payload length:
