@@ -27,11 +27,22 @@
 */
 
 #include <stdint.h>
+#include <pthread.h>
 
-typedef volatile uint8_t MutexFlag;
+//typedef volatile pthread_mutex_t MutexFlag;
+typedef pthread_mutex_t MutexFlag;
 
-#define MUTEX_LOCKED 1
-#define MUTEX_UNLOCKED 0
+//#define MUTEX_LOCKED 1
+//#define MUTEX_UNLOCKED 0
+
+__attribute__((always_inline)) static inline uint8_t INIT_MUTEX(MutexFlag* flag)
+{
+#if defined(__WIN32) || defined(__linux)
+	return pthread_mutex_init(flag, NULL);
+#else
+	return 1;
+#endif
+}
 
 // simple try lock implementation
 
@@ -43,8 +54,11 @@ typedef volatile uint8_t MutexFlag;
 
 __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* flag)
 {
-	__LDREXB(flag);
-	return !__STREXB(MUTEX_UNLOCKED, flag);
+#if defined(__WIN32) || defined(__linux) 
+	return pthread_mutex_unlock(flag);
+#else
+	return 0;
+#endif
 }
 
 // simple unlock mutex implementation
@@ -61,15 +75,19 @@ __attribute__((always_inline)) static inline uint8_t UNLOCK_MUTEX(MutexFlag* fla
 
 __attribute__((always_inline)) static inline uint8_t TRY_LOCK_MUTEX(MutexFlag* flag)
 {
-	uint8_t value = __LDREXB(flag);
-	if(value == MUTEX_LOCKED)
-		__CLREX();
-
-	// if the load didn't succeed, the store will fail anyways
-	// if the load did succeed, but value was already high, the store will fail because of CLREX
-	// if the load did succeed and the value of the flag was low, the store will succeed
-	return !__STREXB(MUTEX_LOCKED, flag);
+#if defined(__WIN32) || defined(__linux)
+	return pthread_mutex_trylock(flag);
+#else
+	return 1;
+#endif
 }
 
-
+__attribute__((always_inline)) static inline uint8_t LOCK_MUTEX(MutexFlag* flag)
+{
+#if defined(__WIN32) || defined(__linux)
+	return pthread_mutex_lock(flag);
+#else
+	return 1;
+#endif
+}
 #endif //__FLEXSEA_MUTEX_

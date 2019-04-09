@@ -41,6 +41,7 @@ extern "C" {
 //****************************************************************************
 
 #include <stdint.h>
+#include "systemStackConfig.h"
 
 //****************************************************************************
 // Definition(s):
@@ -464,7 +465,18 @@ struct i2t_s
 // Shared variable(s)
 //****************************************************************************
 
-extern struct execute_s exec1, exec2, exec3, exec4;
+#ifdef SC_SYS_EN_EX1
+extern struct execute_s exec1;
+#endif
+#ifdef SC_SYS_EN_EX2
+extern struct execute_s exec2;
+#endif
+#ifdef SC_SYS_EN_EX3
+extern struct execute_s exec3;
+#endif
+#ifdef SC_SYS_EN_EX4
+extern struct execute_s exec4;
+#endif
 extern struct ricnu_s ricnu_1;
 extern struct manage_s manag1, manag2;
 extern struct strain_s strain1;
