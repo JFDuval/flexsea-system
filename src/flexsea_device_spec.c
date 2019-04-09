@@ -45,7 +45,7 @@ const char* _rigid_fieldlabels[_rigid_mn_numFields] = 	{"rigid", 			"id",							
 														"ank_ang", "ank_vel", 														// ANKLE			2 32
 #ifdef DEPHY
 														"ank_from_mot", "ank_torque",												// ANKLE			2 34
-														"step_energy", "walking_state", "gait_state" 								// CONTROLLER		3 37
+														"step_energy", "walking_state", "gait_state", 								// CONTROLLER		3 37
 														"shk_ang_deg", "gbl_shnk_ang", 												// CONTROLLER		2 39
 														"gbl_shnk_ang", "mot_from_ank_ang"											// CONTROLLER		2 41
 #endif
@@ -216,9 +216,9 @@ FlexseaDeviceSpec fx_proto_spec = {
 //Prototype boards
 #if(defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
 #if (ACTIVE_PROJECT == PROJECT_SCCD)
-	
+
 	#include "sccd.h"
-	
+
 	#define PTR2(x) (uint8_t*)&(x)
 
 	// only defined on boards not on plan
