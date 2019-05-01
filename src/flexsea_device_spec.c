@@ -328,9 +328,9 @@ uint16_t fx_num_fields_active = 0;
 const uint8_t *_device_active_field_pointers[_dev_numFields];
 uint8_t _device_active_field_lengths[_dev_numFields];
 
-const uint16_t const* read_num_fields_active = &fx_num_fields_active;
-const uint8_t const* const* read_device_active_field_pointers = (const uint8_t const* const*)_device_active_field_pointers;
-const uint8_t const* read_device_active_field_lengths =_device_active_field_lengths;
+const uint16_t *read_num_fields_active = &fx_num_fields_active;
+const uint8_t **read_device_active_field_pointers = (const uint8_t **)_device_active_field_pointers;
+const uint8_t *read_device_active_field_lengths =_device_active_field_lengths;
 
 void setActiveFieldsByMap(uint32_t *map)
 {
