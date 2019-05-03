@@ -14,10 +14,6 @@ extern "C" {
 #include "flexsea_user_structs.h"
 #include "flexsea_board.h"
 
-#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1U << ((i)%32)) )
-#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1U << ((i)%32)) )
-#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1U << ((i)%32))) )
-
 /** Interface specs */
 FlexseaDeviceSpec fx_none_spec = {
 		.numFields = 0,
@@ -142,7 +138,7 @@ FlexseaDeviceSpec fx_proto_spec = {
 // FX_MANAGE spec starts here
 // -------------------------
 
-#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID)))
+#if(defined BOARD_TYPE_FLEXSEA_PLAN)
 
 #define _manage_numFields 13									// type
 const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",													// METADATA			2 2
@@ -160,28 +156,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 		.fieldTypes = _manage_field_formats
 };
 
-#endif // BOARD_TYPE_FLEXSEA_MANAGE
-
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE && !(defined BOARD_SUBTYPE_RIGID))
-
-#define PTR2(x) (uint8_t*)&(x)
-
-// only defined on boards not on plan
-uint8_t* _manage_field_pointers[_manage_numFields] =	{	(uint8_t*)0, (uint8_t*)0, \
-															PTR2(rigid1.ctrl.timestamp),																// STATE TIME		1 3
-															(uint8_t*)&rigid1.mn.accel.x, (uint8_t*)&rigid1.mn.accel.y, (uint8_t*)&rigid1.mn.accel.z,	// IMU				3 6
-															(uint8_t*)&rigid1.mn.gyro.x, (uint8_t*)&rigid1.mn.gyro.y, (uint8_t*)&rigid1.mn.gyro.z,		// IMU
-															(uint8_t*)&rigid1.mn.analog[0], (uint8_t*)&rigid1.mn.analog[1], 							// Analog 0-1
-															(uint8_t*)&rigid1.mn.analog[2], (uint8_t*)&rigid1.mn.analog[3]};							// Analog 2-3
-#undef PTR2
-
-uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_manage_spec;
-const uint8_t ** _dev_data_pointers = (const uint8_t **) _manage_field_pointers;
-const uint8_t * _dev_field_formats = _manage_field_formats;
-
-#endif
-
+#endif // BOARD_TYPE_FLEXSEA_PLAN
 
 #if(defined BOARD_TYPE_FLEXSEA_MANAGE)
 

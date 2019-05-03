@@ -16,6 +16,10 @@ extern "C" {
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
 
+#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
+#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
+#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
+
 /* Flexsea Device C Interface defined here - FlexseaDeviceSpec */
 typedef struct FlexseaDeviceSpec_s {
 	char* name;
