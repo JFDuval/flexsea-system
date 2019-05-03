@@ -64,6 +64,7 @@ extern const uint8_t** _dev_data_pointers;
 extern uint32_t *fx_dev_timestamp;
 extern uint16_t fx_dev_id;
 extern uint8_t fx_dev_type;
+extern uint16_t _dev_numFields;
 
 /* Related to max number of fields, should probably call it max num fields.. */
 #define FX_BITMAP_WIDTH_C 3

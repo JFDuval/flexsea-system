@@ -2,10 +2,6 @@
 extern "C" {
 #endif
 
-#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
-#include "flexsea_device_spec_defs.h"
-#endif
-
 #include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
@@ -13,13 +9,6 @@ extern "C" {
 #include "string.h"
 #include "flexsea_user_structs.h"
 #include "flexsea_board.h"
-
-/** Interface specs */
-FlexseaDeviceSpec fx_none_spec = {
-		.numFields = 0,
-		.fieldLabels = NULL,
-		.fieldTypes = NULL
-};
 
 #if(defined BOARD_TYPE_FLEXSEA_EXECUTE  || defined BOARD_TYPE_FLEXSEA_PLAN)
 
@@ -158,13 +147,7 @@ FlexseaDeviceSpec fx_manage_spec = {
 
 #endif // BOARD_TYPE_FLEXSEA_PLAN
 
-#if(defined BOARD_TYPE_FLEXSEA_MANAGE)
-
-// definition moved to flexsea_device_spec_m7.c
-
-#include "flexsea_device_spec_defs.h"
-
-#elif(defined BOARD_TYPE_FLEXSEA_PLAN)
+#if(defined BOARD_TYPE_FLEXSEA_PLAN)
 
 const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
 uint32_t fx_empty_timestamp;
@@ -180,50 +163,20 @@ const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
 const uint8_t** _dev_data_pointers = (const uint8_t**)_execute_field_pointers;
 const uint8_t * _dev_field_formats = _execute_field_formats;
 
-#elif (defined BOARD_TYPE_FLEXSEA_PROTOTYPE)
-	
-#define	_dev_numFields _proto_numFields
-
-uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_proto_spec;
-const uint8_t ** _dev_data_pointers = (const uint8_t **) _proto_field_pointers;
-const uint8_t * _dev_field_formats = _proto_field_formats;
-
 #endif
+
+#ifdef BOARD_TYPE_FLEXSEA_PLAN
+
+/** Interface specs */
+FlexseaDeviceSpec fx_none_spec = {
+		.numFields = 0,
+		.fieldLabels = NULL,
+		.fieldTypes = NULL
+};
 
 // initialization goes in payload_ptr initialization which is a hack :(
 
 FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
-
-#ifndef BOARD_TYPE_FLEXSEA_PLAN
-uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
-uint16_t fx_num_fields_active = 0;
-
-const uint8_t *_device_active_field_pointers[_dev_numFields];
-uint8_t _device_active_field_lengths[_dev_numFields];
-
-const uint16_t *read_num_fields_active = &fx_num_fields_active;
-const uint8_t **read_device_active_field_pointers = (const uint8_t **)_device_active_field_pointers;
-const uint8_t *read_device_active_field_lengths =_device_active_field_lengths;
-
-void setActiveFieldsByMap(uint32_t *map)
-{
-	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
-
-	int i, j=0;
-	for(i=0;i<_dev_numFields; ++i)
-	{
-		if(IS_FIELD_HIGH(i, map))
-		{
-			_device_active_field_pointers[j] = _dev_data_pointers[i];
-			_device_active_field_lengths[j] = FORMAT_SIZE_MAP[dev_field_formats[i]];
-			++j;
-		}
-	}
-
-	fx_num_fields_active = j;
-}
-#else
 
 void initializeDeviceSpecs()
 {
