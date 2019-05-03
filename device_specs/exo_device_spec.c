@@ -1,13 +1,10 @@
 #include "flexsea_device_spec.h"
-#include "flexsea_dataformats.h"
 #include "flexsea_user_structs.h"
-#include "flexsea_board.h"
 #include "user-mn-DpEb42.h"
 
-#define _rigid_m7_numFields 36
-#define	_dev_numFields _rigid_m7_numFields
+#define DEVICE_FIELD_COUNT 36
 
-const char* device_spec_labels[_dev_numFields] =
+const char* device_spec_labels[DEVICE_FIELD_COUNT] =
 														{"rigid", 			"id",													// METADATA			2 2
 														"state_time",																// STATE TIME		1 3
 														"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU				6 9
@@ -23,7 +20,7 @@ const char* device_spec_labels[_dev_numFields] =
 														"cur_stpt",	"step_energy", "walking_state", "gait_state" 					// CONTROLLER		4 36
 };
 
-const uint8_t device_spec_formats[_dev_numFields] =
+const uint8_t device_spec_formats[DEVICE_FIELD_COUNT] =
 														{FORMAT_8U, 	FORMAT_16U,													// METADATA			2 2
 														FORMAT_32U,																	// STATE TIME		1 3
 														FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S ,	// IMU				6 9
@@ -43,7 +40,7 @@ const uint8_t device_spec_formats[_dev_numFields] =
 #define RGD_STRUCT dpRigid
 
 // only defined on boards not on plan
-uint8_t* device_spec_variables[_dev_numFields] =
+uint8_t* device_spec_variables[DEVICE_FIELD_COUNT] =
 														{	0,	0,																							// METADATA			2 2
 														PTR2(RGD_STRUCT.ctrl.timestamp),																	// STATE TIME		1 3
 														(uint8_t*)&RGD_STRUCT.mn.accel.x, (uint8_t*)&RGD_STRUCT.mn.accel.y, (uint8_t*)&RGD_STRUCT.mn.accel.z,	// IMU				3 6
@@ -64,7 +61,7 @@ uint8_t* device_spec_variables[_dev_numFields] =
 };
 
 FlexseaDeviceSpec fx_rigid_m7_spec = {
-		.numFields = _dev_numFields,
+		.numFields = DEVICE_FIELD_COUNT,
 		.fieldLabels = device_spec_labels,
 		.fieldTypes = device_spec_formats
 };
@@ -84,8 +81,8 @@ FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
 uint32_t fx_active_bitmap[FX_BITMAP_WIDTH_C];
 uint16_t fx_num_fields_active = 0;
 
-const uint8_t *_device_active_field_pointers[_dev_numFields];
-uint8_t _device_active_field_lengths[_dev_numFields];
+const uint8_t *_device_active_field_pointers[DEVICE_FIELD_COUNT];
+uint8_t _device_active_field_lengths[DEVICE_FIELD_COUNT];
 
 const uint16_t *read_num_fields_active = &fx_num_fields_active;
 const uint8_t **read_device_active_field_pointers = (const uint8_t **)_device_active_field_pointers;
@@ -96,7 +93,7 @@ void setActiveFieldsByMap(uint32_t *map)
 	const uint8_t * dev_field_formats = fx_this_device_spec->fieldTypes;
 
 	int i, j=0;
-	for(i=0;i<_dev_numFields; ++i)
+	for(i=0;i<DEVICE_FIELD_COUNT; ++i)
 	{
 		if(IS_FIELD_HIGH(i, map))
 		{
