@@ -19,6 +19,7 @@ extern "C" {
 #define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1 << ((i)%32)) )
 #define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1 << ((i)%32)) )
 #define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1 << ((i)%32))) )
+#define SET_FIELD_HIGH(i, map)( (map)[(i)/32] |= (1U << (i%32))  )
 
 /* Flexsea Device C Interface defined here - FlexseaDeviceSpec */
 typedef struct FlexseaDeviceSpec_s {
