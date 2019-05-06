@@ -67,6 +67,11 @@ extern uint16_t fx_dev_id;
 extern uint8_t fx_dev_type;
 extern uint16_t _dev_numFields;
 
+// giving access to device specific device specs for plan but it would be nice
+// to just return a pointer to the structure
+extern FlexseaDeviceSpec fx_bms_spec;
+extern FlexseaDeviceSpec fx_exo_spec;
+
 /* Related to max number of fields, should probably call it max num fields.. */
 #define FX_BITMAP_WIDTH_C 3
 
