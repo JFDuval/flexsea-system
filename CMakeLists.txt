@@ -3,7 +3,7 @@
 if(FLEXSEA_TYPE STREQUAL PLAN)
 	file(GLOB FLEX_SYSTEM_SRCS
 		${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
-		${CMAKE_CURRENT_SOURCE_DIR}/device_specs/plan_spec_conglomerator.c
+		${CMAKE_CURRENT_SOURCE_DIR}/device_specs/*.c
 	)
 # on manage we only want to use the device spec file for the current project
 else()
