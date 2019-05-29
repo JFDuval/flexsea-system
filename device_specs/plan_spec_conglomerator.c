@@ -2,8 +2,6 @@
 extern "C" {
 #endif
 
-#if(defined BOARD_TYPE_FLEXSEA_EXECUTE)
-
 #include "flexsea_device_spec.h"
 #include "flexsea_dataformats.h"
 #include "flexsea_sys_def.h"
@@ -11,6 +9,22 @@ extern "C" {
 #include "string.h"
 #include "flexsea_user_structs.h"
 #include "flexsea_board.h"
+
+#define _manage_numFields 13									// type
+const char* _manage_fieldlabels[_manage_numFields] = 		{	"manage", 			"id",													// METADATA			2 2
+																"state_time",																// STATE TIME		1 3
+																"accelx", 	"accely", 	"accelz", 	"gyrox", 	"gyroy", 	"gyroz",		// IMU
+																"analog0", "analog1", "analog2", "analog3"};								// Analog
+const uint8_t _manage_field_formats[_manage_numFields] =	{	FORMAT_8U, 	FORMAT_16U,														// METADATA			2 2
+																FORMAT_32U,																	// STATE TIME		1 3
+																FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S, FORMAT_16S,
+																FORMAT_16U, FORMAT_16U, FORMAT_16U, FORMAT_16U};
+
+FlexseaDeviceSpec fx_manage_spec = {
+		.numFields = _manage_numFields,
+		.fieldLabels = _manage_fieldlabels,
+		.fieldTypes = _manage_field_formats
+};
 
 // FX_EXECUTE spec starts here
 // -------------------------
@@ -47,14 +61,28 @@ FlexseaDeviceSpec fx_execute_spec = {
 		.fieldTypes = _execute_field_formats
 };
 
-#define	_dev_numFields _execute_numFields
+/** Interface specs */
+FlexseaDeviceSpec fx_none_spec = {
+		.numFields = 0,
+		.fieldLabels = NULL,
+		.fieldTypes = NULL
+};
 
-uint32_t *fx_dev_timestamp = &rigid1.ctrl.timestamp;
-const FlexseaDeviceSpec *fx_this_device_spec = &fx_execute_spec;
-const uint8_t** _dev_data_pointers = (const uint8_t**)_execute_field_pointers;
-const uint8_t * _dev_field_formats = _execute_field_formats;
+const FlexseaDeviceSpec *fx_this_device_spec = &fx_none_spec;
+uint32_t fx_empty_timestamp;
+uint32_t *fx_dev_timestamp = &fx_empty_timestamp;
+const uint8_t** _dev_data_pointers = NULL;
 
-#endif // BOARD_TYPE_FLEXSEA_EXECUTE
+FlexseaDeviceSpec deviceSpecs[NUM_DEVICE_TYPES];
+
+void initializeDeviceSpecs()
+{
+	deviceSpecs[FX_NONE] = fx_none_spec;
+	deviceSpecs[FX_RIGID] = fx_exo_spec;
+	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
+	deviceSpecs[FX_MANAGE] = fx_manage_spec;
+	deviceSpecs[FX_BMS] = fx_bms_spec;
+}
 
 #ifdef __cplusplus
 }

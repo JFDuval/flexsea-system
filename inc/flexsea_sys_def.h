@@ -196,13 +196,15 @@ extern "C" {
 #define Z_B		g1
 #define Z_I		g2
 
-typedef enum {
-    FX_NONE = 0,
-    FX_RIGID = 1,
-    FX_EXECUTE = 2,
-    FX_MANAGE = 3,
+typedef enum
+{
+	FX_NONE = 0,
+	FX_RIGID = 1,
+	FX_EXECUTE = 2,
+	FX_MANAGE = 3,
 	FX_PROTO = 4,
-    FX_CUSTOM = 99,
+	FX_BMS = 5,
+	FX_CUSTOM = 99,
 } FlexseaDeviceType;
 
 //In Control combined fields:

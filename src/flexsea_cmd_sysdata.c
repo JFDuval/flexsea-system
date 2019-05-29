@@ -41,10 +41,6 @@ extern "C" {
 #include <string.h>
 #include "flexsea_comm_def.h"
 
-#define IS_FIELD_HIGH(i, map) ( (map)[(i)/32] & (1U << ((i)%32)) )
-#define SET_MAP_HIGH(i, map) ( (map)[(i)/32] |= (1U << ((i)%32)) )
-#define SET_MAP_LOW(i, map) ( (map)[(i)/32] &= (~(1U << ((i)%32))) )
-
 /* Initializes part of the array of function pointers which determines which
 	function to call upon receiving a message
 */
