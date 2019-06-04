@@ -134,19 +134,17 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_MANAGE || \
 			defined BOARD_TYPE_FLEXSEA_PLAN)
 
-		shBuf[index++] = i2tTmp->shift;							//I2T_SHIFT
-		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
-		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
-		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
-		shBuf[index++] = i2tTmp->config;						//I2T_CONFIG
+		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);				//I2T_LEAK
+		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);				//I2T_LIMIT
+		SPLIT_16((uint16_t)i2tTmp->nonLinThreshold, shBuf, &index);		//I2T_NON_LIN_THRESHOLD
+		shBuf[index++] = i2tTmp->config;								//I2T_CONFIG
 		
 		#else
 			
 		//Board not supported
-		shBuf[index++] = 0;
 		SPLIT_16(0, shBuf, &index);
 		SPLIT_32(0, shBuf, &index);
-		shBuf[index++] = 0;
+		SPLIT_16(0, shBuf, &index);
 		shBuf[index++] = 0;
 		
 		#endif
@@ -205,10 +203,9 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	}
 	else if(msgBuf[0] & CALIBRATION_I2T)
 	{
-		i2tBattR.shift = msgBuf[index++];
 		i2tBattR.leak = REBUILD_UINT16(msgBuf, &index);
 		i2tBattR.limit = REBUILD_UINT32(msgBuf, &index);
-		i2tBattR.nonLinThreshold = msgBuf[index++];
+		i2tBattR.nonLinThreshold = REBUILD_UINT16(msgBuf, &index);
 		i2tBattR.config = msgBuf[index++];
 	}
 	#endif
@@ -277,10 +274,9 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				}
 				else if(isI2T())
 				{
-					i2tBattR.shift = buf[index++];	//ToDo remove
 					i2tBattR.leak = REBUILD_UINT16(buf, &index);
 					i2tBattR.limit = REBUILD_UINT32(buf, &index);
-					i2tBattR.nonLinThreshold = buf[index++];	//ToDo change to uint16
+					i2tBattR.nonLinThreshold = REBUILD_UINT16(buf, &index);
 					i2tBattR.config = buf[index++];
 					saveI2tRe(i2tBattR);
 				}
