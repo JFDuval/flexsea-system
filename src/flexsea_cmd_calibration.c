@@ -277,12 +277,12 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				}
 				else if(isI2T())
 				{
-					i2tBattR.shift = buf[index++];
+					i2tBattR.shift = buf[index++];	//ToDo remove
 					i2tBattR.leak = REBUILD_UINT16(buf, &index);
 					i2tBattR.limit = REBUILD_UINT32(buf, &index);
-					i2tBattR.nonLinThreshold = buf[index++];
+					i2tBattR.nonLinThreshold = buf[index++];	//ToDo change to uint16
 					i2tBattR.config = buf[index++];
-					saveI2t(i2tBattR);
+					saveI2tRe(i2tBattR);
 				}
 				#endif
 			}
