@@ -59,10 +59,9 @@ extern "C" {
 #include "flexsea_global_structs.h"
 struct i2t_s i2tBattW;
 uint16_t uvlo = 0;
-uint16_t getUVLO(void)
-{
-	return uvlo;
-}
+uint16_t getUVLO(void){return uvlo;}
+int8_t currOffs = 0;
+int8_t getCurrOffs(void){return currOffs;}
 #endif
 
 #if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
@@ -114,6 +113,12 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	{
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
 		SPLIT_16(getUVLO(), shBuf, &index);
+		#endif
+	}
+	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
+	{
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		shBuf[index++] = (uint8_t)getCurrOffs();
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_I2T)
@@ -201,6 +206,10 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	{
 		uvlo = REBUILD_UINT16(msgBuf, &index);
 	}
+	else if(msgBuf[0] & CALIBRATION_CURRENT_OFFSET)
+	{
+		currOffs = (int8_t)msgBuf[index++];
+	}
 	else if(msgBuf[0] & CALIBRATION_I2T)
 	{
 		i2tBattR.leak = REBUILD_UINT16(msgBuf, &index);
@@ -251,6 +260,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 	uint16_t index = 0;
 	uint8_t procedure = buf[index++];
 	uint16_t v = 0;
+	int8_t co = 0;
 
 	uint8_t calibrationFlagToRunOrIsRunning = 0;
 
@@ -271,6 +281,11 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				{
 					v = REBUILD_UINT16(buf, &index);
 					saveUVLO(v);
+				}
+				else if(isCurrOffs())
+				{
+					co = (int8_t)buf[index++];
+					saveCurrOffs(co);
 				}
 				else if(isI2T())
 				{
