@@ -16,7 +16,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
+	[Lead developer] Jean-Francois (JF) Duval, jfduval at dephy dot com.
 	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
@@ -59,10 +59,9 @@ extern "C" {
 #include "flexsea_global_structs.h"
 struct i2t_s i2tBattW;
 uint16_t uvlo = 0;
-uint16_t getUVLO(void)
-{
-	return uvlo;
-}
+uint16_t getUVLO(void){return uvlo;}
+int8_t currOffs = 0;
+int8_t getCurrOffs(void){return currOffs;}
 #endif
 
 #if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
@@ -116,6 +115,12 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		SPLIT_16(getUVLO(), shBuf, &index);
 		#endif
 	}
+	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
+	{
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		#endif
+	}
 	else if(calibrationMode & CALIBRATION_I2T)
 	{
 		//Split I2t struct in bytes:
@@ -134,19 +139,17 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_MANAGE || \
 			defined BOARD_TYPE_FLEXSEA_PLAN)
 
-		shBuf[index++] = i2tTmp->shift;							//I2T_SHIFT
-		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);		//I2T_LEAK
-		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);		//I2T_LIMIT
-		shBuf[index++] = i2tTmp->nonLinThreshold;				//I2T_NON_LIN_THRESHOLD
-		shBuf[index++] = i2tTmp->config;						//I2T_CONFIG
+		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);				//I2T_LEAK
+		SPLIT_32((uint32_t)i2tTmp->limit, shBuf, &index);				//I2T_LIMIT
+		SPLIT_16((uint16_t)i2tTmp->nonLinThreshold, shBuf, &index);		//I2T_NON_LIN_THRESHOLD
+		shBuf[index++] = i2tTmp->config;								//I2T_CONFIG
 		
 		#else
 			
 		//Board not supported
-		shBuf[index++] = 0;
 		SPLIT_16(0, shBuf, &index);
 		SPLIT_32(0, shBuf, &index);
-		shBuf[index++] = 0;
+		SPLIT_16(0, shBuf, &index);
 		shBuf[index++] = 0;
 		
 		#endif
@@ -203,12 +206,15 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	{
 		uvlo = REBUILD_UINT16(msgBuf, &index);
 	}
+	else if(msgBuf[0] & CALIBRATION_CURRENT_OFFSET)
+	{
+		currOffs = (int8_t)REBUILD_UINT16(msgBuf, &index);
+	}
 	else if(msgBuf[0] & CALIBRATION_I2T)
 	{
-		i2tBattR.shift = msgBuf[index++];
 		i2tBattR.leak = REBUILD_UINT16(msgBuf, &index);
 		i2tBattR.limit = REBUILD_UINT32(msgBuf, &index);
-		i2tBattR.nonLinThreshold = msgBuf[index++];
+		i2tBattR.nonLinThreshold = REBUILD_UINT16(msgBuf, &index);
 		i2tBattR.config = msgBuf[index++];
 	}
 	#endif
@@ -254,6 +260,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 	uint16_t index = 0;
 	uint8_t procedure = buf[index++];
 	uint16_t v = 0;
+	int8_t co = 0;
 
 	uint8_t calibrationFlagToRunOrIsRunning = 0;
 
@@ -275,14 +282,18 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					v = REBUILD_UINT16(buf, &index);
 					saveUVLO(v);
 				}
+				else if(isCurrentOffset())
+				{
+					co = (int8_t)REBUILD_UINT16(buf, &index);
+					saveCurrOffs(co);
+				}
 				else if(isI2T())
 				{
-					i2tBattR.shift = buf[index++];
 					i2tBattR.leak = REBUILD_UINT16(buf, &index);
 					i2tBattR.limit = REBUILD_UINT32(buf, &index);
-					i2tBattR.nonLinThreshold = buf[index++];
+					i2tBattR.nonLinThreshold = REBUILD_UINT16(buf, &index);
 					i2tBattR.config = buf[index++];
-					saveI2t(i2tBattR);
+					saveI2tRe(i2tBattR);
 				}
 				#endif
 			}

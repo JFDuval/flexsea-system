@@ -106,7 +106,7 @@ void tx_cmd_sensors_switch_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 	#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-		#if(!(defined BOARD_SUBTYPE_RIGID || defined BOARD_SUBTYPE_POCKET))
+		#if(!(defined BOARD_SUBTYPE_RIGID || defined BOARD_SUBTYPE_POCKET || BOARD_SUBTYPE_HABSOLUTE))
 
 			//Data:
 			shBuf[index++] = read_sw1();
