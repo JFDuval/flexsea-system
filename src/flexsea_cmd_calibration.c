@@ -117,7 +117,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	}
 	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
 	{
-		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
 		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
 	}
@@ -285,7 +285,9 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				else if(isCurrentOffset())
 				{
 					co = (int8_t)REBUILD_UINT16(buf, &index);
+					#ifndef BOARD_SUBTYPE_HABSOLUTE
 					saveCurrOffs(co);
+					#endif
 				}
 				else if(isI2T())
 				{
