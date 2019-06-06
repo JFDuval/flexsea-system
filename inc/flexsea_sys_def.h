@@ -16,7 +16,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
+	[Lead developer] Jean-Francois (JF) Duval, jfduval at dephy dot com.
 	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
@@ -178,7 +178,7 @@ extern "C" {
 
 //List of calibration procedures
 #define CALIBRATION_FIND_POLES 				0x01
-#define CALIBRATION_FIND_CURRENT_ZEROES 	0x02
+#define CALIBRATION_CURRENT_OFFSET		 	0x02
 #define CALIBRATION_BELT					0x04
 #define CALIBRATION_UVLO					0x08
 #define CALIBRATION_I2T						0x10
