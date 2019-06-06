@@ -282,7 +282,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					v = REBUILD_UINT16(buf, &index);
 					saveUVLO(v);
 				}
-				else if(isCurrOffs())
+				else if(isCurrentOffset())
 				{
 					co = (int8_t)buf[index++];
 					saveCurrOffs(co);
