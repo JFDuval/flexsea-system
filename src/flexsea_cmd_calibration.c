@@ -208,7 +208,7 @@ void rx_multi_cmd_calibration_mode_rr(uint8_t *msgBuf, MultiPacketInfo *mInfo, u
 	}
 	else if(msgBuf[0] & CALIBRATION_CURRENT_OFFSET)
 	{
-		currOffs = (int8_t)msgBuf[index++];
+		currOffs = (int8_t)REBUILD_UINT16(msgBuf, &index);
 	}
 	else if(msgBuf[0] & CALIBRATION_I2T)
 	{
@@ -284,7 +284,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				}
 				else if(isCurrentOffset())
 				{
-					co = (int8_t)buf[index++];
+					co = (int8_t)REBUILD_UINT16(buf, &index);
 					saveCurrOffs(co);
 				}
 				else if(isI2T())
