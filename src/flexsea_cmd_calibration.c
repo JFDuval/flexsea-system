@@ -118,7 +118,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
 	{
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
-		shBuf[index++] = (uint8_t)getCurrOffs();
+		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_I2T)
