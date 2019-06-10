@@ -14,7 +14,7 @@ extern "C" {
 	#define SC_SYS_EN_RI1
 	#define SC_SYS_EN_EX1
 
-#elif(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_HABSOLUTE)
+#elif(defined BOARD_TYPE_FLEXSEA_MANAGE && (defined BOARD_SUBTYPE_HABSOLUTE || defined BOARD_SUBTYPE_BMS))
 
 	#define SC_SYS_EN_RI1
 	#define SC_SYS_EN_EX1
