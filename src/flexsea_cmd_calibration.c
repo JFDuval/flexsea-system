@@ -302,7 +302,10 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 			calibrationFlagToRunOrIsRunning = calibrationFlags;
 
 		#else
-			(void)procedure;	//Unused
+			//Unused variables:
+			(void)procedure;
+			(void)v;
+			(void)co;
 		#endif
 	}
 
