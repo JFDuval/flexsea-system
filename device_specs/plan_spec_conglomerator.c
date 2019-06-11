@@ -81,7 +81,7 @@ void initializeDeviceSpecs()
 	deviceSpecs[FX_RIGID] = fx_exo_spec;
 	deviceSpecs[FX_EXECUTE] = fx_execute_spec;
 	deviceSpecs[FX_MANAGE] = fx_manage_spec;
-	deviceSpecs[FX_BMS] = fx_bms_spec;
+	deviceSpecs[FX_PROTO] = fx_bms_spec;
 }
 
 #ifdef __cplusplus
