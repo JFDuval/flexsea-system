@@ -91,8 +91,7 @@ extern "C" {
 #define CMD_IN_CONTROL			90
 #define CMD_CALIBRATION_MODE	91
 #define CMD_STREAM				92
-#define CALIBRATION_POWER_OFF	94
-#define CALIBRATION_POWER_ON	95
+
 
 //MultiPacket Capable commands
 //Maybe one day all commands will be multi packet.. or maybe we don't need that
@@ -184,7 +183,8 @@ extern "C" {
 #define CALIBRATION_BELT					0x04
 #define CALIBRATION_UVLO					0x08
 #define CALIBRATION_I2T						0x10
-
+#define CALIBRATION_POWER_OFF				0x20
+#define CALIBRATION_POWER_ON				0x40
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
 //Nickname for the controller gains:
