@@ -121,6 +121,18 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
 	}
+	else if(calibrationMode & CALIBRATION_POWER_OFF)
+	{
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		#endif
+	}
+	else if(calibrationMode & CALIBRATION_POWER_ON)
+	{
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		#endif
+	}
 	else if(calibrationMode & CALIBRATION_I2T)
 	{
 		//Split I2t struct in bytes:
@@ -296,6 +308,14 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					i2tBattR.nonLinThreshold = REBUILD_UINT16(buf, &index);
 					i2tBattR.config = buf[index++];
 					saveI2tRe(i2tBattR);
+				}
+				else if(isPoweringOn())
+				{
+					utt.val[0][9] = 1;
+				}
+				else if(isPoweringOff())
+				{
+					utt.val[0][9] = 0;
 				}
 				#endif
 			}
