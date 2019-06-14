@@ -47,9 +47,9 @@ extern "C" {
 	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
-#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+#if (defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 	#include "rigid.h"
-#endif //BOARD_TYPE_FLEXSEA_MANAGE
+#endif //(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -64,7 +64,7 @@ int8_t currOffs = 0;
 int8_t getCurrOffs(void){return currOffs;}
 #endif
 
-#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+#if((defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 struct i2t_s i2tBattR;
 #endif
 
@@ -111,13 +111,13 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	shBuf[index++] = calibrationMode;
 	if(calibrationMode & CALIBRATION_UVLO)
 	{
-		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 		SPLIT_16(getUVLO(), shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
 	{
-		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
 	}
@@ -140,7 +140,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tBattW;
 		#endif
 
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+		#if (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID)
 		struct i2t_s *i2tTmp = &i2tBatt;
 		#endif
 		
@@ -148,7 +148,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tMotor;
 		#endif
 		
-		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_MANAGE || \
+		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID) || \
 			defined BOARD_TYPE_FLEXSEA_PLAN)
 
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);				//I2T_LEAK
@@ -278,7 +278,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 
 	if(write)
 	{
-		#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
+		#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 
 			if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 			{
@@ -322,7 +322,10 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 			calibrationFlagToRunOrIsRunning = calibrationFlags;
 
 		#else
-			(void)procedure;	//Unused
+			//Unused variables:
+			(void)procedure;
+			(void)v;
+			(void)co;
 		#endif
 	}
 
