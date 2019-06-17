@@ -183,6 +183,10 @@ extern "C" {
 #define CALIBRATION_UVLO					0x08
 #define CALIBRATION_I2T						0x10
 
+//List of session stats procedures
+#define SESSION_STATS_REQUEST           0x01
+#define SESSION_STATS_RECEIVE           0x02
+
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 
 //Nickname for the controller gains:
