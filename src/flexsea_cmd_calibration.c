@@ -127,14 +127,14 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	{
 		//printf("Power off");
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
-		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_POWER_ON)
 	{
 		//printf("Power on");
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
-		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		SPLIT_16((uint16_t)0, shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_I2T)
@@ -316,10 +316,12 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				else if(isPoweringOn())
 				{
 					utt.val[0][9] = 1;
+					calibrationFlags = 0;
 				}
 				else if(isPoweringOff())
 				{
 					utt.val[0][9] = 0;
+					calibrationFlags = 0;
 				}
 				#endif
 			}
