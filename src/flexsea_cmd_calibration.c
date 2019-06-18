@@ -34,6 +34,7 @@
 #include <flexsea_board.h>
 #include "i2t-current-limit.h"
 #include <stdio.h>
+#include "cmd-UTT.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,6 +103,7 @@ void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t calibrationMode)
 {
+	//printf("Calib command called");
 	//Variable(s) & command:
 	uint16_t index = 0;
 	(*cmd) = CMD_CALIBRATION_MODE;
@@ -123,12 +125,14 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	}
 	else if(calibrationMode & CALIBRATION_POWER_OFF)
 	{
+		//printf("Power off");
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
 		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_POWER_ON)
 	{
+		//printf("Power on");
 		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
 		//SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
 		#endif
