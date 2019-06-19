@@ -143,8 +143,11 @@ void init_flexsea_payload_ptr(void)
 	//User functions:
 	init_flexsea_payload_ptr_user();
 
+	#if ((defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID) || \
+	(defined BOARD_TYPE_FLEXSEA_PLAN))
 	//Session Stats:
 	init_flexsea_payload_ptr_session_stats();
+	#endif
 }
 
 //Catch all function - does nothing. Note: error catching code can be added here

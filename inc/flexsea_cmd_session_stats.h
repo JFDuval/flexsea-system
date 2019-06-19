@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#if ((defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID) || \
+	(defined BOARD_TYPE_FLEXSEA_PLAN))
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
@@ -67,6 +70,8 @@ void tx_cmd_session_stats_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 //****************************************************************************
 
 extern struct sessionStats_s sessionStats;
+
+#endif
 
 #ifdef __cplusplus
 }

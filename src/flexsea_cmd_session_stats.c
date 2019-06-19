@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+#if ((defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID) || \
+	(defined BOARD_TYPE_FLEXSEA_PLAN))
+
 //****************************************************************************
 // Include(s)
 //****************************************************************************
@@ -30,7 +33,7 @@ extern "C" {
 #include "flexsea_cmd_user.h"
 #include "flexsea_cmd_session_stats.h"
 
-#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
+#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || defined BOARD_TYPE_FLEXSEA_MANAGE)
 	#include "session_tools.h"
 #endif
 
@@ -239,6 +242,8 @@ void rx_multi_cmd_session_stats_w(uint8_t *msgBuf, MultiPacketInfo *mInfo, uint8
 
 	#endif //BOARD_TYPE_FLEXSEA_MANAGE
 }
+
+#endif
 
 #ifdef __cplusplus
 }
