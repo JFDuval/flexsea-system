@@ -313,6 +313,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					i2tBattR.config = buf[index++];
 					saveI2tRe(i2tBattR);
 				}
+				#ifdef INCLUDE_UPROJ_DPEB42
 				else if(isPoweringOn())
 				{
 					utt.val[0][9] = 1;
@@ -323,7 +324,8 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					utt.val[0][9] = 0;
 					calibrationFlags = 0;
 				}
-				#endif
+				#endif	//INCLUDE_UPROJ_DPEB42
+				#endif	//(defined BOARD_TYPE_FLEXSEA_MANAGE)
 			}
 			calibrationFlagToRunOrIsRunning = calibrationFlags;
 
