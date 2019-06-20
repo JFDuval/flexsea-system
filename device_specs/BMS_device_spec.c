@@ -79,7 +79,7 @@ const uint8_t bms_spec_formats[DEVICE_FIELD_COUNT] = {
 #ifndef BOARD_TYPE_FLEXSEA_PLAN
 
 #include "sccd.h"
-#include ""
+
 uint8_t *bms_spec_variables[DEVICE_FIELD_COUNT] = {
 	0,
 	0,
