@@ -50,6 +50,10 @@ extern "C" {
 
 #if (defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 	#include "rigid.h"
+	// this is being added for shut off command on rigid 3.0 boards with bilateral xbees
+	#if(HW_VER == 30)
+		#include "bilateral.h"
+	#endif
 #endif //(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 
 #ifndef NULL
@@ -316,13 +320,21 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 				#ifdef INCLUDE_UPROJ_DPEB42
 				else if(isPoweringOn())
 				{
+					// TODO: request other to boot to turn on
 					utt.val[0][9] = 1;
 					calibrationFlags = 0;
+					#if(HW_VER == 30)
+						bilateral_send_command(BILATERAL_POWER_ON_COMMAND);
+					#endif
 				}
 				else if(isPoweringOff())
 				{
+					// TODO: request other boot to shut off
 					utt.val[0][9] = 0;
 					calibrationFlags = 0;
+					#if(HW_VER == 30)
+						bilateral_send_command(BILATERAL_POWER_OFF_COMMAND);
+					#endif
 				}
 				#endif	//INCLUDE_UPROJ_DPEB42
 				#endif	//(defined BOARD_TYPE_FLEXSEA_MANAGE)
