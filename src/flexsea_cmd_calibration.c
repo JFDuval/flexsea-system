@@ -34,7 +34,9 @@
 #include <flexsea_board.h>
 #include "i2t-current-limit.h"
 #include <stdio.h>
-#include "cmd-UTT.h"
+#ifdef INCLUDE_UPROJ_DPEB42
+	#include "cmd-UTT.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
