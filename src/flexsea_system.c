@@ -57,6 +57,7 @@ For rx_* functions, the suffix options are:
 #include "../inc/flexsea_cmd_calibration.h"
 #include "../inc/flexsea_cmd_data.h"
 #include "../inc/flexsea_cmd_in_control.h"
+#include "../inc/flexsea_cmd_session_stats.h"
 #include "flexsea_cmd_sysdata.h"
 #include "flexsea_global_structs.h"
 #include "flexsea_user_structs.h"
@@ -141,6 +142,12 @@ void init_flexsea_payload_ptr(void)
 
 	//User functions:
 	init_flexsea_payload_ptr_user();
+
+	#if ((defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID) || \
+	(defined BOARD_TYPE_FLEXSEA_PLAN))
+	//Session Stats:
+	init_flexsea_payload_ptr_session_stats();
+	#endif
 }
 
 //Catch all function - does nothing. Note: error catching code can be added here

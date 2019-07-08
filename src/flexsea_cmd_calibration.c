@@ -34,6 +34,9 @@
 #include <flexsea_board.h>
 #include "i2t-current-limit.h"
 #include <stdio.h>
+#ifdef INCLUDE_UPROJ_DPEB42
+	#include "cmd-UTT.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,9 +50,13 @@ extern "C" {
 	#include "control.h"
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
 
-#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+#if (defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 	#include "rigid.h"
-#endif //BOARD_TYPE_FLEXSEA_MANAGE
+	// this is being added for shut off command on rigid 3.0 boards with bilateral xbees
+	#if(HW_VER == 30)
+		#include "bilateral.h"
+	#endif
+#endif //(defined BOARD_TYPE_FLEXSEA_MANAGE && defined BOARD_SUBTYPE_RIGID)
 
 #ifndef NULL
 #define NULL   ((void *) 0)
@@ -64,7 +71,7 @@ int8_t currOffs = 0;
 int8_t getCurrOffs(void){return currOffs;}
 #endif
 
-#if((defined BOARD_TYPE_FLEXSEA_MANAGE) || (defined BOARD_TYPE_FLEXSEA_PLAN))
+#if((defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID) || (defined BOARD_TYPE_FLEXSEA_PLAN))
 struct i2t_s i2tBattR;
 #endif
 
@@ -102,6 +109,7 @@ void tx_cmd_calibration_mode_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 						uint16_t *len, uint8_t calibrationMode)
 {
+	//printf("Calib command called");
 	//Variable(s) & command:
 	uint16_t index = 0;
 	(*cmd) = CMD_CALIBRATION_MODE;
@@ -111,14 +119,28 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 	shBuf[index++] = calibrationMode;
 	if(calibrationMode & CALIBRATION_UVLO)
 	{
-		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE)
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 		SPLIT_16(getUVLO(), shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_CURRENT_OFFSET)
 	{
-		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 		SPLIT_16((uint16_t)getCurrOffs(), shBuf, &index);
+		#endif
+	}
+	else if(calibrationMode & CALIBRATION_POWER_OFF)
+	{
+		//printf("Power off");
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		SPLIT_16((uint16_t)0, shBuf, &index);
+		#endif
+	}
+	else if(calibrationMode & CALIBRATION_POWER_ON)
+	{
+		//printf("Power on");
+		#if(defined BOARD_TYPE_FLEXSEA_PLAN || defined BOARD_TYPE_FLEXSEA_MANAGE && !defined BOARD_SUBTYPE_HABSOLUTE)
+		SPLIT_16((uint16_t)0, shBuf, &index);
 		#endif
 	}
 	else if(calibrationMode & CALIBRATION_I2T)
@@ -128,7 +150,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tBattW;
 		#endif
 
-		#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+		#if (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID)
 		struct i2t_s *i2tTmp = &i2tBatt;
 		#endif
 		
@@ -136,7 +158,7 @@ void tx_cmd_calibration_mode_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, 
 		struct i2t_s *i2tTmp = &i2tMotor;
 		#endif
 		
-		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || defined BOARD_TYPE_FLEXSEA_MANAGE || \
+		#if(defined BOARD_TYPE_FLEXSEA_EXECUTE || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID) || \
 			defined BOARD_TYPE_FLEXSEA_PLAN)
 
 		SPLIT_16((uint16_t)i2tTmp->leak, shBuf, &index);				//I2T_LEAK
@@ -266,7 +288,7 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 
 	if(write)
 	{
-		#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE))
+		#if((defined BOARD_TYPE_FLEXSEA_EXECUTE) || (defined BOARD_TYPE_FLEXSEA_MANAGE && BOARD_SUBTYPE_RIGID))
 
 			if(!isRunningCalibrationProcedure() && isLegalCalibrationProcedure(procedure))
 			{
@@ -297,12 +319,35 @@ uint8_t handleCalibrationMessage(uint8_t *buf, uint8_t write)
 					i2tBattR.config = buf[index++];
 					saveI2tRe(i2tBattR);
 				}
-				#endif
+				#ifdef INCLUDE_UPROJ_DPEB42
+				else if(isPoweringOn())
+				{
+					// TODO: request other to boot to turn on
+					utt.val[0][9] = 1;
+					calibrationFlags = 0;
+					#if(HW_VER == 30)
+						bilateral_send_command(BILATERAL_POWER_ON_COMMAND);
+					#endif
+				}
+				else if(isPoweringOff())
+				{
+					// TODO: request other boot to shut off
+					utt.val[0][9] = 0;
+					calibrationFlags = 0;
+					#if(HW_VER == 30)
+						bilateral_send_command(BILATERAL_POWER_OFF_COMMAND);
+					#endif
+				}
+				#endif	//INCLUDE_UPROJ_DPEB42
+				#endif	//(defined BOARD_TYPE_FLEXSEA_MANAGE)
 			}
 			calibrationFlagToRunOrIsRunning = calibrationFlags;
 
 		#else
-			(void)procedure;	//Unused
+			//Unused variables:
+			(void)procedure;
+			(void)v;
+			(void)co;
 		#endif
 	}
 
