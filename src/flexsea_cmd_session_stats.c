@@ -61,7 +61,7 @@ void initSessionStats(void)
     {
         sessionStats.duration[i] = 0;
         sessionStats.energy[i] = 0;
-        sessionStats.status[i] = 0;
+        sessionStats.status[i] = 2;
     }
 }
 
