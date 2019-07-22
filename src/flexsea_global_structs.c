@@ -105,7 +105,7 @@ void initializeGlobalStructs()
 		exec4.enc_ang_vel = &exec4AngVel;
 		#endif
 
-		for (i=0;i<10;i++)
+		for (int i=0;i<10;i++)
 		{
 			user_data_1.w[i] = 0;
 		}
